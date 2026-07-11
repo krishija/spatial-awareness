@@ -11,7 +11,6 @@
 In the tumour microenvironment (TME), the same broad immune cell type behaves very differently depending on *where* it sits and *what surrounds it*. A CD4 T cell touching tumour is not the CD4 T cell three cell-diameters away in a lymphoid aggregate:
 
 - **CD4 T cells** span helper and regulatory states — Th1 (pro-inflammatory, anti-tumour), Th17, Tfh, and **Tregs** (immunosuppressive, often enriched at the tumour edge).
-- **CD8 T cells** run an activation-to-exhaustion axis — effector, memory, progenitor-exhausted, terminally-exhausted (PD-1 / TIM-3 / LAG-3 / TOX).
 
 Single-cell-resolution spatial assays give us *where* every cell is, but their cell-type calls are **coarse** (just "CD4 T cell"). Single-cell reference **atlases** carry the *granular* phenotype but lose spatial context. The scientific move is to bring them together: **map coarse spatial cells onto the granular atlas, in their spatial context**, to recover fine-grained state *in situ* — and then read off phenotype-specific vulnerabilities.
 
