@@ -1,106 +1,79 @@
-"""Stub: search_literature — swap this file for real teammate logic."""
+"""search_literature — real implementation backed by the You.com Search API."""
 
 from __future__ import annotations
 
+import os
+from urllib.parse import urlparse
 from typing import Any
 
-# Curated corpus — fake but formatted like real citations, overlapping frontend suggestions
-CORPUS: list[dict[str, Any]] = [
-    {
-        "title": "PD-1 blockade restores effector function in exhausted CD4 T cells",
-        "source": "Nature Immunology (simulated)",
-        "url": "https://pubmed.ncbi.nlm.nih.gov/",
-        "keywords": ["PDCD1", "PD-1", "exhaustion", "CD4", "effector", "checkpoint"],
-    },
-    {
-        "title": "TOX reinforces the identity and suppresses reprogramming of exhausted T cells",
-        "source": "Nature (simulated)",
-        "url": "https://pubmed.ncbi.nlm.nih.gov/",
-        "keywords": ["TOX", "exhaustion", "epigenetic", "terminal", "Tex"],
-    },
-    {
-        "title": "LAG-3 regulates CD4 T cell exhaustion in the tumor microenvironment",
-        "source": "Cancer Cell (simulated)",
-        "url": "https://pubmed.ncbi.nlm.nih.gov/",
-        "keywords": ["LAG3", "LAG-3", "exhaustion", "tumor", "core", "checkpoint"],
-    },
-    {
-        "title": "CTLA-4 controls Treg-mediated restraint of CD4 antitumor responses",
-        "source": "Immunity (simulated)",
-        "url": "https://pubmed.ncbi.nlm.nih.gov/",
-        "keywords": ["CTLA4", "CTLA-4", "Treg", "margin", "suppression"],
-    },
-    {
-        "title": "TCF1+ progenitor exhausted T cells sustain responses to checkpoint blockade",
-        "source": "Nature Medicine (simulated)",
-        "url": "https://pubmed.ncbi.nlm.nih.gov/",
-        "keywords": ["TCF7", "TCF1", "progenitor", "stemness", "IL7R", "margin"],
-    },
-    {
-        "title": "Spatial niches of T cell exhaustion at the tumor invasive margin",
-        "source": "Cell (simulated)",
-        "url": "https://pubmed.ncbi.nlm.nih.gov/",
-        "keywords": ["spatial", "niche", "margin", "core", "lymphoid", "exhaustion"],
-    },
-    {
-        "title": "Granzyme B expression marks reactivatable CD4 effectors near tertiary lymphoid structures",
-        "source": "Science Immunology (simulated)",
-        "url": "https://pubmed.ncbi.nlm.nih.gov/",
-        "keywords": ["GZMB", "effector", "lymphoid", "TLS", "IL7R"],
-    },
+import requests
+
+YOU_API_KEY = os.environ.get("YOU_API_KEY", "")
+SEARCH_URL = "https://api.you.com/v1/search"
+
+BIOMED_DOMAINS = [
+    "pubmed.ncbi.nlm.nih.gov",
+    "ncbi.nlm.nih.gov",
+    "biorxiv.org",
+    "nature.com",
+    "cell.com",
+    "science.org",
 ]
+
+# Friendly display names for known domains -- falls back to the raw domain
+# if it's not one we recognize, so 'source' always reads sensibly.
+DOMAIN_TO_SOURCE = {
+    "pubmed.ncbi.nlm.nih.gov": "PubMed",
+    "ncbi.nlm.nih.gov": "NCBI",
+    "biorxiv.org": "bioRxiv",
+    "nature.com": "Nature",
+    "cell.com": "Cell",
+    "science.org": "Science",
+}
+
+MAX_CITATIONS = 5
+
+
+def _source_name(url: str) -> str:
+    domain = urlparse(url).netloc.replace("www.", "")
+    return DOMAIN_TO_SOURCE.get(domain, domain)
 
 
 def search_literature(args: dict[str, Any]) -> dict[str, Any]:
     query = args["query"]
     context = args.get("context") or ""
-    haystack = f"{query} {context}".lower()
+    search_text = f"{query} {context}".strip()
 
-    scored: list[tuple[float, dict[str, Any]]] = []
-    for paper in CORPUS:
-        score = 0.0
-        hits = []
-        for kw in paper["keywords"]:
-            if kw.lower() in haystack:
-                score += 1.0
-                hits.append(kw)
-        # Soft boost for exhaustion / CD4 always relevant in this domain
-        if "exhaust" in haystack and "exhaustion" in paper["keywords"]:
-            score += 0.3
-        if score > 0:
-            relevance = (
-                f"Matches query terms: {', '.join(hits)}."
-                if hits
-                else "Broadly relevant to CD4 exhaustion biology."
-            )
-            if context:
-                relevance += f" Context considered: {context[:80]}."
-            scored.append(
-                (
-                    score,
-                    {
-                        "title": paper["title"],
-                        "source": paper["source"],
-                        "url": paper["url"],
-                        "relevance": relevance,
-                        "score": round(score, 2),
-                    },
-                )
-            )
+    citations: list[dict[str, Any]] = []
+    try:
+        resp = requests.get(
+            SEARCH_URL,
+            headers={"X-API-Key": YOU_API_KEY},
+            params={
+                "query": search_text,
+                "count": MAX_CITATIONS,
+                "boost_domains": ",".join(BIOMED_DOMAINS),
+            },
+            timeout=15,
+        )
+        resp.raise_for_status()
+        web_results = resp.json().get("results", {}).get("web", [])
 
-    scored.sort(key=lambda x: x[0], reverse=True)
-    citations = [c for _, c in scored[:5]]
-
-    # Always return at least something useful for demo queries
-    if not citations:
-        citations = [
-            {
-                "title": CORPUS[5]["title"],
-                "source": CORPUS[5]["source"],
-                "url": CORPUS[5]["url"],
-                "relevance": "Default spatial-exhaustion background hit for unmatched query.",
-                "score": 0.1,
-            }
-        ]
+        for r in web_results[:MAX_CITATIONS]:
+            url = r.get("url", "")
+            snippet = (r.get("snippets") or [""])[0]
+            citations.append({
+                "title": r.get("title", "Untitled"),
+                "source": _source_name(url),
+                "url": url,
+                "relevance": snippet[:200] if snippet else "No snippet available.",
+            })
+    except requests.RequestException as e:
+        return {
+            "query": query,
+            "context": context or None,
+            "citations": [],
+            "warning": f"Literature search failed: {e}",
+        }
 
     return {"query": query, "context": context or None, "citations": citations}
