@@ -105,7 +105,7 @@ Discrete OT / assignment is a canonical **QUBO**, so the mapping can be solved o
 
 - **Synthesis (ours):** field-aware optimal transport as a spatial→atlas map with a coupling-entropy confidence readout; optional quantum solve.
 - **Established (cite):** OT for single-cell mapping (Waddington-OT, moscot, SCOT, Tangram); entropic OT / Sinkhorn (Cuturi; Peyré–Cuturi); screened-field Green's function; Ripley's g(r).
-- **Limits:** the map yields confidence-scored *phenotype* mappings, not proven causal targets — causal validation is the downstream in-silico + wet-lab work; coupling→specific target is many-to-one; the quantum path (if used) is formulation + patches with no advantage claim.
+- **Limits:** the map yields confidence-scored *phenotype* mappings, not proven causal targets — causal validation is the downstream in-silico + wet-lab work; coupling→specific target is many-to-one
 
 ---
 
