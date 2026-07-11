@@ -7,7 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node (frontend)
 node_modules
+frontend/node_modules
+frontend/dist
 dist
 dist-ssr
 *.local
@@ -16,7 +19,16 @@ dist-ssr
 .env
 .env.*
 
-# Editor directories and files
+# Python (mcp_server)
+mcp_server/.venv/
+**/__pycache__/
+**/*.egg-info/
+mcp_server/data/*.db
+mcp_server/data/*.db-*
+*.pyc
+.Python
+
+# Editor
 .vscode/*
 !.vscode/extensions.json
 .idea

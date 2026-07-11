@@ -110,15 +110,46 @@ Discrete OT / assignment is a canonical **QUBO**, so the mapping can be solved o
 
 ---
 
-## Stack & run
+## Repo layout
 
-Vite + React + TypeScript frontend.
+```
+spatial-awareness/
+├── frontend/      # Scientist-facing UI (Vite + React). Runs on fixture data.
+├── mcp_server/    # K Pro tool server (Python MCP). Stubs + real memory tools.
+└── README.md      # You are here
+```
+
+The frontend and MCP server do **not** call each other yet. They share the same biology vocabulary (samples, niches, markers) so demos tell one story.
+
+### Frontend — explore tissue & perturbations
 
 ```bash
+cd frontend
 npm install
-npm run dev      # local dev server
-npm run build    # production build
+npm run dev        # http://localhost:5173
+npm run build
 ```
+
+Details: [`frontend/README.md`](frontend/README.md)
+
+### MCP server — tools for K Pro
+
+```bash
+cd mcp_server
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .
+spatial-mcp            # http://0.0.0.0:8000/mcp
+```
+
+Details: [`mcp_server/README.md`](mcp_server/README.md)
+
+### Who edits what
+
+| Person | Edit here |
+|--------|-----------|
+| Frontend / demo UI | `frontend/` |
+| MCP scaffold / memory | `mcp_server/src/spatial_mcp/` (not `stubs/`) |
+| Teammate tool owner | **one file** in `mcp_server/src/spatial_mcp/stubs/` |
 
 ---
 
