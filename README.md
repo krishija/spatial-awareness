@@ -1,7 +1,7 @@
 # Spatial Awareness
 
 <p align="center">
-  <img src="media/spatial-awareness.png" alt="Spatial Awareness" width="100%">
+  <img src="media/spatial awareness.png" alt="Spatial Awareness" width="100%">
 </p>
 
 **Read a cell's microenvironment as a physical field, map its phenotype onto a single-cell atlas by optimal transport, and surface confidence-scored immune targets — from spatial tissue, in situ.**
