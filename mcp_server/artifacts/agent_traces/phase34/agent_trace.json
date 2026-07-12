@@ -1,0 +1,1891 @@
+{
+  "research_question": "Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Resolve candidate cells and check priors. Call suggest_perturbations for orientation, then COMMIT to PDCD1 (pre-locked). Gather grounded evidence (measured + literature with support AND contradiction). After grounded evidence is in, ALWAYS call simulate_perturbations on the committed gene and resolved cell \u2014 note the deltas or ok:false; do not rely on simulation for the conclusion. Then conclude REPORT/DISCARD when the gate allows. Do not invent evidence; keep honest ok:false results.",
+  "reports": [],
+  "discarded": [
+    {
+      "hypothesis": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay.",
+      "confidence": 0.795,
+      "gate": {
+        "decision": "DISCARD",
+        "reason": "Evidence exhausted after 12 iterations; posterior 0.795; not report-ready (unresolved contradiction between grounded sources).",
+        "next_tool": null,
+        "next_tool_reason": null
+      },
+      "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. cohort_prognostic from tcga:CRC:tcga_live_cbioportal: Contradicts \u2192 negative log-LR. Documented prior \u22481 bit: significant Cox HR (bulk association, not mechanism). \u2192 -0.324 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/: Documented prior \u22481 bit: one independent experimental claim with stance. \u2192 +0.700 bits. literature from https://www.nature.com/articles/s41586-024-08451-4: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.cell.com/immunity/fulltext/S1074-7613(19)30409-1: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.cell.com/cell-reports/fulltext/S2211-1247(24)00125-6: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.nature.com/articles/s41467-022-35238-w: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.nature.com/articles/s41423-025-01378-4: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. measured from training:state:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits. measured from training:scldm_cd4:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. simulation from sim:PDCD1:acfejbne-1: No usable calibration pairs (conditional=0, global min=5); using documented prior 0.16 bits (LR\u22481.115). \u2192 +0.152 bits. simulation from sim:PDCD1:lkcmlagn-1: redundant within independence cluster 'simulation:PDCD1' (evidence combines by independence, not by count). Raw would have been -0.112 bits. suggestion from suggest:HAVCR2: Gene mismatch: item gene \u2260 hypothesis gene PDCD1 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits. suggestion from suggest:PDCD1: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits. suggestion from suggest:TCF7: Gene mismatch: item gene \u2260 hypothesis gene PDCD1 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits. Posterior logit\u2082=1.957 bits \u2192 P(H|E)=0.795 (10 independent sources; grounded=True)."
+    }
+  ],
+  "gate_summary": [
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.200; not yet report-ready (posterior 0.200 < 0.7).",
+      "next_tool": "list_candidate_cells",
+      "next_tool_reason": "Need resolved cells/niche context."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.235; not yet report-ready (posterior 0.235 < 0.7).",
+      "next_tool": "suggest_perturbations",
+      "next_tool_reason": "Lock a candidate gene before gathering gene-bound evidence."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.247; not yet report-ready (posterior 0.247 < 0.7).",
+      "next_tool": "search_literature",
+      "next_tool_reason": "Need literature grounding for the locked gene (required for REPORT)."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.828; not yet report-ready (only 1 grounded modality(ies) ['measured'] (need \u22652 of ['literature', 'measured', 'cohort_prognostic']; two measured hits are still one modality \u2014 gather literature or cohort)).",
+      "next_tool": "search_literature",
+      "next_tool_reason": "Need literature grounding (symmetric search preferred)."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Evidence bar met, but canonical workflow still needs simulate_perturbations once (non-load-bearing calibration check) before REPORT.",
+      "next_tool": "simulate_perturbations",
+      "next_tool_reason": "Call scLDM on the committed gene + cell; note real deltas or ok:false. Do not treat simulation as grounded evidence."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.879; not yet report-ready (unresolved contradiction between grounded sources).",
+      "next_tool": "differential_survival_analysis",
+      "next_tool_reason": "Cohort association can add grounded prognostic evidence."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.897; not yet report-ready (unresolved contradiction between grounded sources).",
+      "next_tool": "differential_survival_analysis",
+      "next_tool_reason": "Cohort association can add grounded prognostic evidence."
+    },
+    {
+      "decision": "DISCARD",
+      "reason": "Tool options exhausted with posterior 0.874; not report-ready (unresolved contradiction between grounded sources).",
+      "next_tool": null,
+      "next_tool_reason": null
+    },
+    {
+      "decision": "DISCARD",
+      "reason": "Evidence exhausted after 12 iterations; posterior 0.795; not report-ready (unresolved contradiction between grounded sources).",
+      "next_tool": null,
+      "next_tool_reason": null
+    }
+  ],
+  "final_text": "Simulation ran. **ok:true** \u2014 using the scLDM surrogate (live weights unavailable: `FileNotFoundError: Config not found`). Deltas noted. **This is ~0.16 bits \u2014 non-load-bearing.** Now running the survival analysis and the cohort check.",
+  "trace": {
+    "research_question": "Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Resolve candidate cells and check priors. Call suggest_perturbations for orientation, then COMMIT to PDCD1 (pre-locked). Gather grounded evidence (measured + literature with support AND contradiction). After grounded evidence is in, ALWAYS call simulate_perturbations on the committed gene and resolved cell \u2014 note the deltas or ok:false; do not rely on simulation for the conclusion. Then conclude REPORT/DISCARD when the gate allows. Do not invent evidence; keep honest ok:false results.",
+    "n_events": 43,
+    "events": [
+      {
+        "step": 1,
+        "event": "commit_gene_prelocked",
+        "payload": {
+          "gene": "PDCD1"
+        },
+        "ts": "2026-07-12T22:16:18.315968+00:00"
+      },
+      {
+        "step": 2,
+        "event": "tools_fetched",
+        "payload": {
+          "n": 12,
+          "names": [
+            "list_candidate_cells",
+            "map_spatial_to_single",
+            "search_literature",
+            "suggest_perturbations",
+            "simulate_perturbations",
+            "differential_survival_analysis",
+            "find_measured_perturbation_evidence",
+            "recommend_next_experiment",
+            "record_finding",
+            "query_prior_findings",
+            "evaluate_evidence",
+            "decide_next_action"
+          ]
+        },
+        "ts": "2026-07-12T22:16:18.361565+00:00"
+      },
+      {
+        "step": 3,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 1
+        },
+        "ts": "2026-07-12T22:16:18.361674+00:00"
+      },
+      {
+        "step": 4,
+        "event": "llm_text",
+        "payload": {
+          "text": "I'll follow the canonical workflow strictly. Let me begin with Steps 1 and 2 in parallel \u2014 checking priors and resolving candidate cells simultaneously.\n\n## Step 1 & 2: ORIENT + RESOLVE (parallel)"
+        },
+        "ts": "2026-07-12T22:16:21.858878+00:00"
+      },
+      {
+        "step": 5,
+        "event": "tool_call",
+        "payload": {
+          "tool": "query_prior_findings",
+          "arguments": {
+            "sample_id": "atera-cervical-01"
+          },
+          "result_preview": {
+            "filters": {
+              "sample_id": "atera-cervical-01",
+              "niche": null,
+              "gene": null
+            },
+            "n": 0,
+            "findings": []
+          },
+          "is_error": false
+        },
+        "ts": "2026-07-12T22:16:21.942196+00:00"
+      },
+      {
+        "step": 6,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.2,
+          "posterior_log_odds_bits": -2.0,
+          "n_independent_sources": 0,
+          "has_grounded_source": false,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": false,
+            "prior_finding": true,
+            "cell_context": false,
+            "atlas_mapping": false,
+            "suggestion": false,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": false,
+            "external_grounded": false,
+            "independent_ge_2": false,
+            "hypothesis_gene": "PDCD1"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.200; not yet report-ready (posterior 0.200 < 0.7).",
+            "next_tool": "list_candidate_cells",
+            "next_tool_reason": "Need resolved cells/niche context."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. Posterior logit\u2082=-2.000 bits \u2192 P(H|E)=0.200 (0 independent sources; grounded=False).",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_T",
+            "niche": null,
+            "cell_id": null,
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_T produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T22:16:21.942465+00:00"
+      },
+      {
+        "step": 7,
+        "event": "tool_call",
+        "payload": {
+          "tool": "list_candidate_cells",
+          "arguments": {
+            "sample_id": "atera-cervical-01",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "min_exhaustion_score": 0.7
+          },
+          "result_preview": "{\"ok\": true, \"sample_id\": \"atera-cervical-01\", \"n\": 418, \"cells\": [{\"id\": \"lkcmlagn-1\", \"x\": 5397.7001953125, \"y\": 6030.39990234375, \"cell_type\": \"CD4_Tex_term\", \"niche\": \"tumor_core\", \"exhaustion_state\": \"terminally_exhausted\", \"exhaustion_score\": 1.0, \"expression\": {\"PDCD1\": 0.0, \"TCF7\": 0.0, \"TOX\": 0.0, \"LAG3\": 0.0, \"GZMB\": 0.0, \"IL7R\": 0.0, \"CTLA4\": 4.75, \"FOXP3\": 0.0}}, {\"id\": \"acfejbne-1\", \"x\": 979.5, \"y\": 4218.2998046875, \"cell_type\": \"CD4_Tex_term\", \"niche\": \"tumor_core\", \"exhaustion_state\": \"terminally_exhausted\", \"exhaustion_score\": 1.0, \"expression\": {\"PDCD1\": 2.3299999237060547, \"T\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T22:16:22.595497+00:00"
+      },
+      {
+        "step": 8,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.235,
+          "posterior_log_odds_bits": -1.7,
+          "n_independent_sources": 1,
+          "has_grounded_source": false,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": false,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": false,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": false,
+            "external_grounded": false,
+            "independent_ge_2": false,
+            "hypothesis_gene": "PDCD1"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.235; not yet report-ready (posterior 0.235 < 0.7).",
+            "next_tool": "suggest_perturbations",
+            "next_tool_reason": "Lock a candidate gene before gathering gene-bound evidence."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. Posterior logit\u2082=-1.700 bits \u2192 P(H|E)=0.235 (1 independent sources; grounded=False).",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "lkcmlagn-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T22:16:22.595818+00:00"
+      },
+      {
+        "step": 9,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 2
+        },
+        "ts": "2026-07-12T22:16:22.596053+00:00"
+      },
+      {
+        "step": 10,
+        "event": "llm_text",
+        "payload": {
+          "text": "Excellent. Prior findings: **zero prior investigations** for this sample \u2014 clean slate. Cell resolution: **200 CD4_Tex_term cells in tumor_core**, all with exhaustion_score \u2265 0.90. I'll select **`acfejbne-1`** as my target cell \u2014 it has exhaustion_score = 1.0, expresses PDCD1 = 2.33 (directly relevant to the committed gene), and co-expresses CTLA4 = 2.98, making it a biologically rich target for PDCD1 perturbation. It sits deep in the tumor_core.\n\n---\n\n## Step 3: PROPOSE \u2014 suggest_perturbations "
+        },
+        "ts": "2026-07-12T22:16:28.820448+00:00"
+      },
+      {
+        "step": 11,
+        "event": "tool_call",
+        "payload": {
+          "tool": "suggest_perturbations",
+          "arguments": {
+            "cell_id": "acfejbne-1",
+            "phenotype": "CD4_Tex_term",
+            "niche": "tumor_core"
+          },
+          "result_preview": "{\"ok\": true, \"cell_id\": \"acfejbne-1\", \"phenotype\": \"CD4_Tex_term\", \"niche\": \"tumor_core\", \"source\": \"you.com\", \"suggestions\": [{\"rank\": 1, \"gene\": \"PDCD1\", \"rationale\": \"Mentioned in 2 retrieved sources for CD4_Tex_term in the tumor core, e.g. \\\"Exhausted T cells hijacking the cancer-immunity cycle: Assets and ...\\\": TPEX CD8+ TILs are able to control tumor growth and can respond to anti-PD-1 therapy, while terminally exhausted TILs cannot (9). As pre-existing TILs characterized as terminally exhausted have been c\", \"citations\": [{\"title\": \"Exhausted T cells hijacking the cancer-immunity cycle\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T22:16:32.304221+00:00"
+      },
+      {
+        "step": 12,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.247,
+          "posterior_log_odds_bits": -1.61,
+          "n_independent_sources": 2,
+          "has_grounded_source": false,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": false,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": true,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": false,
+            "external_grounded": false,
+            "independent_ge_2": true,
+            "hypothesis_gene": "PDCD1"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.247; not yet report-ready (posterior 0.247 < 0.7).",
+            "next_tool": "search_literature",
+            "next_tool_reason": "Need literature grounding for the locked gene (required for REPORT)."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:HAVCR2",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "gene_binding",
+              "note": "suggestion from suggest:HAVCR2: Gene mismatch: item gene \u2260 hypothesis gene PDCD1 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+              "summary": "Suggested KO HAVCR2: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Deciphering T-cell exhaustion in the tumor microenvironment: paving ...\": In metastatic melanoma, CXCR6 and TIM-3 co-expression on CD4+ T-cells may indicate pembrolizumab treatment failure (190). Additionally, findings from a pan-cancer study revealed predominant expression",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "suggestion:HAVCR2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:PDCD1",
+              "bits": 0.09,
+              "signed_bits": 0.09,
+              "raw_bits": 0.09,
+              "lr_tier": "documented_prior",
+              "note": "suggestion from suggest:PDCD1: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits.",
+              "summary": "Suggested KO PDCD1: Mentioned in 2 retrieved sources for CD4_Tex_term in the tumor core, e.g. \"Exhausted T cells hijacking the cancer-immunity cycle: Assets and ...\": TPEX CD8+ TILs are able to control tumor growth and can respond to anti-PD-1 therapy, while terminally exhausted TILs cannot (9). As pre-existing TILs characterized as terminally exhausted have been c",
+              "polarity": "supports",
+              "strength": 0.9,
+              "independence_key": "suggestion:PDCD1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:TCF7",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "gene_binding",
+              "note": "suggestion from suggest:TCF7: Gene mismatch: item gene \u2260 hypothesis gene PDCD1 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+              "summary": "Suggested KO TCF7: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Targeting tumor-draining lymph node to overcome resistance to cancer ...\": The process of T cell exhaustion ranges from Tpex cells (PD-1+, TCF1+, CXCR5+), which possess stem-like self-renewal capacity and multilineage differentiation potential, to terminally exhausted T cell",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "suggestion:TCF7",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. suggestion from suggest:HAVCR2: Gene mismatch: item gene \u2260 hypothesis gene PDCD1 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "lkcmlagn-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T22:16:32.304565+00:00"
+      },
+      {
+        "step": 13,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 3
+        },
+        "ts": "2026-07-12T22:16:32.304939+00:00"
+      },
+      {
+        "step": 14,
+        "event": "llm_text",
+        "payload": {
+          "text": "**PDCD1 is Rank 1** in the suggest_perturbations output. This aligns perfectly with the pre-locked commitment. I take Rank 1.\n\n---\n\n## Step 4: COMMIT\n\n> **Hypothesis (fixed):** Knockout of **PDCD1** in **`acfejbne-1`** (CD4_Tex_term, tumor_core) increases effector function, specifically upregulating TCF7, IL7R, and/or GZMB.\n\nAll subsequent tool calls will pass `gene = PDCD1` exclusively.\n\n---\n\n## Step 5a & 5b: GATHER GROUNDED EVIDENCE \u2014 Measured + Literature (parallel, both bound to PDCD1)"
+        },
+        "ts": "2026-07-12T22:16:39.680755+00:00"
+      },
+      {
+        "step": 15,
+        "event": "preregistration",
+        "payload": {
+          "id": "prereg-6d3f0ae335",
+          "tool": "find_measured_perturbation_evidence",
+          "predicted_direction": "up",
+          "gene": "PDCD1"
+        },
+        "ts": "2026-07-12T22:16:39.681123+00:00"
+      },
+      {
+        "step": 16,
+        "event": "preregistration_resolved",
+        "payload": {
+          "id": "prereg-6d3f0ae335",
+          "confirmed": true,
+          "observed": "up"
+        },
+        "ts": "2026-07-12T22:16:39.715146+00:00"
+      },
+      {
+        "step": 17,
+        "event": "tool_call",
+        "payload": {
+          "tool": "find_measured_perturbation_evidence",
+          "arguments": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_T",
+            "perturbation_type": "knockout"
+          },
+          "result_preview": "{\"ok\": true, \"gene\": \"PDCD1\", \"cell_type\": \"CD4_T\", \"perturbation_type\": \"knockout\", \"n_hits\": 2, \"hits\": [{\"source_type\": \"training_corpus\", \"dataset\": \"scLDM-CD4\", \"accession\": \"https://virtualcellmodels.cziscience.com/model/scldm-cd4\", \"source_id\": \"training:scldm_cd4:PDCD1\", \"effect\": {\"kind\": \"training_membership\", \"note\": \"Gene is an actual perturbation target in scLDM-CD4's published guide/vocabulary set \\u2014 closer to ground truth the model saw than a de-novo out-of-distribution inference.\", \"markers_of_interest\": [\"PDCD1\", \"TCF7\", \"TOX\", \"LAG3\", \"GZMB\", \"IL7R\", \"CTLA4\", \"FOXP3\"]}, \"\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T22:16:39.715249+00:00"
+      },
+      {
+        "step": 18,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.828,
+          "posterior_log_odds_bits": 2.2688,
+          "n_independent_sources": 4,
+          "has_grounded_source": true,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": true,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": true,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": true,
+            "external_grounded": true,
+            "independent_ge_2": true,
+            "hypothesis_gene": "PDCD1"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.828; not yet report-ready (only 1 grounded modality(ies) ['measured'] (need \u22652 of ['literature', 'measured', 'cohort_prognostic']; two measured hits are still one modality \u2014 gather literature or cohort)).",
+            "next_tool": "search_literature",
+            "next_tool_reason": "Need literature grounding (symmetric search preferred)."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:state:PDCD1",
+              "bits": 1.8788,
+              "signed_bits": 1.8788,
+              "raw_bits": 1.8788,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:state:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+              "summary": "Measured hit for PDCD1 via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 0.9394,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:scldm_cd4:PDCD1",
+              "bits": 2.0,
+              "signed_bits": 2.0,
+              "raw_bits": 2.0,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:scldm_cd4:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+              "summary": "Measured hit for PDCD1 via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/model/scldm-cd4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:HAVCR2",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "gene_binding",
+              "note": "suggestion from suggest:HAVCR2: Gene mismatch: item gene \u2260 hypothesis gene PDCD1 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+              "summary": "Suggested KO HAVCR2: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Deciphering T-cell exhaustion in the tumor microenvironment: paving ...\": In metastatic melanoma, CXCR6 and TIM-3 co-expression on CD4+ T-cells may indicate pembrolizumab treatment failure (190). Additionally, findings from a pan-cancer study revealed predominant expression",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "suggestion:HAVCR2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:PDCD1",
+              "bits": 0.09,
+              "signed_bits": 0.09,
+              "raw_bits": 0.09,
+              "lr_tier": "documented_prior",
+              "note": "suggestion from suggest:PDCD1: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits.",
+              "summary": "Suggested KO PDCD1: Mentioned in 2 retrieved sources for CD4_Tex_term in the tumor core, e.g. \"Exhausted T cells hijacking the cancer-immunity cycle: Assets and ...\": TPEX CD8+ TILs are able to control tumor growth and can respond to anti-PD-1 therapy, while terminally exhausted TILs cannot (9). As pre-existing TILs characterized as terminally exhausted have been c",
+              "polarity": "supports",
+              "strength": 0.9,
+              "independence_key": "suggestion:PDCD1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:TCF7",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "gene_binding",
+              "note": "suggestion from suggest:TCF7: Gene mismatch: item gene \u2260 hypothesis gene PDCD1 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+              "summary": "Suggested KO TCF7: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Targeting tumor-draining lymph node to overcome resistance to cancer ...\": The process of T cell exhaustion ranges from Tpex cells (PD-1+, TCF1+, CXCR5+), which possess stem-like self-renewal capacity and multilineage differentiation potential, to terminally exhausted T cell",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "suggestion:TCF7",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. measured from training:state:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits. measured from training:scldm_cd4:PDCD1: Documented prior \u22482 bits: well context-matched measured pertu",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "lkcmlagn-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T22:16:39.715576+00:00"
+      },
+      {
+        "step": 19,
+        "event": "gene_arg_corrected",
+        "payload": {
+          "tool": "search_literature",
+          "action": "rewrite",
+          "passed": "PDCD1",
+          "forced": "PDCD1",
+          "message": "Post-COMMIT gene binding: rewrote search_literature gene args from 'PDCD1' \u2192 'PDCD1'."
+        },
+        "ts": "2026-07-12T22:16:39.715967+00:00"
+      },
+      {
+        "step": 20,
+        "event": "tool_call",
+        "payload": {
+          "tool": "search_literature",
+          "arguments": {
+            "query": "PDCD1 PD-1 knockout CD4 T cell exhaustion effector function tumor",
+            "gene": "PDCD1",
+            "phenotype": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "hypothesis": "PDCD1 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7, IL7R, GZMB",
+            "genes": [
+              "PDCD1"
+            ]
+          },
+          "result_preview": "{\"ok\": true, \"backend\": \"you_com+pubmed+bedrock\", \"query\": \"PDCD1 PD-1 knockout CD4 T cell exhaustion effector function tumor\", \"context\": null, \"hypothesis\": \"PDCD1 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7, IL7R, GZMB\", \"genes\": [\"PDCD1\"], \"aliases\": {\"by_symbol\": {\"PDCD1\": [\"ADMIO4\", \"AIMTBS\", \"CD279\", \"PD-1\", \"PD1\", \"PDCD1\", \"SLEB2\", \"hPD-1\", \"hPD-l\", \"hSLE1\", \"programmed cell death 1\"]}, \"all_aliases\": [\"ADMIO4\", \"AIMTBS\", \"CD279\", \"PD-1\", \"PD1\", \"PDCD1\", \"SLEB2\", \"hPD-1\", \"hPD-l\", \"hSLE1\", \"programmed cell death 1\"], \"incomplete\": false, \"notes\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T22:16:48.678853+00:00"
+      },
+      {
+        "step": 21,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.887,
+          "posterior_log_odds_bits": 2.9688,
+          "n_independent_sources": 5,
+          "has_grounded_source": true,
+          "has_conflict": false,
+          "coverage": {
+            "literature": true,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": true,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": true,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": true,
+            "external_grounded": true,
+            "independent_ge_2": true,
+            "hypothesis_gene": "PDCD1"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Evidence bar met, but canonical workflow still needs simulate_perturbations once (non-load-bearing calibration check) before REPORT.",
+            "next_tool": "simulate_perturbations",
+            "next_tool_reason": "Call scLDM on the committed gene + cell; note real deltas or ok:false. Do not treat simulation as grounded evidence."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/",
+              "bits": 0.7,
+              "signed_bits": 0.7,
+              "raw_bits": 0.7,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/: Documented prior \u22481 bit: one independent experimental claim with stance. \u2192 +0.700 bits.",
+              "summary": "PD-1 blockade restores helper activity of tumor-infiltrating, ... \u2014 NCBI: CD4 T cell exhaustion was characterized phenotypically, transcriptomically, and functionally in patients with head and neck, cervical, and ovarian cancer, with PD-1 blockade noted to restore helper activity of tumor-infiltrating CD4 T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-1, n=1]",
+              "polarity": "supports",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41586-024-08451-4",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41586-024-08451-4: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Precursors of exhausted T cells are pre-emptively formed in acute ... \u2014 Nature: Acute infections generate a subset of precursor T cells with exhaustion-associated characteristics, indicating exhaustion precursors are formed pre-emptively even outside chronic infection or tumor contexts. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-2, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Deciphering T-cell exhaustion in the tumor microenvironment: paving ... \u2014 NCBI: In human cancers, PDCD1 is among the most prominently expressed genes in exhausted T cells (Tex), alongside other known exhaustion markers such as CTLA4, LAG3, HAVCR2, TIGIT, and TOX. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-3, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-3",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/immunity/fulltext/S1074-7613(19)30409-1",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/immunity/fulltext/S1074-7613(19)30409-1: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "TCF-1-Centered Transcriptional Network Drives an Effector versus ... \u2014 Cell: TCF-1 supports exhausted T cell precursor development by antagonizing effector-like cell differentiation through multiple transcription factors, representing a binary fate decision between effector and exhausted CD8 T cells during chronic infection. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-4, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/cell-reports/fulltext/S2211-1247(24)00125-6",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/cell-reports/fulltext/S2211-1247(24)00125-6: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Stem-like progenitor and terminally differentiated TFH-like CD4+ ... \u2014 Cell: In the tumor microenvironment, the BLIMP1/TCF1 axis determines the nature of TFH-like CD4+ T cells, paralleling the stem-like progenitor/terminally differentiated exhaustion axis described in CD8+ T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-5, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-5",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "A Multi-Omics Analysis of an Exhausted T Cells\u2019 Molecular Signature ... \u2014 NCBI: PDCD1 mRNA expression levels in bladder cancer (BLCA) correlate with immune cell infiltration patterns, including positive correlations with exhausted macrophages, NK, NKT, Tfh, and Th1/2 cells, and negative correlations with CD4/8 na\u00efve T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-6, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-6",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41467-022-35238-w",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41467-022-35238-w: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "A comprehensive single-cell map of T cell exhaustion-associated ... \u2014 Nature: In breast tumours, single-cell transcriptomics and imaging mass cytometry reveal distinct patterns of PD-1 and CXCL13 expression in T cells, and of MHC-I (but not PD-L1) expression in tumour cells, characterising T cell exhaustion. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-7, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-7",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41423-025-01378-4",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41423-025-01378-4: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Regulation of T cell exhaustion and stemness: molecular mechanisms ... \u2014 Nature: Molecular mechanisms regulate T cell exhaustion and stemness, with implications for cancer immunotherapy. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-8, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-8",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:state:PDCD1",
+              "bits": 1.8788,
+              "signed_bits": 1.8788,
+              "raw_bits": 1.8788,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:state:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+              "summary": "Measured hit for PDCD1 via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 0.9394,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:scldm_cd4:PDCD1",
+              "bits": 2.0,
+              "signed_bits": 2.0,
+              "raw_bits": 2.0,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:scldm_cd4:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+              "summary": "Measured hit for PDCD1 via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/model/scldm-cd4",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/: Documented prior \u22481 bit: one independent experimental claim with stance. \u2192 +0.700 bits. literature from https://www.nature.com/articles/s41586-024-08451-4:",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "lkcmlagn-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T22:16:48.679482+00:00"
+      },
+      {
+        "step": 22,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 4
+        },
+        "ts": "2026-07-12T22:16:48.680020+00:00"
+      },
+      {
+        "step": 23,
+        "event": "llm_text",
+        "payload": {
+          "text": "Good. Now I must actively search for **contradictions** \u2014 the confirmation bias warning is explicit. I'll also run the cohort survival analysis in parallel."
+        },
+        "ts": "2026-07-12T22:16:54.300136+00:00"
+      },
+      {
+        "step": 24,
+        "event": "workflow_forced_simulate",
+        "payload": {
+          "replaced_tool": "search_literature",
+          "deferred_tools": [
+            "differential_survival_analysis"
+          ],
+          "gene": "PDCD1",
+          "cell_id": "lkcmlagn-1",
+          "message": "Canonical workflow: rewrote first tool use to simulate_perturbations; deferred siblings keep toolUseIds for Bedrock."
+        },
+        "ts": "2026-07-12T22:16:54.300244+00:00"
+      },
+      {
+        "step": 25,
+        "event": "preregistration",
+        "payload": {
+          "id": "prereg-04289a5311",
+          "tool": "simulate_perturbations",
+          "predicted_direction": "up",
+          "gene": "PDCD1"
+        },
+        "ts": "2026-07-12T22:16:54.301455+00:00"
+      },
+      {
+        "step": 26,
+        "event": "preregistration_resolved",
+        "payload": {
+          "id": "prereg-04289a5311",
+          "confirmed": false,
+          "observed": "down"
+        },
+        "ts": "2026-07-12T22:17:01.159368+00:00"
+      },
+      {
+        "step": 27,
+        "event": "tool_call",
+        "payload": {
+          "tool": "simulate_perturbations",
+          "arguments": {
+            "gene": "PDCD1",
+            "cell_id": "lkcmlagn-1"
+          },
+          "result_preview": "{\"ok\": true, \"cell_id\": \"lkcmlagn-1\", \"gene\": \"PDCD1\", \"ensembl_id\": \"ENSG00000188389\", \"backend\": \"scldm_surrogate\", \"before\": {\"PDCD1\": 0.0, \"TCF7\": 0.0, \"TOX\": 0.0, \"LAG3\": 0.0, \"GZMB\": 0.0, \"IL7R\": 0.0, \"CTLA4\": 4.75, \"FOXP3\": 0.0}, \"after\": {\"PDCD1\": 0.05, \"TCF7\": 1.1, \"TOX\": 0.05, \"LAG3\": 0.05, \"GZMB\": 0.9, \"IL7R\": 1.0, \"CTLA4\": 4.55, \"FOXP3\": 0.05}, \"deltas\": {\"PDCD1\": 0.05, \"TCF7\": 1.1, \"TOX\": 0.05, \"LAG3\": 0.05, \"GZMB\": 0.9, \"IL7R\": 1.0, \"CTLA4\": -0.2, \"FOXP3\": 0.05}, \"top_effects\": [{\"gene\": \"PDCD1\", \"delta\": -1.8, \"direction\": \"down\"}, {\"gene\": \"TCF7\", \"delta\": 1.1, \"direction\": \"up\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T22:17:01.159475+00:00"
+      },
+      {
+        "step": 28,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.879,
+          "posterior_log_odds_bits": 2.8568,
+          "n_independent_sources": 6,
+          "has_grounded_source": true,
+          "has_conflict": true,
+          "coverage": {
+            "literature": true,
+            "simulation": true,
+            "cohort_prognostic": false,
+            "measured": true,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": true,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": true,
+            "external_grounded": true,
+            "independent_ge_2": true,
+            "hypothesis_gene": "PDCD1"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.879; not yet report-ready (unresolved contradiction between grounded sources).",
+            "next_tool": "differential_survival_analysis",
+            "next_tool_reason": "Cohort association can add grounded prognostic evidence."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/",
+              "bits": 0.7,
+              "signed_bits": 0.7,
+              "raw_bits": 0.7,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/: Documented prior \u22481 bit: one independent experimental claim with stance. \u2192 +0.700 bits.",
+              "summary": "PD-1 blockade restores helper activity of tumor-infiltrating, ... \u2014 NCBI: CD4 T cell exhaustion was characterized phenotypically, transcriptomically, and functionally in patients with head and neck, cervical, and ovarian cancer, with PD-1 blockade noted to restore helper activity of tumor-infiltrating CD4 T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-1, n=1]",
+              "polarity": "supports",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41586-024-08451-4",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41586-024-08451-4: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Precursors of exhausted T cells are pre-emptively formed in acute ... \u2014 Nature: Acute infections generate a subset of precursor T cells with exhaustion-associated characteristics, indicating exhaustion precursors are formed pre-emptively even outside chronic infection or tumor contexts. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-2, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Deciphering T-cell exhaustion in the tumor microenvironment: paving ... \u2014 NCBI: In human cancers, PDCD1 is among the most prominently expressed genes in exhausted T cells (Tex), alongside other known exhaustion markers such as CTLA4, LAG3, HAVCR2, TIGIT, and TOX. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-3, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-3",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/immunity/fulltext/S1074-7613(19)30409-1",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/immunity/fulltext/S1074-7613(19)30409-1: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "TCF-1-Centered Transcriptional Network Drives an Effector versus ... \u2014 Cell: TCF-1 supports exhausted T cell precursor development by antagonizing effector-like cell differentiation through multiple transcription factors, representing a binary fate decision between effector and exhausted CD8 T cells during chronic infection. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-4, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/cell-reports/fulltext/S2211-1247(24)00125-6",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/cell-reports/fulltext/S2211-1247(24)00125-6: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Stem-like progenitor and terminally differentiated TFH-like CD4+ ... \u2014 Cell: In the tumor microenvironment, the BLIMP1/TCF1 axis determines the nature of TFH-like CD4+ T cells, paralleling the stem-like progenitor/terminally differentiated exhaustion axis described in CD8+ T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-5, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-5",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "A Multi-Omics Analysis of an Exhausted T Cells\u2019 Molecular Signature ... \u2014 NCBI: PDCD1 mRNA expression levels in bladder cancer (BLCA) correlate with immune cell infiltration patterns, including positive correlations with exhausted macrophages, NK, NKT, Tfh, and Th1/2 cells, and negative correlations with CD4/8 na\u00efve T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-6, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-6",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41467-022-35238-w",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41467-022-35238-w: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "A comprehensive single-cell map of T cell exhaustion-associated ... \u2014 Nature: In breast tumours, single-cell transcriptomics and imaging mass cytometry reveal distinct patterns of PD-1 and CXCL13 expression in T cells, and of MHC-I (but not PD-L1) expression in tumour cells, characterising T cell exhaustion. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-7, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-7",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41423-025-01378-4",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41423-025-01378-4: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Regulation of T cell exhaustion and stemness: molecular mechanisms ... \u2014 Nature: Molecular mechanisms regulate T cell exhaustion and stemness, with implications for cancer immunotherapy. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-8, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-8",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:state:PDCD1",
+              "bits": 1.8788,
+              "signed_bits": 1.8788,
+              "raw_bits": 1.8788,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:state:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+              "summary": "Measured hit for PDCD1 via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 0.9394,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:scldm_cd4:PDCD1",
+              "bits": 2.0,
+              "signed_bits": 2.0,
+              "raw_bits": 2.0,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:scldm_cd4:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+              "summary": "Measured hit for PDCD1 via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/model/scldm-cd4",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/: Documented prior \u22481 bit: one independent experimental claim with stance. \u2192 +0.700 bits. literature from https://www.nature.com/articles/s41586-024-08451-4:",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "lkcmlagn-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T22:17:01.163546+00:00"
+      },
+      {
+        "step": 29,
+        "event": "tool_deferred_for_simulate",
+        "payload": {
+          "tool": "differential_survival_analysis",
+          "arguments": {
+            "genes": [
+              "PDCD1"
+            ],
+            "cancer_type": "COADREAD",
+            "expected_direction": "protective",
+            "prefer_ssgsea": true
+          }
+        },
+        "ts": "2026-07-12T22:17:01.164073+00:00"
+      },
+      {
+        "step": 30,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 5
+        },
+        "ts": "2026-07-12T22:17:01.164122+00:00"
+      },
+      {
+        "step": 31,
+        "event": "llm_text",
+        "payload": {
+          "text": "The contradiction search returned important nuance \u2014 and the system deferred the survival analysis pending simulation. I note the simulation ran as a side-effect of the contradiction search. Let me now run `simulate_perturbations` explicitly as required by the canonical workflow, then run the survival analysis.\n\n## Step 6: VIRTUAL-CELL CHECK \u2014 simulate_perturbations (MANDATORY, non-load-bearing)"
+        },
+        "ts": "2026-07-12T22:17:06.045718+00:00"
+      },
+      {
+        "step": 32,
+        "event": "preregistration",
+        "payload": {
+          "id": "prereg-1cb9c5f6e1",
+          "tool": "simulate_perturbations",
+          "predicted_direction": "up",
+          "gene": "PDCD1"
+        },
+        "ts": "2026-07-12T22:17:06.046082+00:00"
+      },
+      {
+        "step": 33,
+        "event": "preregistration_resolved",
+        "payload": {
+          "id": "prereg-1cb9c5f6e1",
+          "confirmed": true,
+          "observed": "up"
+        },
+        "ts": "2026-07-12T22:17:06.965088+00:00"
+      },
+      {
+        "step": 34,
+        "event": "tool_call",
+        "payload": {
+          "tool": "simulate_perturbations",
+          "arguments": {
+            "cell_id": "acfejbne-1",
+            "gene": "PDCD1"
+          },
+          "result_preview": "{\"ok\": true, \"cell_id\": \"acfejbne-1\", \"gene\": \"PDCD1\", \"ensembl_id\": \"ENSG00000188389\", \"backend\": \"scldm_surrogate\", \"before\": {\"PDCD1\": 2.3299999237060547, \"TCF7\": 0.0, \"TOX\": 0.0, \"LAG3\": 0.0, \"GZMB\": 0.0, \"IL7R\": 0.0, \"CTLA4\": 2.9800000190734863, \"FOXP3\": 0.0}, \"after\": {\"PDCD1\": 0.53, \"TCF7\": 1.1, \"TOX\": 0.05, \"LAG3\": 0.05, \"GZMB\": 0.9, \"IL7R\": 1.0, \"CTLA4\": 2.78, \"FOXP3\": 0.05}, \"deltas\": {\"PDCD1\": -1.8, \"TCF7\": 1.1, \"TOX\": 0.05, \"LAG3\": 0.05, \"GZMB\": 0.9, \"IL7R\": 1.0, \"CTLA4\": -0.2, \"FOXP3\": 0.05}, \"top_effects\": [{\"gene\": \"PDCD1\", \"delta\": -1.8, \"direction\": \"down\"}, {\"gene\": \"TCF7\", \"\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T22:17:06.965192+00:00"
+      },
+      {
+        "step": 35,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.897,
+          "posterior_log_odds_bits": 3.1208,
+          "n_independent_sources": 6,
+          "has_grounded_source": true,
+          "has_conflict": true,
+          "coverage": {
+            "literature": true,
+            "simulation": true,
+            "cohort_prognostic": false,
+            "measured": true,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": true,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": true,
+            "external_grounded": true,
+            "independent_ge_2": true,
+            "hypothesis_gene": "PDCD1"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.897; not yet report-ready (unresolved contradiction between grounded sources).",
+            "next_tool": "differential_survival_analysis",
+            "next_tool_reason": "Cohort association can add grounded prognostic evidence."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/",
+              "bits": 0.7,
+              "signed_bits": 0.7,
+              "raw_bits": 0.7,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/: Documented prior \u22481 bit: one independent experimental claim with stance. \u2192 +0.700 bits.",
+              "summary": "PD-1 blockade restores helper activity of tumor-infiltrating, ... \u2014 NCBI: CD4 T cell exhaustion was characterized phenotypically, transcriptomically, and functionally in patients with head and neck, cervical, and ovarian cancer, with PD-1 blockade noted to restore helper activity of tumor-infiltrating CD4 T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-1, n=1]",
+              "polarity": "supports",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41586-024-08451-4",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41586-024-08451-4: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Precursors of exhausted T cells are pre-emptively formed in acute ... \u2014 Nature: Acute infections generate a subset of precursor T cells with exhaustion-associated characteristics, indicating exhaustion precursors are formed pre-emptively even outside chronic infection or tumor contexts. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-2, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Deciphering T-cell exhaustion in the tumor microenvironment: paving ... \u2014 NCBI: In human cancers, PDCD1 is among the most prominently expressed genes in exhausted T cells (Tex), alongside other known exhaustion markers such as CTLA4, LAG3, HAVCR2, TIGIT, and TOX. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-3, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-3",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/immunity/fulltext/S1074-7613(19)30409-1",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/immunity/fulltext/S1074-7613(19)30409-1: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "TCF-1-Centered Transcriptional Network Drives an Effector versus ... \u2014 Cell: TCF-1 supports exhausted T cell precursor development by antagonizing effector-like cell differentiation through multiple transcription factors, representing a binary fate decision between effector and exhausted CD8 T cells during chronic infection. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-4, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/cell-reports/fulltext/S2211-1247(24)00125-6",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/cell-reports/fulltext/S2211-1247(24)00125-6: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Stem-like progenitor and terminally differentiated TFH-like CD4+ ... \u2014 Cell: In the tumor microenvironment, the BLIMP1/TCF1 axis determines the nature of TFH-like CD4+ T cells, paralleling the stem-like progenitor/terminally differentiated exhaustion axis described in CD8+ T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-5, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-5",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "A Multi-Omics Analysis of an Exhausted T Cells\u2019 Molecular Signature ... \u2014 NCBI: PDCD1 mRNA expression levels in bladder cancer (BLCA) correlate with immune cell infiltration patterns, including positive correlations with exhausted macrophages, NK, NKT, Tfh, and Th1/2 cells, and negative correlations with CD4/8 na\u00efve T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-6, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-6",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41467-022-35238-w",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41467-022-35238-w: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "A comprehensive single-cell map of T cell exhaustion-associated ... \u2014 Nature: In breast tumours, single-cell transcriptomics and imaging mass cytometry reveal distinct patterns of PD-1 and CXCL13 expression in T cells, and of MHC-I (but not PD-L1) expression in tumour cells, characterising T cell exhaustion. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-7, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-7",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41423-025-01378-4",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41423-025-01378-4: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Regulation of T cell exhaustion and stemness: molecular mechanisms ... \u2014 Nature: Molecular mechanisms regulate T cell exhaustion and stemness, with implications for cancer immunotherapy. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-8, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-8",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:state:PDCD1",
+              "bits": 1.8788,
+              "signed_bits": 1.8788,
+              "raw_bits": 1.8788,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:state:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+              "summary": "Measured hit for PDCD1 via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 0.9394,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:scldm_cd4:PDCD1",
+              "bits": 2.0,
+              "signed_bits": 2.0,
+              "raw_bits": 2.0,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:scldm_cd4:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+              "summary": "Measured hit for PDCD1 via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/model/scldm-cd4",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/: Documented prior \u22481 bit: one independent experimental claim with stance. \u2192 +0.700 bits. literature from https://www.nature.com/articles/s41586-024-08451-4:",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "acfejbne-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T22:17:06.966771+00:00"
+      },
+      {
+        "step": 36,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 6
+        },
+        "ts": "2026-07-12T22:17:06.967289+00:00"
+      },
+      {
+        "step": 37,
+        "event": "llm_text",
+        "payload": {
+          "text": "Simulation ran. **ok:true** \u2014 using the scLDM surrogate (live weights unavailable: `FileNotFoundError: Config not found`). Deltas noted. **This is ~0.16 bits \u2014 non-load-bearing.** Now running the survival analysis and the cohort check."
+        },
+        "ts": "2026-07-12T22:17:11.528664+00:00"
+      },
+      {
+        "step": 38,
+        "event": "preregistration",
+        "payload": {
+          "id": "prereg-564761d771",
+          "tool": "differential_survival_analysis",
+          "predicted_direction": "protective",
+          "gene": "PDCD1"
+        },
+        "ts": "2026-07-12T22:17:11.530126+00:00"
+      },
+      {
+        "step": 39,
+        "event": "preregistration_resolved",
+        "payload": {
+          "id": "prereg-564761d771",
+          "confirmed": false,
+          "observed": "risk_associated"
+        },
+        "ts": "2026-07-12T22:17:13.516191+00:00"
+      },
+      {
+        "step": 40,
+        "event": "tool_call",
+        "payload": {
+          "tool": "differential_survival_analysis",
+          "arguments": {
+            "cancer_type": "COADREAD",
+            "expected_direction": "protective",
+            "genes": [
+              "PDCD1"
+            ],
+            "prefer_ssgsea": true
+          },
+          "result_preview": "{\"ok\": true, \"tool\": \"differential_survival_analysis\", \"analysis_type\": \"differential_survival_analysis\", \"claim_type\": \"cohort_association\", \"cancer_type\": \"CRC\", \"cancer_type_input\": \"COADREAD\", \"outcome\": \"OS\", \"genes\": [\"PDCD1\"], \"weights\": null, \"n_patients\": 566, \"n_events\": 115, \"n_high_signature\": 283, \"n_low_signature\": 283, \"split\": \"median\", \"scoring_method\": \"zscore_mean\", \"hazard_ratio\": 1.1207, \"hr_ci_low\": 0.7759, \"hr_ci_high\": 1.6187, \"p_value\": 0.543598, \"p_value_session_corrected\": null, \"multiple_testing\": {\"status\": \"uncorrected\", \"method\": null, \"note\": \"Returned p-value i\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T22:17:13.516309+00:00"
+      },
+      {
+        "step": 41,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.874,
+          "posterior_log_odds_bits": 2.7968,
+          "n_independent_sources": 7,
+          "has_grounded_source": true,
+          "has_conflict": true,
+          "coverage": {
+            "literature": true,
+            "simulation": true,
+            "cohort_prognostic": true,
+            "measured": true,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": true,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": true,
+            "external_grounded": true,
+            "independent_ge_2": true,
+            "hypothesis_gene": "PDCD1"
+          },
+          "gate": {
+            "decision": "DISCARD",
+            "reason": "Tool options exhausted with posterior 0.874; not report-ready (unresolved contradiction between grounded sources).",
+            "next_tool": null,
+            "next_tool_reason": null
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cohort_prognostic",
+              "source_id": "tcga:CRC:tcga_live_cbioportal",
+              "bits": -0.324,
+              "signed_bits": -0.324,
+              "raw_bits": -0.324,
+              "lr_tier": "documented_prior",
+              "note": "cohort_prognostic from tcga:CRC:tcga_live_cbioportal: Contradicts \u2192 negative log-LR. Documented prior \u22481 bit: significant Cox HR (bulk association, not mechanism). \u2192 -0.324 bits.",
+              "summary": "TCGA CRC bulk cohort association for [PDCD1]: HR=1.1207 (95% CI 0.7759\u20131.6187), p=0.543598 (uncorrected), direction=risk_associated, scoring=zscore_mean, mode=live_cbioportal. Not cell-level validation.",
+              "polarity": "contradicts",
+              "strength": 0.324,
+              "independence_key": "cohort:CRC:PDCD1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/",
+              "bits": 0.7,
+              "signed_bits": 0.7,
+              "raw_bits": 0.7,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC7934837/: Documented prior \u22481 bit: one independent experimental claim with stance. \u2192 +0.700 bits.",
+              "summary": "PD-1 blockade restores helper activity of tumor-infiltrating, ... \u2014 NCBI: CD4 T cell exhaustion was characterized phenotypically, transcriptomically, and functionally in patients with head and neck, cervical, and ovarian cancer, with PD-1 blockade noted to restore helper activity of tumor-infiltrating CD4 T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-1, n=1]",
+              "polarity": "supports",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41586-024-08451-4",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41586-024-08451-4: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Precursors of exhausted T cells are pre-emptively formed in acute ... \u2014 Nature: Acute infections generate a subset of precursor T cells with exhaustion-associated characteristics, indicating exhaustion precursors are formed pre-emptively even outside chronic infection or tumor contexts. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-2, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Deciphering T-cell exhaustion in the tumor microenvironment: paving ... \u2014 NCBI: In human cancers, PDCD1 is among the most prominently expressed genes in exhausted T cells (Tex), alongside other known exhaustion markers such as CTLA4, LAG3, HAVCR2, TIGIT, and TOX. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-3, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-3",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/immunity/fulltext/S1074-7613(19)30409-1",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/immunity/fulltext/S1074-7613(19)30409-1: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "TCF-1-Centered Transcriptional Network Drives an Effector versus ... \u2014 Cell: TCF-1 supports exhausted T cell precursor development by antagonizing effector-like cell differentiation through multiple transcription factors, representing a binary fate decision between effector and exhausted CD8 T cells during chronic infection. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-4, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/cell-reports/fulltext/S2211-1247(24)00125-6",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/cell-reports/fulltext/S2211-1247(24)00125-6: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Stem-like progenitor and terminally differentiated TFH-like CD4+ ... \u2014 Cell: In the tumor microenvironment, the BLIMP1/TCF1 axis determines the nature of TFH-like CD4+ T cells, paralleling the stem-like progenitor/terminally differentiated exhaustion axis described in CD8+ T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-5, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-5",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "A Multi-Omics Analysis of an Exhausted T Cells\u2019 Molecular Signature ... \u2014 NCBI: PDCD1 mRNA expression levels in bladder cancer (BLCA) correlate with immune cell infiltration patterns, including positive correlations with exhausted macrophages, NK, NKT, Tfh, and Th1/2 cells, and negative correlations with CD4/8 na\u00efve T cells. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-6, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-6",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41467-022-35238-w",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41467-022-35238-w: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "A comprehensive single-cell map of T cell exhaustion-associated ... \u2014 Nature: In breast tumours, single-cell transcriptomics and imaging mass cytometry reveal distinct patterns of PD-1 and CXCL13 expression in T cells, and of MHC-I (but not PD-L1) expression in tumour cells, characterising T cell exhaustion. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-7, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-7",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41423-025-01378-4",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41423-025-01378-4: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Regulation of T cell exhaustion and stemness: molecular mechanisms ... \u2014 Nature: Molecular mechanisms regulate T cell exhaustion and stemness, with implications for cancer immunotherapy. [8 papers \u2192 8 independent experimental claims. primary of cluster litc-8, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-8",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:state:PDCD1",
+              "bits": 1.8788,
+              "signed_bits": 1.8788,
+              "raw_bits": 1.8788,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:state:PDCD1: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+              "summary": "Measured hit for PDCD1 via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 0.9394,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. cohort_prognostic from tcga:CRC:tcga_live_cbioportal: Contradicts \u2192 negative log-LR. Documented prior \u22481 bit: significant Cox HR (bulk association, not mechanism). \u2192 -0.324 bits. literature from https://pmc.ncbi.nlm.nih.go",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "acfejbne-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T22:17:13.516794+00:00"
+      },
+      {
+        "step": 42,
+        "event": "forced_stop",
+        "payload": {
+          "gate": {
+            "decision": "DISCARD",
+            "reason": "Tool options exhausted with posterior 0.874; not report-ready (unresolved contradiction between grounded sources).",
+            "next_tool": null,
+            "next_tool_reason": null
+          }
+        },
+        "ts": "2026-07-12T22:17:13.517340+00:00"
+      },
+      {
+        "step": 43,
+        "event": "red_team_confounds",
+        "payload": {
+          "n_confounds": 5,
+          "n_surviving": 3,
+          "surviving": [
+            "off_target",
+            "bulk_confound",
+            "compensation"
+          ],
+          "posterior_after": 0.795
+        },
+        "ts": "2026-07-12T22:17:13.520746+00:00"
+      }
+    ]
+  },
+  "markdown": ""
+}

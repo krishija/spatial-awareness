@@ -1,0 +1,137 @@
+{
+  "sample": {
+    "id": "atera-cervical-01",
+    "name": "Atera cervical SCC \u00b7 section 01",
+    "description": "10x Atera whole-transcriptome assay, cervical squamous cell carcinoma, one section. Cell labels are 10x's own (cell_groups.csv).",
+    "platform": "10x Atera WTA (single-cell resolution spatial)",
+    "cancer_type": "Cervical squamous cell carcinoma (CESC)",
+    "n_cells_full_tissue": 715413,
+    "n_cells_labeled": 547219,
+    "n_cells_fixture": 6000,
+    "cell_type_composition": [
+      {
+        "cell_type": "tumor",
+        "n": 259885,
+        "fraction": 0.4749
+      },
+      {
+        "cell_type": "stromal",
+        "n": 117562,
+        "fraction": 0.2148
+      },
+      {
+        "cell_type": "CD4_Teff",
+        "n": 76154,
+        "fraction": 0.1392
+      },
+      {
+        "cell_type": "myeloid",
+        "n": 52331,
+        "fraction": 0.0956
+      },
+      {
+        "cell_type": "CD4_Treg",
+        "n": 28967,
+        "fraction": 0.0529
+      },
+      {
+        "cell_type": "CD4_Tex_term",
+        "n": 12320,
+        "fraction": 0.0225
+      }
+    ],
+    "niche_composition": [
+      {
+        "niche": "lymphoid_proximal",
+        "n": 240268,
+        "fraction": 0.4391
+      },
+      {
+        "niche": "tumor_margin",
+        "n": 217711,
+        "fraction": 0.3978
+      },
+      {
+        "niche": "tumor_core",
+        "n": 89240,
+        "fraction": 0.1631
+      }
+    ],
+    "bbox": {
+      "xmin": 0.7,
+      "xmax": 8923.7,
+      "ymin": 4.4,
+      "ymax": 8894.0
+    },
+    "license": "CC BY 4.0 (10x Atera preview)",
+    "caveats": [
+      "n=1 section \u2014 within-sample statistics only; not a biological claim.",
+      "CD4/CD8 assignment inherited from 10x labels.",
+      "Tumor cells dominate neighbor fractions \u2014 use enrichment, not raw nb_.",
+      "Browser map shows a spatial subsample of 6,000 / 547,219 labeled cells."
+    ]
+  },
+  "investigation": {
+    "sample_id": "atera-cervical-01",
+    "focus_cell_id": "coafefcd-1",
+    "focus_gene": "LCP2",
+    "tool_replay": [
+      {
+        "tool": "list_candidate_cells",
+        "why": "Rank terminally exhausted CD4_Tex_term cells in tumor_core",
+        "reveals_stage": "resolve"
+      },
+      {
+        "tool": "suggest_perturbations",
+        "why": "Surface atlas-derived knockout targets for this phenotype/niche",
+        "reveals_stage": "propose"
+      },
+      {
+        "tool": "simulate_perturbations",
+        "why": "Replay scLDM-CD4 DE artifact for LCP2 on the focus cell baseline",
+        "reveals_stage": "simulate"
+      },
+      {
+        "tool": "search_literature",
+        "why": "Reserved \u2014 Evidence stage",
+        "reveals_stage": "evidence"
+      },
+      {
+        "tool": "find_measured_perturbation_evidence",
+        "why": "Reserved \u2014 Evidence stage",
+        "reveals_stage": "evidence"
+      },
+      {
+        "tool": "differential_survival_analysis",
+        "why": "Reserved \u2014 Decision stage",
+        "reveals_stage": "decision"
+      },
+      {
+        "tool": "recommend_next_experiment",
+        "why": "Reserved \u2014 Decision stage",
+        "reveals_stage": "decision"
+      }
+    ]
+  },
+  "n_cells": 6000,
+  "focus": {
+    "id": "coafefcd-1",
+    "x": 3972.7,
+    "y": 5685.2,
+    "cell_type": "CD4_Tex_term",
+    "source_label": "Exhausted T Cells",
+    "niche": "tumor_core",
+    "exhaustion_state": "terminally_exhausted",
+    "exhaustion_score": 1.0,
+    "expression": {
+      "PDCD1": 1.84,
+      "TCF7": 0.0,
+      "TOX": 2.45,
+      "LAG3": 2.45,
+      "GZMB": 1.84,
+      "IL7R": 0.0,
+      "CTLA4": 3.49,
+      "FOXP3": 0.0
+    }
+  }
+}

@@ -1,113 +1,114 @@
-"""Stub: simulate_perturbations — swap this file for real teammate logic."""
+"""simulate_perturbations — scLDM-CD4 live when weights exist, else labeled surrogate."""
 
 from __future__ import annotations
 
 from typing import Any
 
-from spatial_mcp.fixtures.cells import MARKER_GENES, get_cell
-
-# Genes the stub "virtual cell" knows about
-IN_VOCAB = set(MARKER_GENES) | {
-    "HAVCR2",  # TIM-3
-    "ENTPD1",  # CD39
-    "CXCL13",
-    "TIGIT",
-    "TNFRSF9",  # 4-1BB
-}
+from spatial_mcp.stubs.cell_store import MARKER_GENES, get_cell
+from spatial_mcp.stubs.scldm_knockout import (
+    KNOWN_GUIDE_SYMBOLS,
+    evaluate_knockout,
+    resolve_ensembl,
+)
 
 
 def _round2(v: float) -> float:
-    return round(max(0.05, min(5.0, v)), 2)
+    return round(float(v), 2)
 
 
-def _apply(before: dict[str, float], gene: str, cell_type: str) -> dict[str, float]:
-    after = dict(before)
-    g = gene.upper()
-    is_tex = cell_type in ("CD4_Tex_term", "CD4_Tex_prog", "CD4_Teff")
-    is_treg = cell_type == "CD4_Treg"
-
-    def bump(key: str, delta: float) -> None:
-        after[key] = _round2(after[key] + delta)
-
-    if g == "PDCD1":
-        bump("PDCD1", -2.2)
-        if is_tex:
-            bump("TOX", -0.9)
-            bump("LAG3", -0.6)
-            bump("TCF7", 1.4)
-            bump("IL7R", 1.2)
-            bump("GZMB", 1.0)
-    elif g == "TOX":
-        bump("TOX", -2.0)
-        if is_tex:
-            bump("PDCD1", -0.8)
-            bump("TCF7", 1.6)
-            bump("IL7R", 1.1)
-            bump("GZMB", 0.7)
-    elif g == "LAG3":
-        bump("LAG3", -2.0)
-        if is_tex:
-            bump("PDCD1", -0.5)
-            bump("GZMB", 0.9)
-            bump("IL7R", 0.6)
-    elif g == "CTLA4":
-        bump("CTLA4", -2.0)
-        if is_treg:
-            bump("FOXP3", -0.8)
-            bump("IL7R", 0.4)
-        if is_tex:
-            bump("GZMB", 0.8)
-            bump("TCF7", 0.5)
-    elif g in MARKER_GENES:
-        bump(g, -1.8)
-    elif g in ("HAVCR2", "ENTPD1", "TIGIT"):
-        # Checkpoint-like: mild effector recovery
-        bump("PDCD1", -0.4)
-        bump("GZMB", 0.6)
-        bump("TCF7", 0.4)
-    elif g in ("CXCL13", "TNFRSF9"):
-        bump("IL7R", 0.5)
-        bump("GZMB", 0.4)
-    return after
+def _clamp(v: float) -> float:
+    return _round2(max(0.05, min(5.0, v)))
 
 
 def simulate_perturbations(args: dict[str, Any]) -> dict[str, Any]:
     cell_id = args["cell_id"]
-    gene = args["gene"].upper()
+    gene = str(args["gene"]).upper()
 
-    cell = get_cell(cell_id)
-    if cell is None:
+    try:
+        cell = get_cell(cell_id)
+    except FileNotFoundError as exc:
         return {
             "ok": False,
-            "error": "cell_not_found",
-            "message": f"No resolved cell with id '{cell_id}'.",
+            "error": "data_missing",
+            "message": str(exc),
+            "cell_id": cell_id,
+            "gene": gene,
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "ok": False,
+            "error": "data_load_failed",
+            "message": f"{type(exc).__name__}: {exc}",
             "cell_id": cell_id,
             "gene": gene,
         }
 
-    if gene not in IN_VOCAB:
+    if cell is None:
+        return {
+            "ok": False,
+            "error": "cell_not_found",
+            "message": f"No cell with id '{cell_id}' in cells.parquet.",
+            "cell_id": cell_id,
+            "gene": gene,
+        }
+
+    ensembl = resolve_ensembl(gene)
+    if gene not in KNOWN_GUIDE_SYMBOLS and ensembl is None:
         return {
             "ok": False,
             "error": "gene_out_of_vocabulary",
             "message": (
                 f"Gene '{gene}' is outside the virtual-cell model's training vocabulary. "
-                f"In-vocab examples: {sorted(IN_VOCAB)}."
+                f"In-vocab examples: {sorted(KNOWN_GUIDE_SYMBOLS)}."
             ),
             "cell_id": cell_id,
             "gene": gene,
         }
 
+    try:
+        ko = evaluate_knockout(gene)
+    except ValueError as exc:
+        msg = str(exc)
+        if msg.startswith("gene_out_of_vocabulary"):
+            return {
+                "ok": False,
+                "error": "gene_out_of_vocabulary",
+                "message": (
+                    f"Gene '{gene}' is outside the virtual-cell model's training vocabulary. "
+                    f"In-vocab examples: {sorted(KNOWN_GUIDE_SYMBOLS)}."
+                ),
+                "cell_id": cell_id,
+                "gene": gene,
+            }
+        return {
+            "ok": False,
+            "error": "simulation_failed",
+            "message": msg,
+            "cell_id": cell_id,
+            "gene": gene,
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "ok": False,
+            "error": "simulation_failed",
+            "message": f"{type(exc).__name__}: {exc}",
+            "cell_id": cell_id,
+            "gene": gene,
+        }
+
     before = {g: float(cell["expression"][g]) for g in MARKER_GENES}
-    after = _apply(before, gene, cell["cell_type"])
-    deltas = {g: round(after[g] - before[g], 2) for g in MARKER_GENES}
+    after = {g: _clamp(before[g] + float(ko.deltas.get(g, 0.0))) for g in MARKER_GENES}
+    deltas = {g: _round2(after[g] - before[g]) for g in MARKER_GENES}
 
     return {
         "ok": True,
         "cell_id": cell_id,
         "gene": gene,
-        "cell_type": cell["cell_type"],
-        "niche": cell["niche"],
+        "ensembl_id": ko.ensembl_id,
+        "backend": ko.backend,
         "before": before,
         "after": after,
         "deltas": deltas,
+        "top_effects": ko.top_effects,
+        "details": ko.details,
     }

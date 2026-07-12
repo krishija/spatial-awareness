@@ -115,6 +115,44 @@ class FindingsStore:
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_findings_gene ON findings(gene)"
             )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS literature_cache (
+                    cache_key TEXT PRIMARY KEY,
+                    query_norm TEXT NOT NULL,
+                    aliases_json TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_lit_cache_query ON literature_cache(query_norm)"
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS edges (
+                    id TEXT PRIMARY KEY,
+                    subject TEXT NOT NULL,
+                    relation TEXT NOT NULL,
+                    object TEXT NOT NULL,
+                    source_type TEXT NOT NULL,
+                    source_ids_json TEXT NOT NULL,
+                    confidence REAL,
+                    cell_type_context TEXT,
+                    sample_context TEXT,
+                    metadata_json TEXT,
+                    created_at TEXT NOT NULL,
+                    UNIQUE(subject, relation, object)
+                )
+                """
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_edges_subject ON edges(subject)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_edges_object ON edges(object)"
+            )
             count = conn.execute("SELECT COUNT(*) FROM findings").fetchone()[0]
             if count == 0:
                 for seed in SEED_FINDINGS:
@@ -205,6 +243,74 @@ class FindingsStore:
             )
         return results
 
+    def get_literature_cache(self, cache_key: str) -> dict[str, Any] | None:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT payload_json, created_at FROM literature_cache WHERE cache_key = ?",
+                (cache_key,),
+            ).fetchone()
+        if row is None:
+            return None
+        payload = json.loads(row["payload_json"])
+        payload["_cache_hit"] = True
+        payload["_cached_at"] = row["created_at"]
+        return payload
+
+    def put_literature_cache(
+        self,
+        *,
+        cache_key: str,
+        query_norm: str,
+        aliases: list[str],
+        payload: dict[str, Any],
+    ) -> None:
+        created_at = datetime.now(timezone.utc).isoformat()
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO literature_cache
+                    (cache_key, query_norm, aliases_json, payload_json, created_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    cache_key,
+                    query_norm,
+                    json.dumps(sorted(set(aliases))),
+                    json.dumps(payload),
+                    created_at,
+                ),
+            )
+            conn.commit()
+
+    def record_literature_finding(
+        self,
+        *,
+        gene: str | None,
+        niche: str | None,
+        summary: str,
+        evidence_cards: list[dict[str, Any]],
+        sample_id: str = "literature",
+    ) -> dict[str, Any]:
+        """Persist a literature rollup as a finding so query_prior_findings can surface it."""
+        citations = [
+            {
+                "title": c.get("title") or "Untitled",
+                "source": c.get("source") or "unknown",
+                "url": c.get("url") or "",
+                "relevance": c.get("claim") or c.get("stance") or "",
+            }
+            for c in evidence_cards[:10]
+        ]
+        return self.record(
+            {
+                "sample_id": sample_id,
+                "niche": niche,
+                "gene": gene,
+                "finding_summary": summary,
+                "citations": citations,
+            }
+        )
+
 
 # Process-wide store (one DB file; path overridable via SPATIAL_MCP_DB)
 _store: FindingsStore | None = None
@@ -214,4 +320,11 @@ def get_store() -> FindingsStore:
     global _store
     if _store is None:
         _store = FindingsStore()
+    return _store
+
+
+def reset_store(db_path: Path | None = None) -> FindingsStore:
+    """Replace the process-wide store (tests / isolated DBs)."""
+    global _store
+    _store = FindingsStore(db_path) if db_path is not None else FindingsStore()
     return _store

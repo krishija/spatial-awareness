@@ -1,0 +1,1465 @@
+{
+  "research_question": "Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Resolve candidate cells and check priors. Call suggest_perturbations, then COMMIT to HAVCR2 (TIM-3) \u2014 not PDCD1 \u2014 even if PDCD1 is rank-1. Gather independent evidence for HAVCR2 across measured, literature (support AND contradiction), and cohort as needed; conclude REPORT/DISCARD when the gate allows. Do not invent evidence; keep honest ok:false results.",
+  "reports": [
+    {
+      "hypothesis": "CRISPR knockout of HAVCR2 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay.",
+      "cell_id": "lkcmlagn-1",
+      "niche": "tumor_core",
+      "gene": "HAVCR2",
+      "cell_type": "CD4_Tex_term",
+      "confidence": 0.729,
+      "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. literature from https://www.nature.com/articles/s41423-020-00575-7: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.nature.com/articles/s41586-023-06733-x: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.nature.com/articles/s41467-026-71161-0: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC13032746/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.cell.com/iscience/fulltext/S2589-0042(23)00561-8: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11208905/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. measured from training:state:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits. measured from training:scldm_cd4:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. suggestion from suggest:HAVCR2: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits. suggestion from suggest:PDCD1: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits. suggestion from suggest:TCF7: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits. Posterior logit\u2082=1.429 bits \u2192 P(H|E)=0.729 (7 independent sources; grounded=True).",
+      "evidence": [
+        {
+          "evidence_type": "cell_context",
+          "source_id": "lkcmlagn-1",
+          "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+          "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+          "delta": 0.3
+        },
+        {
+          "evidence_type": "literature",
+          "source_id": "https://www.nature.com/articles/s41423-020-00575-7",
+          "note": "literature from https://www.nature.com/articles/s41423-020-00575-7: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "Opposing regulatory functions of the TIM3 (HAVCR2) signalosome ... \u2014 Nature: HAVCR2 (TIM3) is expressed on exhausted T cells in chronic viral infection and tumor settings [8 papers \u2192 8 independent experimental claims. primary of cluster litc-1, n=1]",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "literature",
+          "source_id": "https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3",
+          "note": "literature from https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "The transcription factor Eomes drives a stemness program in CD4+ ... \u2014 Cell: Eomes drives a stemness/exhaustion program in CD4+ T cells distinct from effector and memory subsets, amplified by 4-1BB stimulation for tumor control [8 papers \u2192 8 independent experimental claims. primary of cluster litc-2, n=1]",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "literature",
+          "source_id": "https://www.nature.com/articles/s41586-023-06733-x",
+          "note": "literature from https://www.nature.com/articles/s41586-023-06733-x: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "Single-cell CRISPR screens in vivo map T cell fate regulomes in ... \u2014 Nature: HAVCR2 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-3, n=1]",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "literature",
+          "source_id": "https://www.nature.com/articles/s41467-026-71161-0",
+          "note": "literature from https://www.nature.com/articles/s41467-026-71161-0: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "The CD4+ T cell population partners with Tpex CD8+ T cells to mediate ... \u2014 Nature: HAVCR2 (TIM-3) expression in terminally exhausted CD4 T cells is associated with reduced effector function markers TCF7, IL7R, and GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-4, n=1]",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "literature",
+          "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13032746/",
+          "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC13032746/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "Ex vivo expansion of melanoma tumor infiltrating lymphocytes leads ... \u2014 NCBI: HAVCR2 knockout in terminally exhausted CD4 T cells affects effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-5, n=1]",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "literature",
+          "source_id": "https://www.cell.com/iscience/fulltext/S2589-0042(23)00561-8",
+          "note": "literature from https://www.cell.com/iscience/fulltext/S2589-0042(23)00561-8: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "Prioritizing exhausted T cell marker genes highlights immune subtypes ... \u2014 Cell: HAVCR2 (TIM3) is upregulated in terminally exhausted T cells in cancer and chronic infection contexts [8 papers \u2192 8 independent experimental claims. primary of cluster litc-6, n=1]",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "literature",
+          "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11208905/",
+          "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11208905/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "Revolutionizing tumor immunotherapy: unleashing the power of ... \u2014 NCBI: TIM-3 (HAVCR2) upregulation is associated with T cell exhaustion, not increased effector function markers [8 papers \u2192 8 independent experimental claims. primary of cluster litc-7, n=1]",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "literature",
+          "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/",
+          "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "A Multi-Omics Analysis of an Exhausted T Cells\u2019 Molecular Signature ... \u2014 NCBI: HAVCR2 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-8, n=1]",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "measured",
+          "source_id": "training:state:HAVCR2",
+          "note": "measured from training:state:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+          "summary": "Measured hit for HAVCR2 via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+          "delta": 1.8788
+        },
+        {
+          "evidence_type": "measured",
+          "source_id": "training:scldm_cd4:HAVCR2",
+          "note": "measured from training:scldm_cd4:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+          "summary": "Measured hit for HAVCR2 via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+          "delta": 2.0
+        },
+        {
+          "evidence_type": "prior_finding",
+          "source_id": "query_prior_findings",
+          "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "Prior-findings query executed (anti-duplication check).",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "red_team",
+          "source_id": "confound:bulk_confound",
+          "note": "red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+          "summary": "Surviving alternative: TCGA / bulk association reflects tumor-intrinsic or stromal expression, not the CD4 T-cell mechanism under test (ecological inference).",
+          "delta": -0.28
+        },
+        {
+          "evidence_type": "red_team",
+          "source_id": "confound:compensation",
+          "note": "red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+          "summary": "Surviving alternative: Redundant checkpoints compensate for HAVCR2 loss in vivo, so primary assay effects will not translate.",
+          "delta": -0.28
+        },
+        {
+          "evidence_type": "red_team",
+          "source_id": "confound:off_target",
+          "note": "red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+          "summary": "Surviving alternative: Observed phenotype after HAVCR2 perturbation is an off-target CRISPR effect, not on-target loss of function.",
+          "delta": -0.28
+        },
+        {
+          "evidence_type": "suggestion",
+          "source_id": "suggest:HAVCR2",
+          "note": "suggestion from suggest:HAVCR2: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits.",
+          "summary": "Suggested KO HAVCR2: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Deciphering T-cell exhaustion in the tumor microenvironment: paving ...\": In metastatic melanoma, CXCR6 and TIM-3 co-expression on CD4+ T-cells may indicate pembrolizumab treatment failure (190). Additionally, findings from a pan-cancer study revealed predominant expression",
+          "delta": 0.09
+        },
+        {
+          "evidence_type": "suggestion",
+          "source_id": "suggest:PDCD1",
+          "note": "suggestion from suggest:PDCD1: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+          "summary": "Suggested KO PDCD1: Mentioned in 2 retrieved sources for CD4_Tex_term in the tumor core, e.g. \"Exhausted T cells hijacking the cancer-immunity cycle: Assets and ...\": TPEX CD8+ TILs are able to control tumor growth and can respond to anti-PD-1 therapy, while terminally exhausted TILs cannot (9). As pre-existing TILs characterized as terminally exhausted have been c",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "suggestion",
+          "source_id": "suggest:TCF7",
+          "note": "suggestion from suggest:TCF7: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+          "summary": "Suggested KO TCF7: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Targeting tumor-draining lymph node to overcome resistance to cancer ...\": The process of T cell exhaustion ranges from Tpex cells (PD-1+, TCF1+, CXCR5+), which possess stem-like self-renewal capacity and multilineage differentiation potential, to terminally exhausted T cell",
+          "delta": 0.0
+        }
+      ],
+      "citation": {
+        "title": "Deciphering T-cell exhaustion in the tumor microenvironment: paving ...",
+        "source": "pmc.ncbi.nlm.nih.gov",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/",
+        "relevance": "In metastatic melanoma, CXCR6 and TIM-3 co-expression on CD4+ T-cells may indicate pembrolizumab treatment failure (190). Additionally, findings from a pan-cancer study revealed predominant expression"
+      },
+      "perturbation": null,
+      "gate_decision": "REPORT",
+      "research_question": "Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Resolve candidate cells and check priors. Call suggest_perturbations, then COMMIT to HAVCR2 (TIM-3) \u2014 not PDCD1 \u2014 even if PDCD1 is rank-1. Gather independent evidence for HAVCR2 across measured, literature (support AND contradiction), and cohort as needed; conclude REPORT/DISCARD when the gate allows. Do not invent evidence; keep honest ok:false results.",
+      "created_at": "2026-07-12T21:48:53.864680+00:00",
+      "suggestion": {
+        "gene": "HAVCR2",
+        "rationale": "CRISPR knockout of HAVCR2 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay.",
+        "citation": {
+          "title": "Deciphering T-cell exhaustion in the tumor microenvironment: paving ...",
+          "source": "pmc.ncbi.nlm.nih.gov",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/",
+          "relevance": "In metastatic melanoma, CXCR6 and TIM-3 co-expression on CD4+ T-cells may indicate pembrolizumab treatment failure (190). Additionally, findings from a pan-cancer study revealed predominant expression"
+        }
+      }
+    }
+  ],
+  "discarded": [],
+  "gate_summary": [
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.200; not yet report-ready (posterior 0.200 < 0.7).",
+      "next_tool": "list_candidate_cells",
+      "next_tool_reason": "Need resolved cells/niche context."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.235; not yet report-ready (posterior 0.235 < 0.7).",
+      "next_tool": "suggest_perturbations",
+      "next_tool_reason": "Lock a candidate gene before gathering gene-bound evidence."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.247; not yet report-ready (posterior 0.247 < 0.7).",
+      "next_tool": "search_literature",
+      "next_tool_reason": "Need literature grounding for the locked gene (required for REPORT)."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.828; not yet report-ready (only 1 grounded modality(ies) ['measured'] (need \u22652 of ['literature', 'measured', 'cohort_prognostic']; two measured hits are still one modality \u2014 gather literature or cohort)).",
+      "next_tool": "search_literature",
+      "next_tool_reason": "Need literature grounding (symmetric search preferred)."
+    },
+    {
+      "decision": "REPORT",
+      "reason": "Posterior P(H|E)=0.828 \u2265 0.7; 4 independent sources; grounded evidence present; priors checked; no unresolved conflict.",
+      "next_tool": null,
+      "next_tool_reason": null
+    },
+    {
+      "decision": "REPORT",
+      "reason": "Posterior P(H|E)=0.729 \u2265 0.7; 7 independent sources; grounded evidence present; priors checked; no unresolved conflict.",
+      "next_tool": null,
+      "next_tool_reason": null
+    }
+  ],
+  "final_text": "**Perturbation ranking received:**\n- **Rank 1: PDCD1** (2 sources)\n- **Rank 2: HAVCR2** (1 source) \u2190 pre-locked target\n- **Rank 3: TCF7**\n\nPer the research question's pre-lock instruction, I am **deviating from Rank 1 (PDCD1)** and committing to **Rank 2 (HAVCR2)**. Justification: HAVCR2/TIM-3 is the pre-specified investigation target; PDCD1 is already extensively studied and the research question explicitly directs investigation of the less-explored co-inhibitory receptor in this context.\n\n---\n\n## Step 4: COMMIT\n\n> **Hypothesis:** Knockout of **HAVCR2** in **lkcmlagn-1** (CD4_Tex_term, tumor_core, atera-cervical-01) increases effector function, operationalized as upregulation of TCF7, IL7R, and/or GZMB.\n\n**Gene is now fixed: HAVCR2. Every subsequent tool call will pass this gene.**\n\n---\n\n## Step 5a & 5b: GATHER GROUNDED EVIDENCE \u2014 Measured + Literature (parallel)\n\nLaunching measured perturbation evidence AND literature search (support) simultaneously.",
+  "trace": {
+    "research_question": "Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Resolve candidate cells and check priors. Call suggest_perturbations, then COMMIT to HAVCR2 (TIM-3) \u2014 not PDCD1 \u2014 even if PDCD1 is rank-1. Gather independent evidence for HAVCR2 across measured, literature (support AND contradiction), and cohort as needed; conclude REPORT/DISCARD when the gate allows. Do not invent evidence; keep honest ok:false results.",
+    "n_events": 25,
+    "events": [
+      {
+        "step": 1,
+        "event": "commit_gene_prelocked",
+        "payload": {
+          "gene": "HAVCR2"
+        },
+        "ts": "2026-07-12T21:48:20.159849+00:00"
+      },
+      {
+        "step": 2,
+        "event": "tools_fetched",
+        "payload": {
+          "n": 12,
+          "names": [
+            "list_candidate_cells",
+            "map_spatial_to_single",
+            "search_literature",
+            "suggest_perturbations",
+            "simulate_perturbations",
+            "differential_survival_analysis",
+            "find_measured_perturbation_evidence",
+            "recommend_next_experiment",
+            "record_finding",
+            "query_prior_findings",
+            "evaluate_evidence",
+            "decide_next_action"
+          ]
+        },
+        "ts": "2026-07-12T21:48:20.205590+00:00"
+      },
+      {
+        "step": 3,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 1
+        },
+        "ts": "2026-07-12T21:48:20.205712+00:00"
+      },
+      {
+        "step": 4,
+        "event": "llm_text",
+        "payload": {
+          "text": "I'll follow the canonical workflow strictly. Let me begin with Steps 1 and 2 in parallel \u2014 checking prior findings and resolving candidate cells simultaneously.\n\n## Step 1 & 2: ORIENT + RESOLVE (parallel)"
+        },
+        "ts": "2026-07-12T21:48:24.016972+00:00"
+      },
+      {
+        "step": 5,
+        "event": "tool_call",
+        "payload": {
+          "tool": "query_prior_findings",
+          "arguments": {
+            "sample_id": "atera-cervical-01"
+          },
+          "result_preview": {
+            "filters": {
+              "sample_id": "atera-cervical-01",
+              "niche": null,
+              "gene": null
+            },
+            "n": 0,
+            "findings": []
+          },
+          "is_error": false
+        },
+        "ts": "2026-07-12T21:48:24.097486+00:00"
+      },
+      {
+        "step": 6,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.2,
+          "posterior_log_odds_bits": -2.0,
+          "n_independent_sources": 0,
+          "has_grounded_source": false,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": false,
+            "prior_finding": true,
+            "cell_context": false,
+            "atlas_mapping": false,
+            "suggestion": false,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": false,
+            "external_grounded": false,
+            "independent_ge_2": false,
+            "hypothesis_gene": "HAVCR2"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.200; not yet report-ready (posterior 0.200 < 0.7).",
+            "next_tool": "list_candidate_cells",
+            "next_tool_reason": "Need resolved cells/niche context."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. Posterior logit\u2082=-2.000 bits \u2192 P(H|E)=0.200 (0 independent sources; grounded=False).",
+          "hypothesis": {
+            "gene": "HAVCR2",
+            "cell_type": "CD4_T",
+            "niche": null,
+            "cell_id": null,
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of HAVCR2 in CD4_T produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T21:48:24.097771+00:00"
+      },
+      {
+        "step": 7,
+        "event": "tool_call",
+        "payload": {
+          "tool": "list_candidate_cells",
+          "arguments": {
+            "sample_id": "atera-cervical-01",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "min_exhaustion_score": 0.7
+          },
+          "result_preview": "{\"ok\": true, \"sample_id\": \"atera-cervical-01\", \"n\": 418, \"cells\": [{\"id\": \"lkcmlagn-1\", \"x\": 5397.7001953125, \"y\": 6030.39990234375, \"cell_type\": \"CD4_Tex_term\", \"niche\": \"tumor_core\", \"exhaustion_state\": \"terminally_exhausted\", \"exhaustion_score\": 1.0, \"expression\": {\"PDCD1\": 0.0, \"TCF7\": 0.0, \"TOX\": 0.0, \"LAG3\": 0.0, \"GZMB\": 0.0, \"IL7R\": 0.0, \"CTLA4\": 4.75, \"FOXP3\": 0.0}}, {\"id\": \"acfejbne-1\", \"x\": 979.5, \"y\": 4218.2998046875, \"cell_type\": \"CD4_Tex_term\", \"niche\": \"tumor_core\", \"exhaustion_state\": \"terminally_exhausted\", \"exhaustion_score\": 1.0, \"expression\": {\"PDCD1\": 2.3299999237060547, \"T\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T21:48:24.773194+00:00"
+      },
+      {
+        "step": 8,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.235,
+          "posterior_log_odds_bits": -1.7,
+          "n_independent_sources": 1,
+          "has_grounded_source": false,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": false,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": false,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": false,
+            "external_grounded": false,
+            "independent_ge_2": false,
+            "hypothesis_gene": "HAVCR2"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.235; not yet report-ready (posterior 0.235 < 0.7).",
+            "next_tool": "suggest_perturbations",
+            "next_tool_reason": "Lock a candidate gene before gathering gene-bound evidence."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. Posterior logit\u2082=-1.700 bits \u2192 P(H|E)=0.235 (1 independent sources; grounded=False).",
+          "hypothesis": {
+            "gene": "HAVCR2",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "lkcmlagn-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of HAVCR2 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T21:48:24.773543+00:00"
+      },
+      {
+        "step": 9,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 2
+        },
+        "ts": "2026-07-12T21:48:24.773779+00:00"
+      },
+      {
+        "step": 10,
+        "event": "llm_text",
+        "payload": {
+          "text": "Excellent. Prior findings: **zero prior investigations** on this sample \u2014 clean slate. Cell resolution: **200 CD4_Tex_term cells in tumor_core**, all with exhaustion_score \u2265 0.90. I'll select the top-ranked cell **`lkcmlagn-1`** (exhaustion_score = 1.0, tumor_core, CTLA4=4.75, all other markers silenced \u2014 a maximally exhausted profile with no residual effector activity). Now proceeding to Step 3.\n\n---\n\n## Step 3: PROPOSE \u2014 suggest_perturbations (MANDATORY)"
+        },
+        "ts": "2026-07-12T21:48:30.795108+00:00"
+      },
+      {
+        "step": 11,
+        "event": "tool_call",
+        "payload": {
+          "tool": "suggest_perturbations",
+          "arguments": {
+            "cell_id": "lkcmlagn-1",
+            "phenotype": "CD4_Tex_term",
+            "niche": "tumor_core"
+          },
+          "result_preview": "{\"ok\": true, \"cell_id\": \"lkcmlagn-1\", \"phenotype\": \"CD4_Tex_term\", \"niche\": \"tumor_core\", \"source\": \"you.com\", \"suggestions\": [{\"rank\": 1, \"gene\": \"PDCD1\", \"rationale\": \"Mentioned in 2 retrieved sources for CD4_Tex_term in the tumor core, e.g. \\\"Exhausted T cells hijacking the cancer-immunity cycle: Assets and ...\\\": TPEX CD8+ TILs are able to control tumor growth and can respond to anti-PD-1 therapy, while terminally exhausted TILs cannot (9). As pre-existing TILs characterized as terminally exhausted have been c\", \"citations\": [{\"title\": \"Exhausted T cells hijacking the cancer-immunity cycle\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T21:48:34.440806+00:00"
+      },
+      {
+        "step": 12,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.247,
+          "posterior_log_odds_bits": -1.61,
+          "n_independent_sources": 2,
+          "has_grounded_source": false,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": false,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": true,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": false,
+            "external_grounded": false,
+            "independent_ge_2": true,
+            "hypothesis_gene": "HAVCR2"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.247; not yet report-ready (posterior 0.247 < 0.7).",
+            "next_tool": "search_literature",
+            "next_tool_reason": "Need literature grounding for the locked gene (required for REPORT)."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:HAVCR2",
+              "bits": 0.09,
+              "signed_bits": 0.09,
+              "raw_bits": 0.09,
+              "lr_tier": "documented_prior",
+              "note": "suggestion from suggest:HAVCR2: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits.",
+              "summary": "Suggested KO HAVCR2: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Deciphering T-cell exhaustion in the tumor microenvironment: paving ...\": In metastatic melanoma, CXCR6 and TIM-3 co-expression on CD4+ T-cells may indicate pembrolizumab treatment failure (190). Additionally, findings from a pan-cancer study revealed predominant expression",
+              "polarity": "supports",
+              "strength": 0.9,
+              "independence_key": "suggestion:HAVCR2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:PDCD1",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "gene_binding",
+              "note": "suggestion from suggest:PDCD1: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+              "summary": "Suggested KO PDCD1: Mentioned in 2 retrieved sources for CD4_Tex_term in the tumor core, e.g. \"Exhausted T cells hijacking the cancer-immunity cycle: Assets and ...\": TPEX CD8+ TILs are able to control tumor growth and can respond to anti-PD-1 therapy, while terminally exhausted TILs cannot (9). As pre-existing TILs characterized as terminally exhausted have been c",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "suggestion:PDCD1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:TCF7",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "gene_binding",
+              "note": "suggestion from suggest:TCF7: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+              "summary": "Suggested KO TCF7: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Targeting tumor-draining lymph node to overcome resistance to cancer ...\": The process of T cell exhaustion ranges from Tpex cells (PD-1+, TCF1+, CXCR5+), which possess stem-like self-renewal capacity and multilineage differentiation potential, to terminally exhausted T cell",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "suggestion:TCF7",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. suggestion from suggest:HAVCR2: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits. suggestion from suggest:PDCD1",
+          "hypothesis": {
+            "gene": "HAVCR2",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "lkcmlagn-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of HAVCR2 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T21:48:34.441152+00:00"
+      },
+      {
+        "step": 13,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 3
+        },
+        "ts": "2026-07-12T21:48:34.441477+00:00"
+      },
+      {
+        "step": 14,
+        "event": "llm_text",
+        "payload": {
+          "text": "**Perturbation ranking received:**\n- **Rank 1: PDCD1** (2 sources)\n- **Rank 2: HAVCR2** (1 source) \u2190 pre-locked target\n- **Rank 3: TCF7**\n\nPer the research question's pre-lock instruction, I am **deviating from Rank 1 (PDCD1)** and committing to **Rank 2 (HAVCR2)**. Justification: HAVCR2/TIM-3 is the pre-specified investigation target; PDCD1 is already extensively studied and the research question explicitly directs investigation of the less-explored co-inhibitory receptor in this context.\n\n---\n"
+        },
+        "ts": "2026-07-12T21:48:44.737086+00:00"
+      },
+      {
+        "step": 15,
+        "event": "preregistration",
+        "payload": {
+          "id": "prereg-411b5a8eb8",
+          "tool": "find_measured_perturbation_evidence",
+          "predicted_direction": "up",
+          "gene": "HAVCR2"
+        },
+        "ts": "2026-07-12T21:48:44.737481+00:00"
+      },
+      {
+        "step": 16,
+        "event": "preregistration_resolved",
+        "payload": {
+          "id": "prereg-411b5a8eb8",
+          "confirmed": true,
+          "observed": "up"
+        },
+        "ts": "2026-07-12T21:48:44.771767+00:00"
+      },
+      {
+        "step": 17,
+        "event": "tool_call",
+        "payload": {
+          "tool": "find_measured_perturbation_evidence",
+          "arguments": {
+            "gene": "HAVCR2",
+            "cell_type": "CD4_T",
+            "perturbation_type": "knockout"
+          },
+          "result_preview": "{\"ok\": true, \"gene\": \"HAVCR2\", \"cell_type\": \"CD4_T\", \"perturbation_type\": \"knockout\", \"n_hits\": 2, \"hits\": [{\"source_type\": \"training_corpus\", \"dataset\": \"scLDM-CD4\", \"accession\": \"https://virtualcellmodels.cziscience.com/model/scldm-cd4\", \"source_id\": \"training:scldm_cd4:HAVCR2\", \"effect\": {\"kind\": \"training_membership\", \"note\": \"Gene is an actual perturbation target in scLDM-CD4's published guide/vocabulary set \\u2014 closer to ground truth the model saw than a de-novo out-of-distribution inference.\", \"markers_of_interest\": [\"PDCD1\", \"TCF7\", \"TOX\", \"LAG3\", \"GZMB\", \"IL7R\", \"CTLA4\", \"FOXP3\"]},\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T21:48:44.771860+00:00"
+      },
+      {
+        "step": 18,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.828,
+          "posterior_log_odds_bits": 2.2688,
+          "n_independent_sources": 4,
+          "has_grounded_source": true,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": true,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": true,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": true,
+            "external_grounded": true,
+            "independent_ge_2": true,
+            "hypothesis_gene": "HAVCR2"
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.828; not yet report-ready (only 1 grounded modality(ies) ['measured'] (need \u22652 of ['literature', 'measured', 'cohort_prognostic']; two measured hits are still one modality \u2014 gather literature or cohort)).",
+            "next_tool": "search_literature",
+            "next_tool_reason": "Need literature grounding (symmetric search preferred)."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:state:HAVCR2",
+              "bits": 1.8788,
+              "signed_bits": 1.8788,
+              "raw_bits": 1.8788,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:state:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+              "summary": "Measured hit for HAVCR2 via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 0.9394,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:scldm_cd4:HAVCR2",
+              "bits": 2.0,
+              "signed_bits": 2.0,
+              "raw_bits": 2.0,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:scldm_cd4:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+              "summary": "Measured hit for HAVCR2 via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/model/scldm-cd4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:HAVCR2",
+              "bits": 0.09,
+              "signed_bits": 0.09,
+              "raw_bits": 0.09,
+              "lr_tier": "documented_prior",
+              "note": "suggestion from suggest:HAVCR2: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits.",
+              "summary": "Suggested KO HAVCR2: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Deciphering T-cell exhaustion in the tumor microenvironment: paving ...\": In metastatic melanoma, CXCR6 and TIM-3 co-expression on CD4+ T-cells may indicate pembrolizumab treatment failure (190). Additionally, findings from a pan-cancer study revealed predominant expression",
+              "polarity": "supports",
+              "strength": 0.9,
+              "independence_key": "suggestion:HAVCR2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:PDCD1",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "gene_binding",
+              "note": "suggestion from suggest:PDCD1: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+              "summary": "Suggested KO PDCD1: Mentioned in 2 retrieved sources for CD4_Tex_term in the tumor core, e.g. \"Exhausted T cells hijacking the cancer-immunity cycle: Assets and ...\": TPEX CD8+ TILs are able to control tumor growth and can respond to anti-PD-1 therapy, while terminally exhausted TILs cannot (9). As pre-existing TILs characterized as terminally exhausted have been c",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "suggestion:PDCD1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:TCF7",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "gene_binding",
+              "note": "suggestion from suggest:TCF7: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+              "summary": "Suggested KO TCF7: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Targeting tumor-draining lymph node to overcome resistance to cancer ...\": The process of T cell exhaustion ranges from Tpex cells (PD-1+, TCF1+, CXCR5+), which possess stem-like self-renewal capacity and multilineage differentiation potential, to terminally exhausted T cell",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "suggestion:TCF7",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. measured from training:state:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits. measured from training:scldm_cd4:HAVCR2: Documented prior \u22482 bits: well context-matched measured per",
+          "hypothesis": {
+            "gene": "HAVCR2",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "lkcmlagn-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of HAVCR2 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T21:48:44.772185+00:00"
+      },
+      {
+        "step": 19,
+        "event": "gene_arg_corrected",
+        "payload": {
+          "tool": "search_literature",
+          "action": "rewrite",
+          "passed": "HAVCR2",
+          "forced": "HAVCR2",
+          "message": "Post-COMMIT gene binding: rewrote search_literature gene args from 'HAVCR2' \u2192 'HAVCR2'."
+        },
+        "ts": "2026-07-12T21:48:44.772570+00:00"
+      },
+      {
+        "step": 20,
+        "event": "tool_call",
+        "payload": {
+          "tool": "search_literature",
+          "arguments": {
+            "query": "HAVCR2 TIM-3 knockout CD4 T cell exhaustion tumor microenvironment effector function rescue",
+            "gene": "HAVCR2",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "hypothesis": "HAVCR2 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7/IL7R/GZMB",
+            "genes": [
+              "HAVCR2"
+            ]
+          },
+          "result_preview": "{\"ok\": true, \"backend\": \"you_com+pubmed+bedrock\", \"query\": \"HAVCR2 TIM-3 knockout CD4 T cell exhaustion tumor microenvironment effector function rescue\", \"context\": null, \"hypothesis\": \"HAVCR2 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7/IL7R/GZMB\", \"genes\": [\"HAVCR2\"], \"aliases\": {\"by_symbol\": {\"HAVCR2\": [\"CD366\", \"HAVCR2\", \"HAVcr-2\", \"KIM-3\", \"SPTCL\", \"TIM-3\", \"TIM3\", \"TIMD-3\", \"TIMD3\", \"Tim-3\", \"hepatitis A virus cellular receptor 2\"]}, \"all_aliases\": [\"CD366\", \"HAVCR2\", \"HAVcr-2\", \"KIM-3\", \"SPTCL\", \"TIM-3\", \"TIM3\", \"TIMD-3\", \"TIMD3\", \"hepatitis A vi\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T21:48:53.859035+00:00"
+      },
+      {
+        "step": 21,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.828,
+          "posterior_log_odds_bits": 2.2688,
+          "n_independent_sources": 4,
+          "has_grounded_source": true,
+          "has_conflict": false,
+          "coverage": {
+            "literature": true,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": true,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": true,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": true,
+            "external_grounded": true,
+            "independent_ge_2": true,
+            "hypothesis_gene": "HAVCR2"
+          },
+          "gate": {
+            "decision": "REPORT",
+            "reason": "Posterior P(H|E)=0.828 \u2265 0.7; 4 independent sources; grounded evidence present; priors checked; no unresolved conflict.",
+            "next_tool": null,
+            "next_tool_reason": null
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41423-020-00575-7",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41423-020-00575-7: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Opposing regulatory functions of the TIM3 (HAVCR2) signalosome ... \u2014 Nature: HAVCR2 (TIM3) is expressed on exhausted T cells in chronic viral infection and tumor settings [8 papers \u2192 8 independent experimental claims. primary of cluster litc-1, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "The transcription factor Eomes drives a stemness program in CD4+ ... \u2014 Cell: Eomes drives a stemness/exhaustion program in CD4+ T cells distinct from effector and memory subsets, amplified by 4-1BB stimulation for tumor control [8 papers \u2192 8 independent experimental claims. primary of cluster litc-2, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41586-023-06733-x",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41586-023-06733-x: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Single-cell CRISPR screens in vivo map T cell fate regulomes in ... \u2014 Nature: HAVCR2 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-3, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-3",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41467-026-71161-0",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41467-026-71161-0: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "The CD4+ T cell population partners with Tpex CD8+ T cells to mediate ... \u2014 Nature: HAVCR2 (TIM-3) expression in terminally exhausted CD4 T cells is associated with reduced effector function markers TCF7, IL7R, and GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-4, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13032746/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC13032746/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Ex vivo expansion of melanoma tumor infiltrating lymphocytes leads ... \u2014 NCBI: HAVCR2 knockout in terminally exhausted CD4 T cells affects effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-5, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-5",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/iscience/fulltext/S2589-0042(23)00561-8",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/iscience/fulltext/S2589-0042(23)00561-8: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prioritizing exhausted T cell marker genes highlights immune subtypes ... \u2014 Cell: HAVCR2 (TIM3) is upregulated in terminally exhausted T cells in cancer and chronic infection contexts [8 papers \u2192 8 independent experimental claims. primary of cluster litc-6, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-6",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11208905/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11208905/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Revolutionizing tumor immunotherapy: unleashing the power of ... \u2014 NCBI: TIM-3 (HAVCR2) upregulation is associated with T cell exhaustion, not increased effector function markers [8 papers \u2192 8 independent experimental claims. primary of cluster litc-7, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-7",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "A Multi-Omics Analysis of an Exhausted T Cells\u2019 Molecular Signature ... \u2014 NCBI: HAVCR2 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-8, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-8",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:state:HAVCR2",
+              "bits": 1.8788,
+              "signed_bits": 1.8788,
+              "raw_bits": 1.8788,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:state:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+              "summary": "Measured hit for HAVCR2 via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 0.9394,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:scldm_cd4:HAVCR2",
+              "bits": 2.0,
+              "signed_bits": 2.0,
+              "raw_bits": 2.0,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:scldm_cd4:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+              "summary": "Measured hit for HAVCR2 via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/model/scldm-cd4",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. literature from https://www.nature.com/articles/s41423-020-00575-7: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3: Neutral polarity \u2192 LR=1 \u2192 0",
+          "hypothesis": {
+            "gene": "HAVCR2",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_core",
+            "cell_id": "lkcmlagn-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of HAVCR2 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T21:48:53.859645+00:00"
+      },
+      {
+        "step": 22,
+        "event": "forced_stop",
+        "payload": {
+          "gate": {
+            "decision": "REPORT",
+            "reason": "Posterior P(H|E)=0.828 \u2265 0.7; 4 independent sources; grounded evidence present; priors checked; no unresolved conflict.",
+            "next_tool": null,
+            "next_tool_reason": null
+          }
+        },
+        "ts": "2026-07-12T21:48:53.860163+00:00"
+      },
+      {
+        "step": 23,
+        "event": "red_team_confounds",
+        "payload": {
+          "n_confounds": 5,
+          "n_surviving": 3,
+          "surviving": [
+            "off_target",
+            "bulk_confound",
+            "compensation"
+          ],
+          "posterior_after": 0.729
+        },
+        "ts": "2026-07-12T21:48:53.864595+00:00"
+      },
+      {
+        "step": 24,
+        "event": "report_epistemics",
+        "payload": {
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "lkcmlagn-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41423-020-00575-7",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41423-020-00575-7: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Opposing regulatory functions of the TIM3 (HAVCR2) signalosome ... \u2014 Nature: HAVCR2 (TIM3) is expressed on exhausted T cells in chronic viral infection and tumor settings [8 papers \u2192 8 independent experimental claims. primary of cluster litc-1, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "The transcription factor Eomes drives a stemness program in CD4+ ... \u2014 Cell: Eomes drives a stemness/exhaustion program in CD4+ T cells distinct from effector and memory subsets, amplified by 4-1BB stimulation for tumor control [8 papers \u2192 8 independent experimental claims. primary of cluster litc-2, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41586-023-06733-x",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41586-023-06733-x: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Single-cell CRISPR screens in vivo map T cell fate regulomes in ... \u2014 Nature: HAVCR2 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-3, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-3",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.nature.com/articles/s41467-026-71161-0",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.nature.com/articles/s41467-026-71161-0: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "The CD4+ T cell population partners with Tpex CD8+ T cells to mediate ... \u2014 Nature: HAVCR2 (TIM-3) expression in terminally exhausted CD4 T cells is associated with reduced effector function markers TCF7, IL7R, and GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-4, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13032746/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC13032746/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Ex vivo expansion of melanoma tumor infiltrating lymphocytes leads ... \u2014 NCBI: HAVCR2 knockout in terminally exhausted CD4 T cells affects effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-5, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-5",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://www.cell.com/iscience/fulltext/S2589-0042(23)00561-8",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://www.cell.com/iscience/fulltext/S2589-0042(23)00561-8: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prioritizing exhausted T cell marker genes highlights immune subtypes ... \u2014 Cell: HAVCR2 (TIM3) is upregulated in terminally exhausted T cells in cancer and chronic infection contexts [8 papers \u2192 8 independent experimental claims. primary of cluster litc-6, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-6",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11208905/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11208905/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Revolutionizing tumor immunotherapy: unleashing the power of ... \u2014 NCBI: TIM-3 (HAVCR2) upregulation is associated with T cell exhaustion, not increased effector function markers [8 papers \u2192 8 independent experimental claims. primary of cluster litc-7, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-7",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "A Multi-Omics Analysis of an Exhausted T Cells\u2019 Molecular Signature ... \u2014 NCBI: HAVCR2 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-8, n=1]",
+              "polarity": "neutral",
+              "strength": 0.7000000000000001,
+              "independence_key": "literature:litc-8",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:state:HAVCR2",
+              "bits": 1.8788,
+              "signed_bits": 1.8788,
+              "raw_bits": 1.8788,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:state:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+              "summary": "Measured hit for HAVCR2 via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 0.9394,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:scldm_cd4:HAVCR2",
+              "bits": 2.0,
+              "signed_bits": 2.0,
+              "raw_bits": 2.0,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:scldm_cd4:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+              "summary": "Measured hit for HAVCR2 via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/model/scldm-cd4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "red_team",
+              "source_id": "confound:bulk_confound",
+              "bits": -0.28,
+              "signed_bits": -0.28,
+              "raw_bits": -0.28,
+              "lr_tier": "documented_prior",
+              "note": "red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+              "summary": "Surviving alternative: TCGA / bulk association reflects tumor-intrinsic or stromal expression, not the CD4 T-cell mechanism under test (ecological inference).",
+              "polarity": "contradicts",
+              "strength": 0.35,
+              "independence_key": "red_team:confound:bulk_confound",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "red_team",
+              "source_id": "confound:compensation",
+              "bits": -0.28,
+              "signed_bits": -0.28,
+              "raw_bits": -0.28,
+              "lr_tier": "documented_prior",
+              "note": "red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+              "summary": "Surviving alternative: Redundant checkpoints compensate for HAVCR2 loss in vivo, so primary assay effects will not translate.",
+              "polarity": "contradicts",
+              "strength": 0.35,
+              "independence_key": "red_team:confound:compensation",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "red_team",
+              "source_id": "confound:off_target",
+              "bits": -0.28,
+              "signed_bits": -0.28,
+              "raw_bits": -0.28,
+              "lr_tier": "documented_prior",
+              "note": "red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+              "summary": "Surviving alternative: Observed phenotype after HAVCR2 perturbation is an off-target CRISPR effect, not on-target loss of function.",
+              "polarity": "contradicts",
+              "strength": 0.35,
+              "independence_key": "red_team:confound:off_target",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:HAVCR2",
+              "bits": 0.09,
+              "signed_bits": 0.09,
+              "raw_bits": 0.09,
+              "lr_tier": "documented_prior",
+              "note": "suggestion from suggest:HAVCR2: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits.",
+              "summary": "Suggested KO HAVCR2: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Deciphering T-cell exhaustion in the tumor microenvironment: paving ...\": In metastatic melanoma, CXCR6 and TIM-3 co-expression on CD4+ T-cells may indicate pembrolizumab treatment failure (190). Additionally, findings from a pan-cancer study revealed predominant expression",
+              "polarity": "supports",
+              "strength": 0.9,
+              "independence_key": "suggestion:HAVCR2",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:PDCD1",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "gene_binding",
+              "note": "suggestion from suggest:PDCD1: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+              "summary": "Suggested KO PDCD1: Mentioned in 2 retrieved sources for CD4_Tex_term in the tumor core, e.g. \"Exhausted T cells hijacking the cancer-immunity cycle: Assets and ...\": TPEX CD8+ TILs are able to control tumor growth and can respond to anti-PD-1 therapy, while terminally exhausted TILs cannot (9). As pre-existing TILs characterized as terminally exhausted have been c",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "suggestion:PDCD1",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "suggestion",
+              "source_id": "suggest:TCF7",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "gene_binding",
+              "note": "suggestion from suggest:TCF7: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.",
+              "summary": "Suggested KO TCF7: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Targeting tumor-draining lymph node to overcome resistance to cancer ...\": The process of T cell exhaustion ranges from Tpex cells (PD-1+, TCF1+, CXCR5+), which possess stem-like self-renewal capacity and multilineage differentiation potential, to terminally exhausted T cell",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "suggestion:TCF7",
+              "redundant": false
+            }
+          ],
+          "surviving_alternative_explanations": [
+            {
+              "id": "off_target",
+              "explanation": "Observed phenotype after HAVCR2 perturbation is an off-target CRISPR effect, not on-target loss of function.",
+              "ruled_out_by": [],
+              "surviving": true
+            },
+            {
+              "id": "bulk_confound",
+              "explanation": "TCGA / bulk association reflects tumor-intrinsic or stromal expression, not the CD4 T-cell mechanism under test (ecological inference).",
+              "ruled_out_by": [],
+              "surviving": true
+            },
+            {
+              "id": "compensation",
+              "explanation": "Redundant checkpoints compensate for HAVCR2 loss in vivo, so primary assay effects will not translate.",
+              "ruled_out_by": [],
+              "surviving": true
+            }
+          ],
+          "posterior_log_odds_bits": 1.4288
+        },
+        "ts": "2026-07-12T21:48:53.864686+00:00"
+      },
+      {
+        "step": 25,
+        "event": "finding_recorded",
+        "payload": {
+          "gene": "HAVCR2"
+        },
+        "ts": "2026-07-12T21:48:53.878555+00:00"
+      }
+    ]
+  },
+  "markdown": "# Hypothesis report (confidence 0.729)\n\n**Question:** Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Resolve candidate cells and check priors. Call suggest_perturbations, then COMMIT to HAVCR2 (TIM-3) \u2014 not PDCD1 \u2014 even if PDCD1 is rank-1. Gather independent evidence for HAVCR2 across measured, literature (support AND contradiction), and cohort as needed; conclude REPORT/DISCARD when the gate allows. Do not invent evidence; keep honest ok:false results.\n\n**Claim:** CRISPR knockout of HAVCR2 in CD4_Tex_term from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay.\n\n| Field | Value |\n|---|---|\n| Gene | `HAVCR2` |\n| Cell | `lkcmlagn-1` |\n| Cell type | CD4_Tex_term |\n| Niche | tumor_core |\n| Gate | REPORT |\n\n## Why this confidence\n\nPrior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. literature from https://www.nature.com/articles/s41423-020-00575-7: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.nature.com/articles/s41586-023-06733-x: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.nature.com/articles/s41467-026-71161-0: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC13032746/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://www.cell.com/iscience/fulltext/S2589-0042(23)00561-8: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11208905/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. measured from training:state:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits. measured from training:scldm_cd4:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. suggestion from suggest:HAVCR2: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits. suggestion from suggest:PDCD1: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits. suggestion from suggest:TCF7: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits. Posterior logit\u2082=1.429 bits \u2192 P(H|E)=0.729 (7 independent sources; grounded=True).\n\n## Evidence (ordered)\n\n1. **cell_context** (`lkcmlagn-1`, \u0394+0.300): Resolved 200 cells; top=lkcmlagn-1 CD4_Tex_term in tumor_core (exhaustion_score=1.0).\n   - cell_context from lkcmlagn-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.\n2. **literature** (`https://www.nature.com/articles/s41423-020-00575-7`, \u03940): Opposing regulatory functions of the TIM3 (HAVCR2) signalosome ... \u2014 Nature: HAVCR2 (TIM3) is expressed on exhausted T cells in chronic viral infection and tumor settings [8 papers \u2192 8 independent experimental claims. primary of cluster litc-1, n=1]\n   - literature from https://www.nature.com/articles/s41423-020-00575-7: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n3. **literature** (`https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3`, \u03940): The transcription factor Eomes drives a stemness program in CD4+ ... \u2014 Cell: Eomes drives a stemness/exhaustion program in CD4+ T cells distinct from effector and memory subsets, amplified by 4-1BB stimulation for tumor control [8 papers \u2192 8 independent experimental claims. primary of cluster litc-2, n=1]\n   - literature from https://www.cell.com/immunity/fulltext/S1074-7613(26)00229-3: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n4. **literature** (`https://www.nature.com/articles/s41586-023-06733-x`, \u03940): Single-cell CRISPR screens in vivo map T cell fate regulomes in ... \u2014 Nature: HAVCR2 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-3, n=1]\n   - literature from https://www.nature.com/articles/s41586-023-06733-x: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n5. **literature** (`https://www.nature.com/articles/s41467-026-71161-0`, \u03940): The CD4+ T cell population partners with Tpex CD8+ T cells to mediate ... \u2014 Nature: HAVCR2 (TIM-3) expression in terminally exhausted CD4 T cells is associated with reduced effector function markers TCF7, IL7R, and GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-4, n=1]\n   - literature from https://www.nature.com/articles/s41467-026-71161-0: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n6. **literature** (`https://pmc.ncbi.nlm.nih.gov/articles/PMC13032746/`, \u03940): Ex vivo expansion of melanoma tumor infiltrating lymphocytes leads ... \u2014 NCBI: HAVCR2 knockout in terminally exhausted CD4 T cells affects effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-5, n=1]\n   - literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC13032746/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n7. **literature** (`https://www.cell.com/iscience/fulltext/S2589-0042(23)00561-8`, \u03940): Prioritizing exhausted T cell marker genes highlights immune subtypes ... \u2014 Cell: HAVCR2 (TIM3) is upregulated in terminally exhausted T cells in cancer and chronic infection contexts [8 papers \u2192 8 independent experimental claims. primary of cluster litc-6, n=1]\n   - literature from https://www.cell.com/iscience/fulltext/S2589-0042(23)00561-8: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n8. **literature** (`https://pmc.ncbi.nlm.nih.gov/articles/PMC11208905/`, \u03940): Revolutionizing tumor immunotherapy: unleashing the power of ... \u2014 NCBI: TIM-3 (HAVCR2) upregulation is associated with T cell exhaustion, not increased effector function markers [8 papers \u2192 8 independent experimental claims. primary of cluster litc-7, n=1]\n   - literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11208905/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n9. **literature** (`https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/`, \u03940): A Multi-Omics Analysis of an Exhausted T Cells\u2019 Molecular Signature ... \u2014 NCBI: HAVCR2 knockout in terminally exhausted CD4 T cells increases effector function markers TCF7/IL7R/GZMB [8 papers \u2192 8 independent experimental claims. primary of cluster litc-8, n=1]\n   - literature from https://pmc.ncbi.nlm.nih.gov/articles/PMC11278172/: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n10. **measured** (`training:state:HAVCR2`, \u0394+1.879): Measured hit for HAVCR2 via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)\n   - measured from training:state:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.\n11. **measured** (`training:scldm_cd4:HAVCR2`, \u0394+2.000): Measured hit for HAVCR2 via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)\n   - measured from training:scldm_cd4:HAVCR2: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.\n12. **prior_finding** (`query_prior_findings`, \u03940): Prior-findings query executed (anti-duplication check).\n   - prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n13. **red_team** (`confound:bulk_confound`, \u0394-0.280): Surviving alternative: TCGA / bulk association reflects tumor-intrinsic or stromal expression, not the CD4 T-cell mechanism under test (ecological inference).\n   - red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.\n14. **red_team** (`confound:compensation`, \u0394-0.280): Surviving alternative: Redundant checkpoints compensate for HAVCR2 loss in vivo, so primary assay effects will not translate.\n   - red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.\n15. **red_team** (`confound:off_target`, \u0394-0.280): Surviving alternative: Observed phenotype after HAVCR2 perturbation is an off-target CRISPR effect, not on-target loss of function.\n   - red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.\n16. **suggestion** (`suggest:HAVCR2`, \u0394+0.090): Suggested KO HAVCR2: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Deciphering T-cell exhaustion in the tumor microenvironment: paving ...\": In metastatic melanoma, CXCR6 and TIM-3 co-expression on CD4+ T-cells may indicate pembrolizumab treatment failure (190). Additionally, findings from a pan-cancer study revealed predominant expression\n   - suggestion from suggest:HAVCR2: Documented prior \u22480.1 bits: a proposal is not evidence. \u2192 +0.090 bits.\n17. **suggestion** (`suggest:PDCD1`, \u03940): Suggested KO PDCD1: Mentioned in 2 retrieved sources for CD4_Tex_term in the tumor core, e.g. \"Exhausted T cells hijacking the cancer-immunity cycle: Assets and ...\": TPEX CD8+ TILs are able to control tumor growth and can respond to anti-PD-1 therapy, while terminally exhausted TILs cannot (9). As pre-existing TILs characterized as terminally exhausted have been c\n   - suggestion from suggest:PDCD1: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.\n18. **suggestion** (`suggest:TCF7`, \u03940): Suggested KO TCF7: Mentioned in 1 retrieved source for CD4_Tex_term in the tumor core, e.g. \"Targeting tumor-draining lymph node to overcome resistance to cancer ...\": The process of T cell exhaustion ranges from Tpex cells (PD-1+, TCF1+, CXCR5+), which possess stem-like self-renewal capacity and multilineage differentiation potential, to terminally exhausted T cell\n   - suggestion from suggest:TCF7: Gene mismatch: item gene \u2260 hypothesis gene HAVCR2 \u2014 contributes 0 bits (evidence must bind to H). \u2192 +0.000 bits.\n\n## Supporting citation\n\n- Deciphering T-cell exhaustion in the tumor microenvironment: paving ... \u2014 pmc.ncbi.nlm.nih.gov\n- https://pmc.ncbi.nlm.nih.gov/articles/PMC11996672/\n"
+}

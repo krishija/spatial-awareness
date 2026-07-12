@@ -28,6 +28,17 @@ mcp_server/data/*.db-*
 *.pyc
 .Python
 
+
+# Large local data — lives in the team S3 bucket, not git
+/artifacts/
+/figures/
+/kriti visualizations/work/
+/kriti visualizations/artifacts/
+/kriti visualizations/*.html
+frontend/public/explorer.html
+frontend/public/atlas_explorer.html
+mcp_server/data/*.parquet
+
 # Editor
 .vscode/*
 !.vscode/extensions.json
@@ -38,3 +49,17 @@ mcp_server/data/*.db-*
 *.njsproj
 *.sln
 *.sw?
+
+*.h5ad
+*.parquet
+*.pkl
+work/
+artifacts/
+# Keep committed demo deliverables (calibration + agent traces)
+!mcp_server/artifacts/
+mcp_server/artifacts/**
+!mcp_server/artifacts/calibration/
+!mcp_server/artifacts/calibration/**
+!mcp_server/artifacts/agent_traces/
+!mcp_server/artifacts/agent_traces/**
+demo_data/

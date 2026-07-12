@@ -1,7 +1,7 @@
-import type { AiSuggestion, Cell, PerturbationResult } from '../types';
+import type { Cell, PerturbationResult, SuggestionCitationRef } from '../types';
 import {
-  CELL_TYPE_LABELS,
   NICHE_LABELS,
+  cellTypeLabel,
   formatExpr,
 } from '../data/palettes';
 import { MARKER_GENES } from '../types';
@@ -9,7 +9,7 @@ import { MARKER_GENES } from '../types';
 interface Props {
   cell: Cell;
   result: PerturbationResult;
-  suggestion?: AiSuggestion | null;
+  suggestion?: SuggestionCitationRef | null;
 }
 
 function summarizeEffect(result: PerturbationResult): string {
@@ -29,17 +29,23 @@ function summarizeEffect(result: PerturbationResult): string {
 export function HypothesisCard({ cell, result, suggestion }: Props) {
   const effect = summarizeEffect(result);
   const cite = suggestion?.citation;
+  const nicheText = cell.niche ? NICHE_LABELS[cell.niche] : null;
 
   return (
     <div className="hypothesis-slot">
       <div className="hypothesis-card">
         <div className="hypothesis-card__eyebrow">Hypothesis summary</div>
         <p className="hypothesis-card__claim">
-          In a <strong>{CELL_TYPE_LABELS[cell.cell_type]}</strong> cell within the{' '}
-          <strong>{NICHE_LABELS[cell.niche].toLowerCase()}</strong>, knockout of{' '}
-          <span className="gene">{result.gene}</span> is predicted to shift the
-          marker profile toward a less exhausted / more effector-like state (
-          {effect}).
+          In a <strong>{cellTypeLabel(cell.cell_type)}</strong> cell
+          {nicheText && (
+            <>
+              {' '}
+              within the <strong>{nicheText.toLowerCase()}</strong>
+            </>
+          )}
+          , knockout of <span className="gene">{result.gene}</span> is
+          predicted to shift the marker profile toward a less exhausted /
+          more effector-like state ({effect}).
         </p>
         <div className="hypothesis-card__meta">
           <span>
@@ -48,7 +54,7 @@ export function HypothesisCard({ cell, result, suggestion }: Props) {
           <span>
             Perturbation <span className="gene">{result.gene}</span> KO
           </span>
-          <span>{NICHE_LABELS[cell.niche]}</span>
+          {nicheText && <span>{nicheText}</span>}
         </div>
         {cite && (
           <div className="hypothesis-card__cite">

@@ -11,10 +11,21 @@ requires-python = ">=3.10"
 dependencies = [
   "mcp[cli]>=1.10,<2",
   "jsonschema>=4.20",
+  "boto3>=1.35",
+  "requests>=2.31",
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.27",
+  "pandas>=2.0",
+  "pyarrow>=14",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
 
 [project.scripts]
 spatial-mcp = "spatial_mcp.server:main"
+spatial-agent = "spatial_mcp.agent.cli:main"
+spatial-api = "spatial_mcp.http_api:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

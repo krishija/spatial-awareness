@@ -121,14 +121,23 @@ class ToolRegistry:
 
 
 def build_default_registry() -> ToolRegistry:
-    """Assemble all seven tools. Teammates swap stub handlers by editing one file."""
+    """Assemble all registered tools. Teammates swap stub handlers by editing one file."""
     from spatial_mcp.stubs.list_candidate_cells import list_candidate_cells
     from spatial_mcp.stubs.map_spatial_to_single import map_spatial_to_single
     from spatial_mcp.stubs.search_literature import search_literature
     from spatial_mcp.stubs.suggest_perturbations import suggest_perturbations
     from spatial_mcp.stubs.simulate_perturbations import simulate_perturbations
+    from spatial_mcp.stubs.differential_survival_analysis import (
+        differential_survival_analysis,
+    )
+    from spatial_mcp.stubs.find_measured_perturbation_evidence import (
+        find_measured_perturbation_evidence,
+    )
+    from spatial_mcp.stubs.recommend_next_experiment import recommend_next_experiment
     from spatial_mcp.memory_tools.record_finding import record_finding
     from spatial_mcp.memory_tools.query_prior_findings import query_prior_findings
+    from spatial_mcp.memory_tools.evaluate_evidence import evaluate_evidence
+    from spatial_mcp.memory_tools.decide_next_action import decide_next_action_tool
     from spatial_mcp import schemas
 
     registry = ToolRegistry()
@@ -138,8 +147,13 @@ def build_default_registry() -> ToolRegistry:
         (schemas.SEARCH_LITERATURE, search_literature),
         (schemas.SUGGEST_PERTURBATIONS, suggest_perturbations),
         (schemas.SIMULATE_PERTURBATIONS, simulate_perturbations),
+        (schemas.DIFFERENTIAL_SURVIVAL_ANALYSIS, differential_survival_analysis),
+        (schemas.FIND_MEASURED_PERTURBATION_EVIDENCE, find_measured_perturbation_evidence),
+        (schemas.RECOMMEND_NEXT_EXPERIMENT, recommend_next_experiment),
         (schemas.RECORD_FINDING, record_finding),
         (schemas.QUERY_PRIOR_FINDINGS, query_prior_findings),
+        (schemas.EVALUATE_EVIDENCE, evaluate_evidence),
+        (schemas.DECIDE_NEXT_ACTION, decide_next_action_tool),
     ]
     for meta, handler in pairs:
         registry.register(

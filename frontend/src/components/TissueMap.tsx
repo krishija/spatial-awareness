@@ -1,15 +1,22 @@
 import { useCallback, useEffect, useRef } from 'react';
 import type { Cell, ColorMode, MarkerGene, SampleData } from '../types';
-import { NICHE_COLORS, NICHE_STROKE } from '../data/palettes';
-import { cellColor, Legend } from './Legend';
+import { TUMOR_BACKDROP_TYPES, cellColor } from '../data/palettes';
+import { Legend } from './Legend';
 
 interface Props {
   data: SampleData;
   colorMode: ColorMode;
   selectedGene: MarkerGene;
-  showNiches: boolean;
   selectedCellId: string | null;
   onSelectCell: (cellId: string | null) => void;
+}
+
+/** Whether a cell is drawn (and clickable) in the current mode. cell_type and
+ * expression modes show everything; treg_niches only shows the tumor
+ * backdrop + niche-assigned Tregs, matching explorer.html's Treg-niches layer. */
+function isVisible(cell: Cell, colorMode: ColorMode): boolean {
+  if (colorMode !== 'treg_niches') return true;
+  return TUMOR_BACKDROP_TYPES.includes(cell.cell_type) || cell.niche !== null;
 }
 
 function draw(
@@ -17,7 +24,6 @@ function draw(
   data: SampleData,
   colorMode: ColorMode,
   selectedGene: MarkerGene,
-  showNiches: boolean,
   selectedCellId: string | null,
 ) {
   const parent = canvas.parentElement;
@@ -54,27 +60,11 @@ function draw(
   ctx.lineWidth = 1;
   ctx.strokeRect(ox + 0.5, oy + 0.5, size - 1, size - 1);
 
-  if (showNiches) {
-    for (const [niche, c] of Object.entries(data.nicheCenters) as Array<
-      [keyof typeof data.nicheCenters, (typeof data.nicheCenters)[keyof typeof data.nicheCenters]]
-    >) {
-      const { px, py } = toPx(c.x, c.y);
-      const rx = (c.rx / 100) * size;
-      const ry = (c.ry / 100) * size;
-      ctx.beginPath();
-      ctx.ellipse(px, py, rx, ry, 0, 0, Math.PI * 2);
-      ctx.fillStyle = NICHE_COLORS[niche];
-      ctx.fill();
-      ctx.strokeStyle = NICHE_STROKE[niche];
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-  }
-
   const r = Math.max(1.2, size / 420);
   let selected: Cell | null = null;
 
   for (const cell of data.cells) {
+    if (!isVisible(cell, colorMode)) continue;
     if (cell.id === selectedCellId) {
       selected = cell;
       continue;
@@ -82,11 +72,7 @@ function draw(
     const { px, py } = toPx(cell.x, cell.y);
     ctx.beginPath();
     ctx.arc(px, py, r, 0, Math.PI * 2);
-    ctx.fillStyle = cellColor(
-      colorMode,
-      cell.cell_type,
-      cell.expression[selectedGene],
-    );
+    ctx.fillStyle = cellColor(cell, colorMode, selectedGene);
     ctx.globalAlpha = 0.85;
     ctx.fill();
   }
@@ -101,11 +87,7 @@ function draw(
     ctx.stroke();
     ctx.beginPath();
     ctx.arc(px, py, r + 0.5, 0, Math.PI * 2);
-    ctx.fillStyle = cellColor(
-      colorMode,
-      selected.cell_type,
-      selected.expression[selectedGene],
-    );
+    ctx.fillStyle = cellColor(selected, colorMode, selectedGene);
     ctx.fill();
   }
 
@@ -119,7 +101,6 @@ export function TissueMap({
   data,
   colorMode,
   selectedGene,
-  showNiches,
   selectedCellId,
   onSelectCell,
 }: Props) {
@@ -130,8 +111,8 @@ export function TissueMap({
   const redraw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    draw(canvas, data, colorMode, selectedGene, showNiches, selectedCellId);
-  }, [data, colorMode, selectedGene, showNiches, selectedCellId]);
+    draw(canvas, data, colorMode, selectedGene, selectedCellId);
+  }, [data, colorMode, selectedGene, selectedCellId]);
 
   useEffect(() => {
     redraw();
@@ -160,10 +141,11 @@ export function TissueMap({
       return;
     }
 
-    // Nearest-neighbor hit test
+    // Nearest-neighbor hit test — only among cells actually drawn in this mode.
     let best: Cell | null = null;
     let bestD = 2.2; // tissue-coordinate threshold
     for (const cell of cellsRef.current) {
+      if (!isVisible(cell, colorMode)) continue;
       const dx = cell.x - tx;
       const dy = cell.y - ty;
       const d = dx * dx + dy * dy;
@@ -178,7 +160,7 @@ export function TissueMap({
   return (
     <div className="map-canvas-wrap">
       <canvas ref={canvasRef} onClick={handleClick} />
-      <Legend colorMode={colorMode} selectedGene={selectedGene} />
+      <Legend colorMode={colorMode} selectedGene={selectedGene} cells={data.cells} />
       <div className="map-hint">Click a cell to inspect phenotype & markers</div>
     </div>
   );
