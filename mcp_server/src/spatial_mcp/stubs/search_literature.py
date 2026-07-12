@@ -1,38 +1,15 @@
 """search_literature — You.com Search API with curated biomedical fallback.
 
-Primary path: You.com API (requires YOU_API_KEY).
+Primary path: You.com API via the shared you_client (requires YOU_API_KEY).
 If the key is missing or the API fails (e.g. 402), falls back to a curated
 corpus so the agent loop stays demoable offline / without billing.
 """
 
 from __future__ import annotations
 
-import os
 from typing import Any
-from urllib.parse import urlparse
 
-import requests
-
-YOU_API_KEY = os.environ.get("YOU_API_KEY", "")
-SEARCH_URL = "https://api.you.com/v1/search"
-
-BIOMED_DOMAINS = [
-    "pubmed.ncbi.nlm.nih.gov",
-    "ncbi.nlm.nih.gov",
-    "biorxiv.org",
-    "nature.com",
-    "cell.com",
-    "science.org",
-]
-
-DOMAIN_TO_SOURCE = {
-    "pubmed.ncbi.nlm.nih.gov": "PubMed",
-    "ncbi.nlm.nih.gov": "NCBI",
-    "biorxiv.org": "bioRxiv",
-    "nature.com": "Nature",
-    "cell.com": "Cell",
-    "science.org": "Science",
-}
+from spatial_mcp.you_client import you_search
 
 MAX_CITATIONS = 5
 
@@ -75,11 +52,6 @@ FALLBACK_CORPUS: list[dict[str, Any]] = [
         "keywords": ["spatial", "niche", "margin", "core", "lymphoid", "exhaustion"],
     },
 ]
-
-
-def _source_name(url: str) -> str:
-    domain = urlparse(url).netloc.replace("www.", "")
-    return DOMAIN_TO_SOURCE.get(domain, domain)
 
 
 def _fallback_search(query: str, context: str) -> list[dict[str, Any]]:
@@ -132,42 +104,13 @@ def search_literature(args: dict[str, Any]) -> dict[str, Any]:
     context = args.get("context") or ""
     search_text = f"{query} {context}".strip()
 
-    warning: str | None = None
-    citations: list[dict[str, Any]] = []
-
-    if not YOU_API_KEY:
-        warning = "YOU_API_KEY not set — using curated fallback corpus."
-    else:
-        try:
-            resp = requests.get(
-                SEARCH_URL,
-                headers={"X-API-Key": YOU_API_KEY},
-                params={
-                    "query": search_text,
-                    "count": MAX_CITATIONS,
-                    "boost_domains": ",".join(BIOMED_DOMAINS),
-                },
-                timeout=15,
-            )
-            resp.raise_for_status()
-            web_results = resp.json().get("results", {}).get("web", [])
-            for r in web_results[:MAX_CITATIONS]:
-                url = r.get("url", "")
-                snippet = (r.get("snippets") or [""])[0]
-                citations.append(
-                    {
-                        "title": r.get("title", "Untitled"),
-                        "source": _source_name(url),
-                        "url": url,
-                        "relevance": snippet[:200] if snippet else "No snippet available.",
-                    }
-                )
-            if not citations:
-                warning = "You.com returned no results — using curated fallback corpus."
-        except requests.RequestException as e:
-            warning = f"Literature search failed ({e}) — using curated fallback corpus."
-
+    citations, warning = you_search(search_text, count=MAX_CITATIONS)
     if not citations:
+        warning = (
+            f"{warning} Using curated fallback corpus."
+            if warning
+            else "You.com returned no results — using curated fallback corpus."
+        )
         citations = _fallback_search(query, context)
 
     out: dict[str, Any] = {

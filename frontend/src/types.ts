@@ -43,6 +43,8 @@ export interface Citation {
   title: string;
   source: string;
   url: string;
+  /** Snippet from search_literature / You.com — present on live results. */
+  relevance?: string;
 }
 
 export interface AiSuggestion {
@@ -59,6 +61,54 @@ export interface PerturbationResult {
   gene: string;
   before: Record<MarkerGene, number>;
   after: Record<MarkerGene, number>;
+}
+
+/** Minimal shape HypothesisCard needs — satisfied by both fixture AiSuggestion and live RankedSuggestion. */
+export interface SuggestionCitationRef {
+  gene: string;
+  citation: Citation;
+}
+
+/** A gene knockout suggestion ranked from live You.com literature search. */
+export interface RankedSuggestion {
+  rank: number;
+  gene: string;
+  rationale: string;
+  citations: Citation[];
+  linked_cell_id?: string;
+  linked_niche?: Niche;
+}
+
+export interface SuggestPerturbationsResponse {
+  cell_id: string;
+  phenotype: string;
+  niche: Niche;
+  source: 'you.com' | 'fallback';
+  suggestions: RankedSuggestion[];
+}
+
+export interface SearchLiteratureResponse {
+  query: string;
+  context: string | null;
+  citations: Citation[];
+  warning?: string;
+}
+
+export interface ChatResponse {
+  answer: string;
+  citations: Citation[];
+  suggestions: RankedSuggestion[];
+  suggestions_source: 'you.com' | 'fallback' | null;
+  warning: string | null;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  text: string;
+  citations?: Citation[];
+  suggestions?: RankedSuggestion[];
+  warning?: string | null;
 }
 
 export interface SampleMeta {

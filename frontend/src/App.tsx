@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type {
-  AiSuggestion,
   ColorMode,
   MarkerGene,
   PerturbationResult,
   SampleData,
   SampleMeta,
+  SuggestionCitationRef,
 } from './types';
 import { MARKER_GENES } from './types';
 import { listSamples, loadSample } from './api/client';
@@ -13,6 +13,7 @@ import { SampleSelect } from './components/SampleSelect';
 import { TissueMap } from './components/TissueMap';
 import { CellPanel } from './components/CellPanel';
 import { HypothesisCard } from './components/HypothesisCard';
+import { LiteratureChat } from './components/LiteratureChat';
 import './styles.css';
 
 export default function App() {
@@ -27,7 +28,10 @@ export default function App() {
   const [perturbation, setPerturbation] = useState<PerturbationResult | null>(
     null,
   );
-  const [activeSuggestion, setActiveSuggestion] = useState<AiSuggestion | null>(
+  const [activeSuggestion, setActiveSuggestion] =
+    useState<SuggestionCitationRef | null>(null);
+  const [showChat, setShowChat] = useState(false);
+  const [pendingGene, setPendingGene] = useState<{ gene: string; nonce: number } | null>(
     null,
   );
 
@@ -73,10 +77,14 @@ export default function App() {
 
   const handlePerturbation = (
     result: PerturbationResult | null,
-    suggestion?: AiSuggestion,
+    suggestion?: SuggestionCitationRef,
   ) => {
     setPerturbation(result);
     setActiveSuggestion(suggestion ?? null);
+  };
+
+  const handleUseGene = (gene: string) => {
+    setPendingGene({ gene, nonce: Date.now() });
   };
 
   if (!sampleId) {
@@ -149,6 +157,14 @@ export default function App() {
 
         <span className="toolbar__spacer" />
 
+        <button
+          type="button"
+          className={`toolbar__back${showChat ? ' toolbar__back--active' : ''}`}
+          onClick={() => setShowChat((v) => !v)}
+        >
+          Ask literature
+        </button>
+
         <button type="button" className="toolbar__back" onClick={resetToSelect}>
           Change sample
         </button>
@@ -172,6 +188,13 @@ export default function App() {
             />
           )}
         </div>
+        {showChat && (
+          <LiteratureChat
+            selectedCell={selectedCell}
+            onClose={() => setShowChat(false)}
+            onUseGene={handleUseGene}
+          />
+        )}
         <CellPanel
           sampleId={sampleId}
           data={data}
@@ -180,6 +203,7 @@ export default function App() {
           selectedGene={selectedGene}
           perturbation={perturbation}
           onPerturbation={handlePerturbation}
+          pendingGene={pendingGene}
         />
       </div>
     </div>

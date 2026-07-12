@@ -3,49 +3,56 @@
 Owkin *Rewiring Biology* hackathon project. We look at exhausted CD4 T cells in spatial tumor data, propose gene knockouts, simulate them, and check whether related signatures associate with survival in TCGA bulk cohorts.
 
 ```
-frontend/     Vite + React explorer (fixture tissue maps)
-mcp_server/   MCP tools + Bedrock research agent
+frontend/     Vite + React explorer (fixture tissue maps) + live literature chat
+mcp_server/   MCP tools + Bedrock research agent + REST proxy for the browser demo
 ```
 
-The UI and MCP server don’t talk to each other yet. They share the same sample / niche / marker vocabulary so the demos line up.
+The UI and MCP server don't talk to each other directly for tissue/cell data yet — that part still runs on shared fixture vocabulary (sample / niche / marker names line up). Literature search and knockout suggestions, however, are live: the frontend calls the same `search_literature` / `suggest_perturbations` MCP tools the agent uses, via a thin REST proxy (`spatial-api`) so the browser never holds `YOU_API_KEY`.
 
-## What’s actually built
+## What's actually built
 
 | Piece | Reality |
 |-------|---------|
 | Tissue explorer | Works on seeded fixture samples (`crc-01`, `nsclc-03`, `mel-07`) |
+| Literature search + KO suggestions | Live in the browser via `spatial-api` — You.com-grounded, with a curated offline fallback |
 | MCP tools | List cells, map to atlas labels, literature search, suggest/simulate KOs, TCGA survival association, SQLite memory, evidence scoring |
 | Research agent | Bedrock Converse loop over the MCP server (`spatial-agent`) |
 | Field-aware OT / quantum mapping | Described in earlier notes — **not implemented in this repo** |
 | Live scLDM | Needs `SCLDM_ROOT` + weights; otherwise a surrogate |
 | TCGA survival | Live via cBioPortal (or local `TCGA_DATA_ROOT`); fixture offline. Bulk association only — not cell-level proof |
 
-## Run the UI
+## Run the demo
 
 ```bash
-cd frontend
-npm install
-npm run dev    # http://localhost:5173
-```
-
-## Run the MCP server
-
-```bash
+# terminal 1 — REST proxy (fronts search_literature / suggest_perturbations for the UI)
 cd mcp_server
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-spatial-mcp    # http://0.0.0.0:8000/mcp
+# YOU_API_KEY in repo-root .env (see .env.example)
+spatial-api            # http://0.0.0.0:8001
+
+# terminal 2 — UI
+cd frontend
+npm install
+npm run dev             # http://localhost:5173
 ```
 
-## Run the agent
+In the UI: select a cell for You.com-grounded knockout suggestions, or open **Ask literature** for free-text `search_literature` chat.
 
-Needs `AWS_BEARER_TOKEN_BEDROCK` in a repo-root `.env`, plus a running MCP server.
+Details: [`frontend/README.md`](frontend/README.md)
+
+## Run the MCP server + agent
 
 ```bash
-# terminal 1
-spatial-mcp
+cd mcp_server
+source .venv/bin/activate
+spatial-mcp             # http://0.0.0.0:8000/mcp  (agent / K Pro)
+spatial-api             # http://0.0.0.0:8001      (browser REST proxy)
+```
 
-# terminal 2
+Needs `AWS_BEARER_TOKEN_BEDROCK` in a repo-root `.env` for the agent.
+
+```bash
 spatial-agent "Which gene knockout would best re-activate exhausted CD4 T cells in the CRC-01 tumor core?"
 ```
 
@@ -60,7 +67,7 @@ More detail: [`mcp_server/README.md`](mcp_server/README.md), [`frontend/README.m
 | Area | Path |
 |------|------|
 | UI | `frontend/` |
-| MCP registry / agent / memory | `mcp_server/src/spatial_mcp/` (avoid rewriting teammates’ stub files unless that’s your tool) |
+| MCP registry / agent / memory / REST proxy | `mcp_server/src/spatial_mcp/` (avoid rewriting teammates' stub files unless that's your tool) |
 | One domain tool | a single file under `mcp_server/src/spatial_mcp/stubs/` |
 
 ## Links

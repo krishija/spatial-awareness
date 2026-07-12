@@ -1,4 +1,4 @@
-import type { AiSuggestion, Cell, PerturbationResult } from '../types';
+import type { Cell, PerturbationResult, SuggestionCitationRef } from '../types';
 import {
   CELL_TYPE_LABELS,
   NICHE_LABELS,
@@ -9,7 +9,7 @@ import { MARKER_GENES } from '../types';
 interface Props {
   cell: Cell;
   result: PerturbationResult;
-  suggestion?: AiSuggestion | null;
+  suggestion?: SuggestionCitationRef | null;
 }
 
 function summarizeEffect(result: PerturbationResult): string {
