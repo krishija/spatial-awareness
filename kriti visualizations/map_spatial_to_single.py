@@ -1,14 +1,48 @@
-"""map_spatial_to_single — signature transfer from spatial Atera Tregs to AIFI atlas.
+"""Stub: map_spatial_to_single — real signature transfer, Atera -> AIFI atlas.
 
-Pipeline (see also `kriti visualizations/score_atlas.py`):
-  spatial tumour-infiltrating Tregs → DE signature → score atlas CD4 cells → top barcodes
+Self-contained. Same function name and signature as the fixture version, so
+schemas.py, registry.py and the frontend are untouched.
 
-This is NOT cell-to-cell assignment. It picks atlas control cells that resemble the
-spatial infiltration programme — the handoff point for scLDM perturbation.
+WHAT THIS ACTUALLY DOES, AND WHY IT IS NOT WHAT THE FIXTURE DID
+--------------------------------------------------------------
+The fixture pretended to assign each spatial cell an atlas identity. We do the
+opposite, deliberately:
 
-Data: `mcp_server/data/atlas_mapping.parquet` (+ optional `margin_signature.csv`),
-precomputed by `kriti visualizations/score_atlas.py`. Without those files, returns
-fixture mappings with an explicit warning (no silent fake biology).
+    spatial Tregs  ->  DE signature  ->  score every atlas cell  ->  pick barcodes
+
+Direction matters. Assigning a tumour-margin Treg to a specific healthy-blood cell
+would be a confident answer to a question with no answer — blood has no tumour margin,
+so no blood cell "is" that cell. What CAN be asked, and answered, is: which atlas cells
+most resemble the Tregs we found at the invasive front? Those are the control cells the
+perturbation model starts from.
+
+WHY THE ATLAS IS IN THE CHAIN AT ALL
+------------------------------------
+scLDM.CD4 was trained on Chromium Perturb-seq of primary blood CD4 T cells. Atera is
+probe-based, FFPE, in-situ, ~10x lower depth — OUT OF DISTRIBUTION for that model.
+The AIFI atlas is Chromium blood CD4: the same domain. It supplies the CONTROL
+POPULATION. Atera supplies the question.
+
+THE SIGNATURE
+-------------
+DE between tumour-INFILTRATING Tregs (>=20% invasive/hypoxic tumour neighbours) and all
+other Tregs, in the spatial data. Not "Treg vs everything" — that would just re-find
+Tregs, which is a sanity check, not a result.
+
+Abundance genes (ribosomal, mito, ACTB) are dropped: leave them in and the atlas score
+becomes a ranking by library size. Stromal/epithelial genes are dropped too: infiltrating
+Tregs are by construction the ones touching tumour and stroma, so they carry the most
+segmentation spillover, and an unmasked signature is a contamination signature.
+
+DATA
+----
+Reads mcp_server/data/atlas_mapping.parquet, precomputed by score_atlas.py.
+Falls back to the fixtures if absent, and SAYS SO.
+
+    aws s3 cp s3://owkin-hackathon26-spatialawareness-raw-data/artifacts/atlas_mapping.parquet \
+      mcp_server/data/
+    aws s3 cp s3://owkin-hackathon26-spatialawareness-raw-data/artifacts/margin_signature.csv \
+      mcp_server/data/
 """
 
 from __future__ import annotations
@@ -99,10 +133,7 @@ def _fixture_fallback(args: dict[str, Any]) -> dict[str, Any]:
         "n_mapped": len(mappings),
         "mappings": mappings,
         "summary": {"counts_by_atlas_label": dict(counts), "mean_confidence": 0.92},
-        "warning": (
-            "FIXTURE MODE — synthetic. Fetch atlas_mapping.parquet into mcp_server/data/ "
-            "(see kriti visualizations/score_atlas.py)."
-        ),
+        "warning": "FIXTURE MODE — synthetic. Fetch atlas_mapping.parquet into mcp_server/data/.",
     }
 
 
@@ -125,10 +156,15 @@ def map_spatial_to_single(args: dict[str, Any]) -> dict[str, Any]:
     sel = df[df["selected"]].sort_values("infiltration_score", ascending=False)
     tregs = df[df["is_treg"]] if "is_treg" in df.columns else df
 
+    # Which atlas subtypes are ENRICHED among the selected cells, versus all atlas
+    # Tregs? This is the finding. A flat 1.0x everywhere means the signature is not
+    # transferring and nothing downstream should be trusted.
     sel_frac = sel["aifi_label"].value_counts(normalize=True)
     base_frac = tregs["aifi_label"].value_counts(normalize=True)
     enrich = (sel_frac / base_frac.reindex(sel_frac.index)).sort_values(ascending=False)
 
+    # Cap the payload — thousands of barcodes would blow the agent's context window.
+    # The full list lives in the CSV.
     head = sel.head(50)
 
     return {
@@ -140,17 +176,19 @@ def map_spatial_to_single(args: dict[str, Any]) -> dict[str, Any]:
             "(expression-bin-matched background)"
         ),
         "direction": (
-            "spatial signature -> atlas cells. NOT cell-to-cell assignment."
+            "spatial signature -> atlas cells. NOT cell-to-cell assignment. A "
+            "tumour-margin Treg has no counterpart in healthy blood, so assigning one "
+            "would be a confident answer to a question with no answer."
         ),
         "n_atlas_cells_scored": int(len(df)),
         "n_atlas_tregs": int(len(tregs)),
         "n_selected": int(len(sel)),
-        "n_mapped": int(len(sel)),
         "score_cutoff": round(float(sel["infiltration_score"].min()), 4) if len(sel) else None,
         "signature_genes": (
             _SIG["names"].head(30).tolist() if _SIG is not None and "names" in _SIG else None
         ),
         "signature_size": int(len(_SIG)) if _SIG is not None else None,
+        # schema-shaped: the selected barcodes, ranked
         "mappings": [
             {
                 "cell_id": str(r.barcode),
@@ -171,22 +209,28 @@ def map_spatial_to_single(args: dict[str, Any]) -> dict[str, Any]:
             ),
         },
         "how_to_read_the_enrichment": (
-            "If ACTIVATED / EFFECTOR Treg subtypes are enriched and NAIVE ones depleted, "
-            "the spatial infiltration signature is transferring coherently. Flat ~1.0x "
-            "everywhere means the signature is not transferring."
+            "If ACTIVATED / EFFECTOR Treg subtypes are enriched and NAIVE ones depleted, a "
+            "tumour-infiltration programme derived from spatial tissue is picking activated "
+            "Tregs out of healthy blood — coherent, and a real result. If every subtype sits "
+            "near 1.0x, the signature is not transferring and nothing downstream should be "
+            "trusted."
         ),
         "why_the_atlas": (
             "scLDM.CD4 was trained on Chromium Perturb-seq of blood CD4 T cells. Atera is "
-            "probe-based FFPE in-situ — out of distribution. The AIFI atlas supplies the "
-            "control population in the same domain."
+            "probe-based FFPE in-situ at ~10x lower depth — out of distribution for that "
+            "model. The AIFI atlas is Chromium blood CD4: the same domain. It supplies the "
+            "CONTROL POPULATION; Atera supplies the question."
         ),
         "handoff": (
-            "Selected barcodes are AIFI atlas cell IDs for perturbation controls. "
-            "Full list: artifacts/selected_barcodes.csv (from score_atlas.py)."
+            "The selected barcodes are AIFI atlas cell IDs. Subset the atlas h5ad on them "
+            "and that is the control population for perturbation. Full list: "
+            "artifacts/selected_barcodes.csv"
         ),
         "caveat": (
-            "Atlas is healthy blood. Core Treg identity transfers; tumour-margin programme "
-            "does not — same context gap as scLDM.CD4 training data."
+            "The atlas is HEALTHY BLOOD. Core Treg identity transfers; the tumour-margin "
+            "programme does not, because blood has no tumour margin. That gap is not a bug "
+            "— it is the context gap, and scLDM.CD4 has the same one, having been trained "
+            "on blood-derived CD4 cells."
         ),
         "provenance": PROVENANCE,
         "note": (

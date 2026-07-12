@@ -202,9 +202,11 @@ WEAK
                                  not as evidence FOR that target.
   simulate_perturbations ....... ~0.16 bits. Corroboration only, never load-bearing.
 
-BROKEN
-  map_spatial_to_single ........ NOT IMPLEMENTED. Always returns ok:false. Do not call
-                                 it. It costs an iteration and returns nothing.
+OPTIONAL (context bridge)
+  map_spatial_to_single ........ signature transfer: spatial Treg infiltration programme
+                                 → AIFI atlas barcodes for perturbation controls. Needs
+                                 atlas_mapping.parquet in mcp_server/data/ (see kriti
+                                 visualizations/score_atlas.py). Fixture fallback if missing.
 
 ════════════════════════════════════════════════════════════════════════
 WHEN THINGS FAIL — FAIL LOUD IS THE POLICY, NOT A BUG

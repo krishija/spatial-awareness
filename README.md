@@ -15,6 +15,9 @@ mcp_server/   12 MCP tools, Bedrock research agent, REST proxy for the UI
 The UI and the agent share the same tool registry. They are not fully wired into
 one product yet — you can demo either side on its own.
 
+Atlas mapping pipeline (Kriti): `kriti visualizations/` — `score_atlas.py` builds
+`atlas_mapping.parquet`; the MCP tool reads it from `mcp_server/data/`.
+
 ## What works today
 
 | Piece | Status |
@@ -29,7 +32,7 @@ one product yet — you can demo either side on its own.
 | TCGA survival | Cox association (local → cBioPortal → fixture). Bulk prognostic signal, not cell-level proof |
 | Research agent | Bedrock ↔ MCP: gene binding after COMMIT, ≥2 grounded modalities before REPORT, mandatory non-load-bearing simulate step, independence clustering, conflict-aware gating |
 | Agent traces | Example runs under `mcp_server/artifacts/agent_traces/phase34/` |
-| `map_spatial_to_single` | Not implemented — fails loud (no invented atlas couplings) |
+| `map_spatial_to_single` | Signature transfer (spatial Treg DE → AIFI atlas barcodes). Real when `atlas_mapping.parquet` is in `mcp_server/data/`; fixture fallback with warning otherwise. Pipeline in `kriti visualizations/` |
 
 ## Honest failure modes
 

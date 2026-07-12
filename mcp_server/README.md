@@ -23,7 +23,7 @@ Tunnel if needed: `ngrok http 8000` → point an MCP client at `https://…/mcp`
 | Tool | Notes |
 |------|-------|
 | `list_candidate_cells` | Real Atera parquet when configured; otherwise fails loud |
-| `map_spatial_to_single` | Not implemented — `ok: false` (no fake OT mappings) |
+| `map_spatial_to_single` | Signature transfer (Atera infiltration signature → AIFI atlas controls). Precomputed parquet in `data/`; fixture fallback if missing. See `kriti visualizations/score_atlas.py` |
 | `search_literature` | You.com (+ PubMed/PMC helpers); stance-labeled evidence cards |
 | `suggest_perturbations` | Literature-ranked knockout candidates for a phenotype/niche |
 | `simulate_perturbations` | Live scLDM if weights exist; else labeled `scldm_surrogate`. OOV gene → `ok: false` |

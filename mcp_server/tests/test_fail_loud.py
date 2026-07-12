@@ -45,10 +45,11 @@ def test_search_literature_fails_without_key(monkeypatch):
     assert out.get("evidence_cards") == [] or out.get("citations") == []
 
 
-def test_map_spatial_fails_not_implemented():
-    out = map_spatial_to_single({"sample_id": "atera-cervical-01"})
-    assert out["ok"] is False
-    assert out["error"] == "not_implemented"
+def test_map_spatial_fixture_mode_without_parquet():
+    out = map_spatial_to_single({"sample_id": "crc-01"})
+    assert out.get("ok") is not False
+    assert out.get("mappings")
+    assert "FIXTURE MODE" in (out.get("warning") or "")
 
 
 def test_simulate_fails_without_scldm_or_data(monkeypatch, tmp_path):
