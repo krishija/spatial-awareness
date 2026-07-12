@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from spatial_mcp.agent.evidence import EvidenceItem
+from spatial_mcp.agent.lit_clusters import cluster_literature_cards
 
 
 def evidence_from_tool_result(
@@ -18,6 +19,22 @@ def evidence_from_tool_result(
 
     Returns [] on hard errors so a failed call does not invent support.
     """
+    extractors = {
+        "query_prior_findings": _from_priors,
+        "list_candidate_cells": _from_cells,
+        "map_spatial_to_single": _from_atlas,
+        "search_literature": _from_literature,
+        "suggest_perturbations": _from_suggestions,
+        "simulate_perturbations": _from_simulation,
+        "differential_survival_analysis": _from_cohort_prognostic,
+        "find_measured_perturbation_evidence": _from_measured,
+        "recommend_next_experiment": _from_recommend,
+        "record_finding": _from_record,
+    }
+    fn = extractors.get(tool_name)
+    if fn:
+        return fn(arguments, result, focus_gene=focus_gene)
+
     if result.get("ok") is False and result.get("error"):
         return [
             EvidenceItem(
@@ -29,21 +46,7 @@ def evidence_from_tool_result(
                 metadata={"tool": tool_name, "error": True},
             )
         ]
-
-    extractors = {
-        "query_prior_findings": _from_priors,
-        "list_candidate_cells": _from_cells,
-        "map_spatial_to_single": _from_atlas,
-        "search_literature": _from_literature,
-        "suggest_perturbations": _from_suggestions,
-        "simulate_perturbations": _from_simulation,
-        "differential_survival_analysis": _from_cohort_prognostic,
-        "record_finding": _from_record,
-    }
-    fn = extractors.get(tool_name)
-    if not fn:
-        return []
-    return fn(arguments, result, focus_gene=focus_gene)
+    return []
 
 
 def _from_priors(
@@ -137,31 +140,144 @@ def _from_literature(
     *,
     focus_gene: str | None = None,
 ) -> list[EvidenceItem]:
+    """Map structured evidence_cards (preferred) or legacy citations → literature items."""
+    if result.get("ok") is False:
+        return [
+            EvidenceItem(
+                evidence_type="literature",
+                summary=result.get("message") or "Literature search failed",
+                source_id="search_literature:error",
+                polarity="neutral",
+                strength=0.0,
+                metadata={"error": result.get("error")},
+            )
+        ]
+
     items: list[EvidenceItem] = []
-    for i, c in enumerate(result.get("citations") or []):
-        title = c.get("title") or "Untitled"
-        score = float(c.get("score") or 1.0)
-        # Optional conflict hook: titles containing "contradict" / "fails to"
-        # mark contradicting literature (used by conflict demos / tests).
-        lower = (title + " " + (c.get("relevance") or "")).lower()
-        polarity = "contradicts" if any(
-            k in lower for k in ("contradict", "fails to restore", "no benefit", "ineffective")
-        ) else "supports"
-        gene_hit = focus_gene and focus_gene.upper() in (
-            title + " " + (c.get("relevance") or "")
-        ).upper()
+    cards = result.get("evidence_cards")
+    if cards is None:
+        # Legacy path
+        cards = []
+        for c in result.get("citations") or []:
+            cards.append(
+                {
+                    "title": c.get("title"),
+                    "source": c.get("source"),
+                    "url": c.get("url"),
+                    "claim": c.get("relevance"),
+                    "stance": c.get("stance"),
+                    "snippet": c.get("relevance"),
+                }
+            )
+
+    rollup = result.get("rollup") or {}
+    if result.get("under_studied"):
         items.append(
             EvidenceItem(
                 evidence_type="literature",
-                summary=f"{title} — {c.get('source')}",
-                source_id=c.get("url") or f"lit-{i}",
+                summary=(
+                    "Literature search completed with zero hits after alias-expanded "
+                    "sub-queries — claim may be under-studied."
+                ),
+                source_id="search_literature:under_studied",
+                polarity="neutral",
+                strength=0.3,
+                metadata={"under_studied": True, "rollup": rollup},
+            )
+        )
+
+    # Independence clustering before evidence items (W4)
+    if cards:
+        clustering = cluster_literature_cards(cards)
+        result["_lit_independence"] = clustering
+    else:
+        clustering = {"summary": "0 papers → 0 independent experimental claims."}
+
+    # One evidence item per independent cluster (primary card), not per paper
+    emitted_clusters: set[str] = set()
+    for i, c in enumerate(cards):
+        cluster_id = c.get("lit_cluster_id") or f"litc-singleton-{i}"
+        if cluster_id in emitted_clusters:
+            continue
+        emitted_clusters.add(cluster_id)
+
+        title = c.get("title") or "Untitled"
+        claim = c.get("claim") or c.get("snippet") or ""
+        stance_raw = (c.get("stance") or "").lower()
+        if stance_raw == "supports":
+            polarity = "supports"
+        elif stance_raw == "contradicts":
+            polarity = "contradicts"
+        elif stance_raw == "tangential":
+            polarity = "neutral"
+        else:
+            lower = (title + " " + claim).lower()
+            polarity = (
+                "contradicts"
+                if any(
+                    k in lower
+                    for k in ("contradict", "fails to restore", "no benefit", "ineffective")
+                )
+                else "supports"
+            )
+
+        strength = 0.55
+        if c.get("metadata_confidence") == "high":
+            strength += 0.15
+        if c.get("extraction_ok"):
+            strength += 0.1
+        pub_types = [t.lower() for t in (c.get("publication_types") or [])]
+        if any("meta-analysis" in t or "systematic review" in t for t in pub_types):
+            strength += 0.1
+        elif any("clinical trial" in t or "randomized" in t for t in pub_types):
+            strength += 0.08
+        elif any(t == "review" for t in pub_types):
+            strength += 0.03
+        gene_hit = focus_gene and focus_gene.upper() in (
+            title + " " + (claim or "") + " " + " ".join(arguments.get("genes") or [])
+        ).upper()
+        if gene_hit:
+            strength += 0.05
+        strength = min(1.0, strength)
+
+        n_in_cluster = sum(
+            1 for x in cards if (x.get("lit_cluster_id") or "") == cluster_id
+        )
+        summary = f"{title} — {c.get('source')}"
+        if claim:
+            summary = f"{summary}: {claim}"
+        summary = f"{summary} [{clustering.get('summary', '')} primary of cluster {cluster_id}, n={n_in_cluster}]"
+
+        items.append(
+            EvidenceItem(
+                evidence_type="literature",
+                summary=summary,
+                source_id=c.get("pmid") and f"pmid:{c['pmid']}" or c.get("url") or f"lit-{i}",
                 polarity=polarity,  # type: ignore[arg-type]
-                strength=min(1.0, 0.5 + score * 0.15 + (0.2 if gene_hit else 0)),
+                strength=strength,
                 metadata={
                     "title": title,
                     "source": c.get("source"),
                     "url": c.get("url"),
-                    "relevance": c.get("relevance"),
+                    "pmid": c.get("pmid"),
+                    "year": c.get("year"),
+                    "journal": c.get("journal"),
+                    "publication_type": c.get("publication_type"),
+                    "publication_types": c.get("publication_types"),
+                    "claim": claim,
+                    "stance": c.get("stance"),
+                    "biological_context": c.get("biological_context"),
+                    "extraction_note": c.get("extraction_note"),
+                    "metadata_confidence": c.get("metadata_confidence"),
+                    "rollup_narrative": rollup.get("narrative"),
+                    "lit_cluster_id": cluster_id,
+                    "independence_cluster": f"literature:{cluster_id}",
+                    "lit_independence_summary": clustering.get("summary"),
+                    "symmetric_search": result.get("symmetric_search_complete"),
+                    "support_search_effort": result.get("support_search_effort"),
+                    "contradiction_search_effort": result.get(
+                        "contradiction_search_effort"
+                    ),
                 },
             )
         )
@@ -216,7 +332,6 @@ def _from_simulation(
             )
         ]
     deltas = result.get("deltas") or {}
-    # "Supports reversion from exhaustion" if PDCD1/TOX down and TCF7/IL7R/GZMB up
     inhibitory_down = sum(
         1 for g in ("PDCD1", "TOX", "LAG3", "CTLA4") if float(deltas.get(g, 0)) < -0.3
     )
@@ -224,7 +339,6 @@ def _from_simulation(
         1 for g in ("TCF7", "IL7R", "GZMB") if float(deltas.get(g, 0)) > 0.3
     )
     supports = inhibitory_down >= 1 and effector_up >= 1
-    # Conflict demo: metadata flag or net effector drop
     if effector_up == 0 and inhibitory_down == 0:
         polarity = "neutral"
         strength = 0.3
@@ -236,9 +350,25 @@ def _from_simulation(
         strength = 0.7
 
     gene = result.get("gene") or arguments.get("gene")
+    # Conditional trust → sim_trust_bits for the log-odds layer
+    try:
+        from spatial_mcp.agent.trust import simulation_trust
+
+        trust = simulation_trust(
+            str(gene or ""),
+            cell_type_context=result.get("cell_type"),
+            metadata={"deltas": deltas, "gene": gene},
+        )
+        sim_bits = float(trust["bits"])
+        trust_meta = trust
+    except Exception as exc:  # noqa: BLE001
+        sim_bits = 0.16
+        trust_meta = {"tier": "documented_prior", "error": str(exc), "bits": sim_bits}
+
     summary = (
         f"Simulated {gene} KO on {result.get('cell_id')}: "
         f"inhibitory_down={inhibitory_down}, effector_up={effector_up}; "
+        f"trust_tier={trust_meta.get('tier')} bits={sim_bits}; "
         f"top deltas={dict(sorted(deltas.items(), key=lambda kv: abs(kv[1]), reverse=True)[:4])}"
     )
     return [
@@ -256,6 +386,9 @@ def _from_simulation(
                 "before": result.get("before"),
                 "after": result.get("after"),
                 "deltas": deltas,
+                "sim_trust_bits": sim_bits,
+                "lr_note": trust_meta.get("note"),
+                "trust": trust_meta,
             },
         )
     ]
@@ -321,6 +454,7 @@ def _from_cohort_prognostic(
             strength=strength,
             metadata={
                 "claim_type": "cohort_association",
+                "cancer_type": result.get("cancer_type"),
                 "hazard_ratio": hr,
                 "hr_ci_low": result.get("hr_ci_low"),
                 "hr_ci_high": result.get("hr_ci_high"),
@@ -336,6 +470,121 @@ def _from_cohort_prognostic(
                 "n_patients": result.get("n_patients"),
                 "interpretation_caveat": result.get("interpretation_caveat"),
                 "genes": genes,
+            },
+        )
+    ]
+
+
+def _from_measured(
+    arguments: dict[str, Any],
+    result: dict[str, Any],
+    *,
+    focus_gene: str | None = None,
+) -> list[EvidenceItem]:
+    """Measured perturbation evidence — strongest grounded type when context matches."""
+    gene = (result.get("gene") or arguments.get("gene") or focus_gene or "").upper()
+    if result.get("ok") is False:
+        return [
+            EvidenceItem(
+                evidence_type="measured",
+                summary=result.get("message") or "Measured-evidence lookup failed",
+                source_id="measured:error",
+                polarity="neutral",
+                strength=0.0,
+                metadata={"error": result.get("error")},
+            )
+        ]
+    if result.get("nothing_found"):
+        return [
+            EvidenceItem(
+                evidence_type="measured",
+                summary=(
+                    result.get("message")
+                    or f"No measured perturbation evidence for {gene} — "
+                    "simulated predictions should be trusted less."
+                ),
+                source_id=f"measured:none:{gene}",
+                polarity="neutral",
+                strength=0.4,
+                metadata={"nothing_found": True, "gene": gene},
+            )
+        ]
+
+    items: list[EvidenceItem] = []
+    for i, h in enumerate(result.get("hits") or []):
+        score = float(h.get("context_match_score") or 0)
+        comps = h.get("context_match_components") or {}
+        # Low context match: still surface, but weak / near-zero diagnosticity
+        strength = min(1.0, max(0.1, score))
+        polarity: str = "supports" if score >= 0.45 else "neutral"
+        # Training-corpus membership is categorically stronger when cell matches
+        if h.get("source_type") == "training_corpus" and score >= 0.5:
+            polarity = "supports"
+            strength = min(1.0, 0.7 + 0.3 * score)
+        items.append(
+            EvidenceItem(
+                evidence_type="measured",
+                summary=(
+                    f"Measured hit for {gene} via {h.get('dataset')}: "
+                    f"context_match={score} (cell={comps.get('cell_type_match')}, "
+                    f"species={comps.get('species_match')}, "
+                    f"mechanism={comps.get('perturbation_mechanism_match')})"
+                ),
+                source_id=h.get("source_id") or h.get("accession") or f"measured:{gene}:{i}",
+                polarity=polarity,  # type: ignore[arg-type]
+                strength=strength,
+                metadata={
+                    "gene": gene,
+                    "accession": h.get("accession"),
+                    "dataset": h.get("dataset"),
+                    "source_type": h.get("source_type"),
+                    "context_match_score": score,
+                    "context_match_components": comps,
+                    "effect": h.get("effect"),
+                    "independence_cluster": f"measured:{h.get('accession') or h.get('dataset') or i}",
+                },
+            )
+        )
+    return items
+
+
+def _from_recommend(
+    arguments: dict[str, Any],
+    result: dict[str, Any],
+    *,
+    focus_gene: str | None = None,
+) -> list[EvidenceItem]:
+    """Recommend is a decision aid — neutral scaffolding, not diagnostic evidence."""
+    if result.get("ok") is False:
+        return []
+    recs = result.get("recommendations") or []
+    if not recs:
+        return [
+            EvidenceItem(
+                evidence_type="suggestion",
+                summary=result.get("message") or "No experiment recommendations.",
+                source_id="recommend:empty",
+                polarity="neutral",
+                strength=0.2,
+                metadata={"calibration": result.get("calibration")},
+            )
+        ]
+    top = recs[0]
+    return [
+        EvidenceItem(
+            evidence_type="suggestion",
+            summary=(
+                f"Next experiment: {top.get('recommendation_type')} for {top.get('gene')} "
+                f"(score={top.get('score')}). {top.get('rationale')}"
+            ),
+            source_id=f"recommend:{top.get('gene')}",
+            polarity="supports",
+            strength=0.35,
+            metadata={
+                "gene": top.get("gene"),
+                "recommendation_type": top.get("recommendation_type"),
+                "calibration": result.get("calibration"),
+                "graph_path": top.get("graph_path"),
             },
         )
     ]

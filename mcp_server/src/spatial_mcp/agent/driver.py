@@ -23,7 +23,13 @@ from spatial_mcp.agent.bedrock import (
 from spatial_mcp.agent.evidence import EvidenceItem, aggregate_evidence
 from spatial_mcp.agent.extract import evidence_from_tool_result
 from spatial_mcp.agent.gating import decide_next_action
+from spatial_mcp.agent.hypothesis import Hypothesis
 from spatial_mcp.agent.mcp_client import McpToolClient, connect_mcp
+from spatial_mcp.agent.preregister import (
+    make_preregistration,
+    requires_preregistration,
+    resolve_preregistration,
+)
 from spatial_mcp.agent.report import HypothesisReport, build_report, render_markdown
 from spatial_mcp.agent.trace import ReasoningTrace
 
@@ -35,10 +41,14 @@ bulk cohorts (cohort association — not cell-level validation), and recording/q
 
 Hard rules you must follow:
 1. Call query_prior_findings BEFORE suggest_perturbations.
-2. Prefer a concrete sample (crc-01, nsclc-03, or mel-07) when the user does not specify.
-3. After gathering enough evidence, stop calling tools and write a short conclusion.
-4. Do NOT invent confidence numbers — a separate scoring module computes confidence.
-5. Prefer exhausted CD4 cells in tumor_core when exploring checkpoint knockouts (PDCD1, TOX, LAG3).
+2. Prefer sample_id atera-cervical-01 when real Atera data is available; call list_candidate_cells
+   with cell_type alone first to read niche_composition, then narrow with niche=.
+3. When calling search_literature, pass structured fields (gene/genes, phenotype, niche,
+   hypothesis) — not just a flat query string — so stance-labeled evidence cards are useful.
+4. After gathering enough evidence, stop calling tools and write a short conclusion.
+5. Do NOT invent confidence numbers — a separate scoring module computes confidence.
+6. Prefer exhausted CD4 cells when exploring checkpoint knockouts (PDCD1, TOX, LAG3);
+   for Tregs prefer margin-adjacent populations and CTLA4.
 
 Work efficiently: few high-value tool calls, not exhaustive exploration.
 """
@@ -51,7 +61,7 @@ class AgentConfig:
     wall_clock_s: float = 180.0
     model_id: str | None = None
     region: str | None = None
-    sample_id_default: str = "crc-01"
+    sample_id_default: str = "atera-cervical-01"
 
 
 @dataclass
@@ -238,6 +248,47 @@ class ResearchAgent:
                         )
                         continue
 
+                    # W5: pre-register predicted direction before evidence-gathering tools
+                    prereg = None
+                    if requires_preregistration(name):
+                        gene = (
+                            args.get("gene")
+                            or (args.get("genes") or [None])[0]
+                            or focus.get("gene")
+                        )
+                        # Direction from tool args / focus — code commits, not free prose
+                        predicted = (
+                            args.get("expected_direction")
+                            or args.get("predicted_direction")
+                            or focus.get("predicted_direction")
+                            or "up"
+                        )
+                        prereg = make_preregistration(
+                            tool=name,
+                            gene=str(gene) if gene else None,
+                            predicted_direction=str(predicted),
+                            predicted_magnitude=str(
+                                args.get("predicted_magnitude") or "moderate"
+                            ),
+                            rationale=(
+                                f"Pre-registration before {name} "
+                                f"(agent may not narrate this result post-hoc)."
+                            ),
+                            hypothesis_claim=_compose_hypothesis(
+                                focus, research_question
+                            ),
+                        )
+                        from spatial_mcp.agent.preregister import append_preregistration
+
+                        append_preregistration(prereg)
+                        trace.log(
+                            "preregistration",
+                            id=prereg.id,
+                            tool=name,
+                            predicted_direction=prereg.predicted_direction,
+                            gene=prereg.gene,
+                        )
+
                     try:
                         raw = await mcp.call_tool(name, args)
                         is_error = bool(raw.get("ok") is False and raw.get("error"))
@@ -248,6 +299,15 @@ class ResearchAgent:
                             "message": f"{type(exc).__name__}: {exc}",
                         }
                         is_error = True
+
+                    if prereg is not None:
+                        resolve_preregistration(prereg, raw)
+                        trace.log(
+                            "preregistration_resolved",
+                            id=prereg.id,
+                            confirmed=prereg.confirmed,
+                            observed=prereg.observed_direction,
+                        )
 
                     tools_called.append(name)
                     trace.log(
@@ -264,7 +324,8 @@ class ResearchAgent:
                     evidence_bank.extend(new_items)
                     _update_focus(focus, name, args, raw, new_items)
 
-                    score = aggregate_evidence(evidence_bank)
+                    hyp = Hypothesis.from_focus(focus)
+                    score = aggregate_evidence(evidence_bank, hypothesis=hyp)
                     gate = decide_next_action(
                         evidence_score=score,
                         tools_called=tools_called,
@@ -276,19 +337,27 @@ class ResearchAgent:
                     trace.log(
                         "aggregate_and_gate",
                         confidence=score.confidence,
+                        posterior_log_odds_bits=score.posterior_log_odds_bits,
+                        n_independent_sources=score.n_independent_sources,
+                        has_grounded_source=score.has_grounded_source,
                         has_conflict=score.has_conflict,
                         coverage=score.coverage,
                         gate=gate.to_dict(),
+                        evidence_budget=score.evidence_budget[:12],
                         rationale=score.rationale[:400],
+                        hypothesis=hyp.to_dict(),
                     )
 
                     # Feed programmatic score back so the model sees constraints
                     enriched = {
                         "tool_result": raw,
                         "programmatic_confidence": score.confidence,
+                        "posterior_log_odds_bits": score.posterior_log_odds_bits,
+                        "evidence_budget": score.evidence_budget,
                         "gate_decision": gate.decision,
                         "gate_reason": gate.reason,
                         "suggested_next_tool": gate.next_tool,
+                        "hypothesis": hyp.to_dict(),
                     }
                     tool_results_payload.append(
                         (tu["toolUseId"], enriched, is_error)
@@ -317,10 +386,65 @@ class ResearchAgent:
                 )
                 gate_summary.append(last_gate.to_dict())
 
+            # W3: confound enumeration — surviving alternatives subtract bits (not a tool checklist)
+            hyp = Hypothesis.from_focus(focus)
+            from spatial_mcp.agent.red_team import (
+                enumerate_confounds,
+                surviving_alternatives,
+                update_confound_status,
+            )
+
+            confounds = update_confound_status(
+                enumerate_confounds(hyp),
+                evidence_types_present={i.evidence_type for i in evidence_bank},
+                measured_context_match=next(
+                    (
+                        float(i.metadata.get("context_match_score") or 0)
+                        for i in evidence_bank
+                        if i.evidence_type == "measured"
+                        and i.metadata.get("context_match_score") is not None
+                    ),
+                    None,
+                ),
+                cohort_present=any(
+                    i.evidence_type == "cohort_prognostic" for i in evidence_bank
+                ),
+            )
+            surviving = surviving_alternatives(confounds)
+            for alt in surviving:
+                evidence_bank.append(
+                    EvidenceItem(
+                        evidence_type="red_team",
+                        summary=f"Surviving alternative: {alt['explanation']}",
+                        source_id=f"confound:{alt['id']}",
+                        polarity="contradicts",
+                        strength=0.35,  # partial — enumerated, not steelmanned
+                        metadata={"confound_id": alt["id"], "red_team": True},
+                    )
+                )
+            score = aggregate_evidence(evidence_bank, hypothesis=hyp)
+            last_gate = decide_next_action(
+                evidence_score={
+                    **score.to_dict(),
+                    "surviving_alternative_explanations": surviving,
+                },
+                tools_called=tools_called,
+                max_iterations=self.config.max_iterations,
+                iteration=self.config.max_iterations,
+            )
+            gate_summary.append(last_gate.to_dict())
+            trace.log(
+                "red_team_confounds",
+                n_confounds=len(confounds),
+                n_surviving=len(surviving),
+                surviving=[c["id"] for c in surviving],
+                posterior_after=score.confidence,
+            )
+
             reports: list[HypothesisReport] = []
             discarded: list[dict[str, Any]] = []
 
-            hypothesis = _compose_hypothesis(focus, research_question)
+            hypothesis = hyp.claim
             if last_gate.decision == "REPORT":
                 reports.append(
                     build_report(
@@ -337,6 +461,12 @@ class ResearchAgent:
                         gate_decision="REPORT",
                         research_question=research_question,
                     )
+                )
+                trace.log(
+                    "report_epistemics",
+                    evidence_budget=score.evidence_budget,
+                    surviving_alternative_explanations=surviving,
+                    posterior_log_odds_bits=score.posterior_log_odds_bits,
                 )
                 # Persist finding for cross-session memory
                 try:
@@ -447,12 +577,4 @@ def _update_focus(
 
 
 def _compose_hypothesis(focus: dict[str, Any], question: str) -> str:
-    gene = focus.get("gene") or "an unspecified gene"
-    cell = focus.get("cell_id") or "a resolved cell"
-    niche = focus.get("niche") or "its niche"
-    ctype = focus.get("cell_type") or "CD4 T cell"
-    return (
-        f"In {ctype} {cell} within the {niche}, knockout of {gene} is predicted to "
-        f"shift the marker profile toward a less exhausted / more effector-like state "
-        f"(addressing: {question})"
-    )
+    return Hypothesis.from_focus(focus).claim

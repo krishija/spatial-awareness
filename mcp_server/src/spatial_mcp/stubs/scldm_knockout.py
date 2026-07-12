@@ -464,21 +464,15 @@ def run_live_knockout(gene: str) -> KnockoutResult:
 
 
 def evaluate_knockout(gene: str) -> KnockoutResult:
-    """Public entry: live scLDM if configured, else surrogate."""
+    """Live scLDM only. Raises if weights/deps are missing or inference fails."""
     gene = gene.upper()
     if gene not in KNOWN_GUIDE_SYMBOLS and resolve_ensembl(gene) is None:
         raise ValueError(f"gene_out_of_vocabulary:{gene}")
 
-    if scldm_available():
-        try:
-            return run_live_knockout(gene)
-        except Exception as exc:  # noqa: BLE001
-            # Fall through to surrogate but keep the error visible
-            result = run_surrogate_knockout(gene)
-            result.details["live_error"] = f"{type(exc).__name__}: {exc}"
-            result.details["note"] = (
-                "Live scLDM inference failed — served surrogate deltas. "
-                + str(result.details.get("note", ""))
-            )
-            return result
-    return run_surrogate_knockout(gene)
+    if not scldm_available():
+        raise RuntimeError(
+            "scLDM not available. Set SCLDM_ROOT (and optionally SCLDM_CHECKPOINT) "
+            "to an installed scLDM-CD4 checkout with weights. "
+            "Surrogate deltas are disabled — refusing to invent knockout effects."
+        )
+    return run_live_knockout(gene)

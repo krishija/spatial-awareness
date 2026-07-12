@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from spatial_mcp.fixtures.cells import get_cell
+from spatial_mcp.stubs.cell_store import get_cell
 from spatial_mcp.you_client import you_search
 
 MAX_SUGGESTIONS = 5
@@ -236,11 +236,37 @@ def suggest_perturbations(args: dict[str, Any]) -> dict[str, Any]:
     niche = args["niche"]
     literature_context = args.get("literature_context")
 
-    # cell lookup is best-effort context only — a cell_id that doesn't resolve
-    # (e.g. a demo cell from a synthetic tissue map) shouldn't block suggestions,
-    # since ranking is driven by phenotype/niche + literature, not the cell record.
-    cell = get_cell(cell_id)
+    try:
+        cell = get_cell(cell_id)
+    except FileNotFoundError as exc:
+        return {
+            "ok": False,
+            "error": "data_missing",
+            "message": str(exc),
+            "cell_id": cell_id,
+            "suggestions": [],
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "ok": False,
+            "error": "data_load_failed",
+            "message": f"{type(exc).__name__}: {exc}",
+            "cell_id": cell_id,
+            "suggestions": [],
+        }
+
+    # Phenotype from args wins; cell record fills gaps when present.
     effective_phenotype = phenotype or (cell["cell_type"] if cell else "")
+    if not effective_phenotype:
+        return {
+            "ok": False,
+            "error": "cell_not_found",
+            "message": (
+                f"No cell with id '{cell_id}' in cells.parquet and no phenotype provided."
+            ),
+            "cell_id": cell_id,
+            "suggestions": [],
+        }
 
     phenotype_label = PHENOTYPE_QUERY_LABEL.get(effective_phenotype, effective_phenotype or "cell")
     query = (
@@ -283,6 +309,7 @@ def suggest_perturbations(args: dict[str, Any]) -> dict[str, Any]:
         suggestions.append(item)
 
     return {
+        "ok": True,
         "cell_id": cell_id,
         "phenotype": phenotype,
         "niche": niche,

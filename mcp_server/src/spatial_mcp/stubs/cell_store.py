@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
 DATA_DIR = Path(__file__).resolve().parents[3] / "data"
-CELLS_PARQUET = DATA_DIR / "cells.parquet"
+CELLS_PARQUET = Path(
+    os.environ.get("SPATIAL_CELLS_PARQUET") or (DATA_DIR / "cells.parquet")
+)
 
 MARKER_GENES = [
     "PDCD1",
