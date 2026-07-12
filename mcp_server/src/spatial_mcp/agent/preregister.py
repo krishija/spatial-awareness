@@ -8,6 +8,7 @@ generates free calibration data about the agent itself.
 from __future__ import annotations
 
 import json
+import os
 import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
@@ -26,6 +27,15 @@ PREREGISTER_REQUIRED = frozenset(
 _DEFAULT_STORE = (
     Path(__file__).resolve().parents[3] / "data" / "preregistrations.jsonl"
 )
+
+
+def _store_path(path: Path | None = None) -> Path:
+    if path is not None:
+        return path
+    override = os.environ.get("SPATIAL_PREREG_PATH")
+    if override:
+        return Path(override)
+    return _DEFAULT_STORE
 
 
 @dataclass
@@ -77,7 +87,7 @@ def make_preregistration(
 def append_preregistration(
     reg: PreRegistration, path: Path | None = None
 ) -> Path:
-    path = path or _DEFAULT_STORE
+    path = _store_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(reg.to_dict()) + "\n")
@@ -145,7 +155,7 @@ def _infer_observed_direction(tool: str, result: dict[str, Any]) -> str | None:
 
 
 def load_preregistrations(path: Path | None = None) -> list[dict[str, Any]]:
-    path = path or _DEFAULT_STORE
+    path = _store_path(path)
     if not path.is_file():
         return []
     rows = []

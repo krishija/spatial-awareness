@@ -44,4 +44,11 @@ mcp_server/data/*.db-*
 *.pkl
 work/
 artifacts/
+# Keep committed demo deliverables (calibration + agent traces)
+!mcp_server/artifacts/
+mcp_server/artifacts/**
+!mcp_server/artifacts/calibration/
+!mcp_server/artifacts/calibration/**
+!mcp_server/artifacts/agent_traces/
+!mcp_server/artifacts/agent_traces/**
 demo_data/

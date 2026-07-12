@@ -20,20 +20,27 @@ from pathlib import Path
 
 
 def main() -> int:
-    # Ensure MCP package importable when repo is synced beside data
-    repo = Path(os.environ.get("REPO_ROOT", "/home/ec2-user/SageMaker/spatial-awareness"))
+    # Prefer user-owned e2e_work paths (avoid root-owned lifecycle leftovers)
+    default_repo = "/home/ec2-user/SageMaker/e2e_work/spatial-awareness"
+    repo = Path(os.environ.get("REPO_ROOT", default_repo))
     src = repo / "mcp_server" / "src"
     if src.is_dir():
         sys.path.insert(0, str(src))
 
     cells = os.environ.get(
         "SPATIAL_CELLS_PARQUET",
-        "/home/ec2-user/SageMaker/spatial-awareness-data/cells.parquet",
+        "/home/ec2-user/SageMaker/e2e_work/data/cells.parquet",
+    )
+    os.environ.setdefault(
+        "SPATIAL_PREREG_PATH",
+        "/home/ec2-user/SageMaker/e2e_work/data/preregistrations.jsonl",
     )
     # Point cell_store at real parquet
     os.environ.setdefault("SCLDM_DEVICE", "cuda")
     if not os.environ.get("SCLDM_ROOT"):
-        os.environ["SCLDM_ROOT"] = "/home/ec2-user/SageMaker/scldm_cd4"
+        candidate = "/home/ec2-user/SageMaker/e2e_work/scldm_cd4"
+        if Path(candidate).is_dir():
+            os.environ["SCLDM_ROOT"] = candidate
 
     from spatial_mcp.stubs import cell_store
 
