@@ -41,80 +41,80 @@ type ExpressionBase = Record<MarkerGene, number>;
 const PHENOTYPE_BASE: Record<CellType, ExpressionBase> = {
   CD4_Tex_term: {
     PDCD1: 4.2,
-    TCF7: 0.6,
-    TOX: 4.0,
-    LAG3: 3.8,
-    GZMB: 0.8,
-    IL7R: 0.7,
     CTLA4: 2.4,
     FOXP3: 0.5,
+    CXCL9: 2.8,
+    STAT1: 3.5,
+    CXCR4: 0.5,
+    IL2RA: 0.4,
+    TNFRSF9: 1.5,
   },
   CD4_Tex_prog: {
-    PDCD1: 2.6,
-    TCF7: 3.2,
-    TOX: 2.0,
-    LAG3: 1.8,
-    GZMB: 1.4,
-    IL7R: 2.8,
+    PDCD1: 2.4,
     CTLA4: 1.2,
-    FOXP3: 0.4,
+    FOXP3: 0.3,
+    CXCL9: 1.5,
+    STAT1: 1.8,
+    CXCR4: 1.8,
+    IL2RA: 1.0,
+    TNFRSF9: 1.2,
   },
   CD4_Teff: {
-    PDCD1: 0.8,
-    TCF7: 2.4,
-    TOX: 0.5,
-    LAG3: 0.6,
-    GZMB: 4.0,
-    IL7R: 3.6,
+    PDCD1: 0.7,
     CTLA4: 0.5,
-    FOXP3: 0.3,
+    FOXP3: 0.2,
+    CXCL9: 0.6,
+    STAT1: 1.0,
+    CXCR4: 2.0,
+    IL2RA: 1.5,
+    TNFRSF9: 3.0,
   },
   CD4_Treg: {
-    PDCD1: 1.4,
-    TCF7: 1.0,
-    TOX: 0.8,
-    LAG3: 1.2,
-    GZMB: 0.4,
-    IL7R: 1.6,
-    CTLA4: 3.6,
-    FOXP3: 4.2,
+    PDCD1: 1.3,
+    CTLA4: 3.8,
+    FOXP3: 4.3,
+    CXCL9: 0.5,
+    STAT1: 1.0,
+    CXCR4: 1.8,
+    IL2RA: 3.5,
+    TNFRSF9: 1.0,
   },
   myeloid: {
     PDCD1: 0.3,
-    TCF7: 0.2,
-    TOX: 0.4,
-    LAG3: 0.5,
-    GZMB: 1.2,
-    IL7R: 0.8,
-    CTLA4: 0.4,
-    FOXP3: 0.2,
+    CTLA4: 0.3,
+    FOXP3: 0.1,
+    CXCL9: 2.2,
+    STAT1: 1.5,
+    CXCR4: 1.2,
+    IL2RA: 0.3,
+    TNFRSF9: 0.4,
   },
   tumor: {
     PDCD1: 0.2,
-    TCF7: 0.1,
-    TOX: 0.3,
-    LAG3: 0.2,
-    GZMB: 0.2,
-    IL7R: 0.3,
     CTLA4: 0.2,
     FOXP3: 0.1,
+    CXCL9: 0.4,
+    STAT1: 0.8,
+    CXCR4: 0.5,
+    IL2RA: 0.1,
+    TNFRSF9: 0.1,
   },
   stromal: {
     PDCD1: 0.15,
-    TCF7: 0.2,
-    TOX: 0.15,
-    LAG3: 0.1,
-    GZMB: 0.1,
-    IL7R: 0.5,
     CTLA4: 0.1,
     FOXP3: 0.1,
+    CXCL9: 0.3,
+    STAT1: 0.6,
+    CXCR4: 0.4,
+    IL2RA: 0.1,
+    TNFRSF9: 0.1,
   },
 };
 
 const NICHE_EXPR_BIAS: Record<Niche, Partial<ExpressionBase>> = {
-  tumor_core: { PDCD1: 0.35, TOX: 0.3, LAG3: 0.25, TCF7: -0.25, IL7R: -0.2 },
-  tumor_margin: { TCF7: 0.2, IL7R: 0.15, GZMB: 0.15 },
-  lymphoid_proximal: { TCF7: 0.35, IL7R: 0.3, GZMB: 0.25, PDCD1: -0.2 },
+  tumor_core: { PDCD1: 0.35, STAT1: 0.3, CXCL9: 0.3, CXCR4: -0.2 },
+  tumor_margin: { CXCR4: 0.2, TNFRSF9: 0.15 },
+  lymphoid_proximal: { IL2RA: 0.3, CXCR4: 0.15, PDCD1: -0.2 },
 };
 
 function exhaustionForType(ct: CellType): ExhaustionState {
@@ -192,10 +192,12 @@ function sampleInEllipse(
   };
 }
 
+type NicheCenters = Record<Niche, { x: number; y: number; rx: number; ry: number }>;
+
 function assignNiche(
   x: number,
   y: number,
-  centers: SampleData['nicheCenters'],
+  centers: NicheCenters,
 ): Niche {
   let best: Niche = 'tumor_core';
   let bestD = Infinity;
@@ -216,7 +218,7 @@ const SAMPLE_CONFIGS: Array<{
   meta: SampleMeta;
   seed: number;
   nCells: number;
-  centers: SampleData['nicheCenters'];
+  centers: NicheCenters;
 }> = [
   {
     meta: {
@@ -266,7 +268,7 @@ const SUGGESTION_TEMPLATES: Array<Omit<AiSuggestion, 'id'>> = [
   {
     gene: 'PDCD1',
     rationale:
-      'Terminal Tex cells in the core show high PD-1; knockout may restore TCF7/IL7R stemness programs.',
+      'Terminal Tex cells in the core show high PD-1; knockout may restore effector programs.',
     citation: {
       title: 'PD-1 blockade restores effector function in exhausted CD4 T cells',
       source: 'Nature Immunology (simulated)',
@@ -275,22 +277,22 @@ const SUGGESTION_TEMPLATES: Array<Omit<AiSuggestion, 'id'>> = [
     linked_niche: 'tumor_core',
   },
   {
-    gene: 'TOX',
+    gene: 'STAT1',
     rationale:
-      'TOX locks the terminal exhaustion epigenetic state; reducing TOX may reopen progenitor trajectories.',
+      'STAT1-driven interferon signaling reinforces the terminal exhaustion program; knockout may relieve chronic IFN pressure.',
     citation: {
-      title: 'TOX reinforces the identity and suppresses reprogramming of exhausted T cells',
+      title: 'STAT1 sustains a terminal exhaustion transcriptional state',
       source: 'Nature (simulated)',
       url: 'https://pubmed.ncbi.nlm.nih.gov/',
     },
     linked_niche: 'tumor_core',
   },
   {
-    gene: 'LAG3',
+    gene: 'CXCL9',
     rationale:
-      'Co-inhibitory LAG3 is elevated with PDCD1 in core Tex; dual checkpoint logic suggests LAG3 KO synergy.',
+      'CXCL9 marks the IFN-γ-driven core niche and co-elevates with PDCD1 in terminal Tex; dual-target logic suggests CXCL9 KO synergy.',
     citation: {
-      title: 'LAG-3 regulates CD4 T cell exhaustion in the tumor microenvironment',
+      title: 'CXCL9 shapes the exhausted T cell niche in the tumor core',
       source: 'Cancer Cell (simulated)',
       url: 'https://pubmed.ncbi.nlm.nih.gov/',
     },
@@ -310,7 +312,7 @@ const SUGGESTION_TEMPLATES: Array<Omit<AiSuggestion, 'id'>> = [
 ];
 
 /** Deterministic perturbation shifts by KO gene × phenotype class */
-function applyPerturbation(
+export function applyPerturbation(
   before: Record<MarkerGene, number>,
   gene: string,
   cellType: CellType,
@@ -330,44 +332,47 @@ function applyPerturbation(
   if (g === 'PDCD1') {
     bump('PDCD1', -2.2);
     if (isTex) {
-      bump('TOX', -0.9);
-      bump('LAG3', -0.6);
-      bump('TCF7', 1.4);
-      bump('IL7R', 1.2);
-      bump('GZMB', 1.0);
+      bump('STAT1', -0.8);
+      bump('CXCL9', -0.6);
+      bump('CXCR4', 1.2);
+      bump('TNFRSF9', 1.0);
     }
-  } else if (g === 'TOX') {
-    bump('TOX', -2.0);
+  } else if (g === 'STAT1') {
+    bump('STAT1', -2.0);
     if (isTex) {
-      bump('PDCD1', -0.8);
-      bump('TCF7', 1.6);
-      bump('IL7R', 1.1);
-      bump('GZMB', 0.7);
+      bump('PDCD1', -0.6);
+      bump('CXCL9', -0.9);
+      bump('CXCR4', 0.8);
     }
-  } else if (g === 'LAG3') {
-    bump('LAG3', -2.0);
+  } else if (g === 'CXCL9') {
+    bump('CXCL9', -2.0);
     if (isTex) {
       bump('PDCD1', -0.5);
-      bump('GZMB', 0.9);
-      bump('IL7R', 0.6);
+      bump('STAT1', -0.6);
     }
   } else if (g === 'CTLA4') {
     bump('CTLA4', -2.0);
     if (isTreg) {
       bump('FOXP3', -0.8);
-      bump('IL7R', 0.4);
+      bump('IL2RA', -0.6);
     }
     if (isTex) {
-      bump('GZMB', 0.8);
-      bump('TCF7', 0.5);
+      bump('TNFRSF9', 0.8);
+      bump('CXCR4', 0.5);
+    }
+  } else if (g === 'FOXP3') {
+    bump('FOXP3', -2.0);
+    if (isTreg) {
+      bump('CTLA4', -0.8);
+      bump('IL2RA', -0.9);
     }
   } else if (MARKER_GENES.includes(g as MarkerGene)) {
     bump(g as MarkerGene, -1.8);
   } else {
     // Unknown gene: modest generic shift toward effector-like
     bump('PDCD1', -0.4);
-    bump('GZMB', 0.5);
-    bump('TCF7', 0.3);
+    bump('CXCR4', 0.3);
+    bump('TNFRSF9', 0.3);
   }
 
   return after;
@@ -428,7 +433,6 @@ export function generateSample(sampleId: string): SampleData {
   const data: SampleData = {
     cells,
     suggestions,
-    nicheCenters: cfg.centers,
   };
   cache.set(sampleId, data);
   return data;

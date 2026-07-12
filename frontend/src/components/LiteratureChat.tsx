@@ -1,6 +1,6 @@
 import { useId, useRef, useState } from 'react';
 import type { Cell, ChatMessage } from '../types';
-import { CELL_TYPE_LABELS, NICHE_LABELS } from '../data/palettes';
+import { NICHE_LABELS, cellTypeLabel } from '../data/palettes';
 import { sendChatMessage } from '../api/client';
 
 interface Props {
@@ -24,7 +24,9 @@ export function LiteratureChat({ selectedCell, onClose, onUseGene }: Props) {
   const inputId = useId();
 
   const scopeLabel = selectedCell
-    ? `Scoped to ${CELL_TYPE_LABELS[selectedCell.cell_type]} · ${NICHE_LABELS[selectedCell.niche]}`
+    ? `Scoped to ${cellTypeLabel(selectedCell.cell_type)}${
+        selectedCell.niche ? ` · ${NICHE_LABELS[selectedCell.niche]}` : ' (no niche — suggestions unavailable)'
+      }`
     : 'No cell selected — general answer only, no knockout suggestions yet';
 
   const loadGeneIntoForm = (gene: string) => {
@@ -44,7 +46,7 @@ export function LiteratureChat({ selectedCell, onClose, onUseGene }: Props) {
       const res = await sendChatMessage(text, {
         cellId: selectedCell?.id,
         phenotype: selectedCell?.cell_type,
-        niche: selectedCell?.niche,
+        niche: selectedCell?.niche ?? undefined,
       });
       const assistantMsg: ChatMessage = {
         id: nextId(),

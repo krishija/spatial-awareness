@@ -1,19 +1,22 @@
 import {
-  CELL_TYPE_COLORS,
-  CELL_TYPE_LABELS,
   EXPRESSION_SCALE,
-  expressionColor,
+  NICHE_DOT_COLORS,
+  NICHE_LABELS,
+  cellTypeColor,
+  cellTypeLabel,
 } from '../data/palettes';
-import type { CellType, ColorMode, MarkerGene } from '../types';
+import type { Cell, ColorMode, MarkerGene } from '../types';
+
+const MAGMA_GRADIENT =
+  'linear-gradient(90deg, #000004, #721f81, #cd4071, #fd9668, #fcfdbf)';
 
 interface Props {
   colorMode: ColorMode;
   selectedGene: MarkerGene;
+  cells: Cell[];
 }
 
-const CELL_TYPES = Object.keys(CELL_TYPE_COLORS) as CellType[];
-
-export function Legend({ colorMode, selectedGene }: Props) {
+export function Legend({ colorMode, selectedGene, cells }: Props) {
   if (colorMode === 'expression') {
     const gradient = `linear-gradient(90deg, ${EXPRESSION_SCALE.low}, ${EXPRESSION_SCALE.mid}, ${EXPRESSION_SCALE.high})`;
     return (
@@ -31,27 +34,74 @@ export function Legend({ colorMode, selectedGene }: Props) {
     );
   }
 
+  if (colorMode === 'treg_niches') {
+    return (
+      <div className="legend">
+        <div className="legend__title">Treg niches</div>
+        <div className="legend__row">
+          <span className="legend__swatch" style={{ background: '#d5d5d5' }} />
+          <span>Tumour (background)</span>
+        </div>
+        {(['lymphoid_proximal', 'tumor_margin', 'tumor_core'] as const).map((n) => (
+          <div key={n} className="legend__row">
+            <span
+              className="legend__swatch"
+              style={{ background: NICHE_DOT_COLORS[n] }}
+            />
+            <span>Treg — {NICHE_LABELS[n]}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (colorMode === 'atlas_score') {
+    return (
+      <div className="legend">
+        <div className="legend__title">Infiltration score</div>
+        <div className="legend__scale" style={{ background: MAGMA_GRADIENT }} />
+        <div className="legend__ticks">
+          <span>low</span>
+          <span>high</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (colorMode === 'atlas_selected') {
+    const nSelected = cells.filter((c) => c.selected).length;
+    return (
+      <div className="legend">
+        <div className="legend__title">Selected barcodes</div>
+        <div className="legend__row">
+          <span className="legend__swatch" style={{ background: '#dcdcdc' }} />
+          <span>All atlas cells</span>
+        </div>
+        <div className="legend__row">
+          <span className="legend__swatch" style={{ background: '#c0392b' }} />
+          <span>Selected (top 5%, {nSelected})</span>
+        </div>
+      </div>
+    );
+  }
+
+  // cell_type — only show types actually present in this sample's cells.
+  const present = Array.from(new Set(cells.map((c) => c.cell_type))).sort(
+    (a, b) => cellTypeLabel(a).localeCompare(cellTypeLabel(b)),
+  );
+
   return (
-    <div className="legend">
+    <div className="legend legend--scroll">
       <div className="legend__title">Cell type</div>
-      {CELL_TYPES.map((ct) => (
+      {present.map((ct) => (
         <div key={ct} className="legend__row">
           <span
             className="legend__swatch"
-            style={{ background: CELL_TYPE_COLORS[ct] }}
+            style={{ background: cellTypeColor(ct) }}
           />
-          <span>{CELL_TYPE_LABELS[ct]}</span>
+          <span>{cellTypeLabel(ct)}</span>
         </div>
       ))}
     </div>
   );
-}
-
-export function cellColor(
-  colorMode: ColorMode,
-  cellType: CellType,
-  expression: number,
-): string {
-  if (colorMode === 'expression') return expressionColor(expression, 5);
-  return CELL_TYPE_COLORS[cellType];
 }

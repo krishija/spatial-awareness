@@ -28,6 +28,17 @@ mcp_server/data/*.db-*
 *.pyc
 .Python
 
+
+# Large local data — lives in the team S3 bucket, not git
+/artifacts/
+/figures/
+/kriti visualizations/work/
+/kriti visualizations/artifacts/
+/kriti visualizations/*.html
+frontend/public/explorer.html
+frontend/public/atlas_explorer.html
+mcp_server/data/*.parquet
+
 # Editor
 .vscode/*
 !.vscode/extensions.json
