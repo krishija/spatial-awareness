@@ -38,3 +38,10 @@ mcp_server/data/*.db-*
 *.njsproj
 *.sln
 *.sw?
+
+*.h5ad
+*.parquet
+*.pkl
+work/
+artifacts/
+demo_data/
