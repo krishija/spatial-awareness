@@ -211,7 +211,10 @@ def _extractive_answer(query: str, citations: list[dict]) -> str:
         )
     lines = [f'Based on {len(citations)} source(s) for "{query}":']
     for c in citations:
-        lines.append(f"- {c['title']} ({c['source']}): {c['relevance']}")
+        snippet = c.get("relevance")
+        lines.append(
+            f"- {c['title']} ({c['source']}): {snippet}" if snippet else f"- {c['title']} ({c['source']})"
+        )
     return "\n".join(lines)
 
 

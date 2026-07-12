@@ -99,10 +99,12 @@ def you_search(query: str, count: int = 5) -> tuple[list[dict[str, Any]], str | 
     for r in web_results[:count]:
         url = r.get("url", "")
         snippet = (r.get("snippets") or [""])[0]
-        citations.append({
+        citation: dict[str, Any] = {
             "title": r.get("title", "Untitled"),
             "source": _source_name(url),
             "url": url,
-            "relevance": snippet[:200] if snippet else "No snippet available.",
-        })
+        }
+        if snippet:
+            citation["relevance"] = snippet[:200]
+        citations.append(citation)
     return citations, None

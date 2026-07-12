@@ -263,9 +263,11 @@ def suggest_perturbations(args: dict[str, Any]) -> dict[str, Any]:
         top = gene_citations[0]
         n = len(gene_citations)
         source_word = "source" if n == 1 else "sources"
+        top_relevance = top.get("relevance")
         rationale = (
             f'Mentioned in {n} retrieved {source_word} for {effective_phenotype or "this phenotype"} '
-            f'in the {NICHE_READABLE.get(niche, niche)}, e.g. "{top["title"]}": {top["relevance"]}'
+            f'in the {NICHE_READABLE.get(niche, niche)}, e.g. "{top["title"]}"'
+            + (f": {top_relevance}" if top_relevance else "")
         )
         item = {
             "rank": i + 1,
