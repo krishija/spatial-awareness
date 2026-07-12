@@ -32,26 +32,10 @@ from spatial_mcp.agent.preregister import (
 )
 from spatial_mcp.agent.report import HypothesisReport, build_report, render_markdown
 from spatial_mcp.agent.trace import ReasoningTrace
+from spatial_mcp.server import SERVER_INSTRUCTIONS
 
-SYSTEM_PROMPT = """You are an autonomous spatial immunology research agent for CD4 T-cell exhaustion.
-
-You have MCP tools for resolving spatial cells, searching literature, suggesting gene
-knockouts, simulating perturbations, differential survival analysis in matched TCGA
-bulk cohorts (cohort association — not cell-level validation), and recording/querying findings.
-
-Hard rules you must follow:
-1. Call query_prior_findings BEFORE suggest_perturbations.
-2. Prefer sample_id atera-cervical-01 when real Atera data is available; call list_candidate_cells
-   with cell_type alone first to read niche_composition, then narrow with niche=.
-3. When calling search_literature, pass structured fields (gene/genes, phenotype, niche,
-   hypothesis) — not just a flat query string — so stance-labeled evidence cards are useful.
-4. After gathering enough evidence, stop calling tools and write a short conclusion.
-5. Do NOT invent confidence numbers — a separate scoring module computes confidence.
-6. Prefer exhausted CD4 cells when exploring checkpoint knockouts (PDCD1, TOX, LAG3);
-   for Tregs prefer margin-adjacent populations and CTLA4.
-
-Work efficiently: few high-value tool calls, not exhaustive exploration.
-"""
+# Bedrock stand-in sees the same operational brief K Pro gets via MCP instructions.
+SYSTEM_PROMPT = SERVER_INSTRUCTIONS
 
 
 @dataclass
@@ -62,6 +46,9 @@ class AgentConfig:
     model_id: str | None = None
     region: str | None = None
     sample_id_default: str = "atera-cervical-01"
+    # If set, pre-lock H.gene (overrides suggest rank-1). Used to force a thinner
+    # gene for breadth demos without fighting post-COMMIT gene binding.
+    commit_gene: str | None = None
 
 
 @dataclass
@@ -100,10 +87,15 @@ class ResearchAgent:
             "cell_id": None,
             "niche": None,
             "gene": None,
+            "gene_locked": False,
             "cell_type": None,
             "citation": None,
             "perturbation": None,
         }
+        if self.config.commit_gene:
+            focus["gene"] = str(self.config.commit_gene).strip().upper()
+            focus["gene_locked"] = True
+            trace.log("commit_gene_prelocked", gene=focus["gene"])
 
         async with connect_mcp(self.config.mcp_url) as mcp:
             tools = await mcp.list_tools(force=True)
@@ -127,7 +119,13 @@ class ResearchAgent:
                             "text": (
                                 f"Research question: {research_question}\n\n"
                                 f"Default sample if unspecified: {self.config.sample_id_default}.\n"
-                                "Begin by checking prior findings, then resolve candidate cells."
+                                + (
+                                    f"COMMITTED GENE (pre-locked): {focus['gene']}. "
+                                    "Every evidence tool gene arg must equal this gene.\n"
+                                    if focus.get("gene_locked")
+                                    else ""
+                                )
+                                + "Begin by checking prior findings, then resolve candidate cells."
                             )
                         }
                     ],
@@ -220,11 +218,38 @@ class ResearchAgent:
                         continue
                     break
 
+                # Code disposes: if workflow requires simulate and the model proposed
+                # something else, rewrite the first tool use to simulate_perturbations
+                # (keep toolUseId so Bedrock conversation stays valid).
+                tool_uses = _maybe_force_simulate_tool_use(
+                    tool_uses, focus=focus, tools_called=tools_called, last_gate=last_gate,
+                    trace=trace,
+                )
+
                 # Soft-enforce prior-before-suggest before executing
                 tool_results_payload: list[tuple[str, dict[str, Any], bool]] = []
                 for tu in tool_uses:
                     name = tu["name"]
                     args = dict(tu.get("input") or {})
+                    if tu.get("_defer_for_sim_workflow"):
+                        deferred = {
+                            "ok": False,
+                            "error": "deferred_for_simulate_workflow",
+                            "message": (
+                                "Deferred: simulate_perturbations must run once "
+                                "(non-load-bearing) before other tools this turn."
+                            ),
+                            "deferred_tool": name,
+                        }
+                        trace.log(
+                            "tool_deferred_for_simulate",
+                            tool=name,
+                            arguments=args,
+                        )
+                        tool_results_payload.append(
+                            (tu["toolUseId"], deferred, True)
+                        )
+                        continue
                     if (
                         name == "suggest_perturbations"
                         and "query_prior_findings" not in tools_called
@@ -247,6 +272,28 @@ class ResearchAgent:
                             (tu["toolUseId"], blocked, True)
                         )
                         continue
+
+                    # After COMMIT: evidence-tool gene args must match locked H.gene
+                    args, gene_correction = _enforce_committed_gene(focus, name, args)
+                    if gene_correction is not None:
+                        if gene_correction.get("action") == "reject":
+                            blocked = {
+                                "ok": False,
+                                "error": "gene_binding_violation",
+                                "message": gene_correction["message"],
+                                "committed_gene": focus.get("gene"),
+                                "passed_gene": gene_correction.get("passed"),
+                            }
+                            trace.log(
+                                "gene_binding_rejected",
+                                tool=name,
+                                **{k: v for k, v in gene_correction.items() if k != "message"},
+                            )
+                            tool_results_payload.append(
+                                (tu["toolUseId"], blocked, True)
+                            )
+                            continue
+                        trace.log("gene_arg_corrected", tool=name, **gene_correction)
 
                     # W5: pre-register predicted direction before evidence-gathering tools
                     prereg = None
@@ -518,11 +565,125 @@ class ResearchAgent:
             return result
 
 
+def _maybe_force_simulate_tool_use(
+    tool_uses: list[dict[str, Any]],
+    *,
+    focus: dict[str, Any],
+    tools_called: list[str],
+    last_gate: Any,
+    trace: ReasoningTrace,
+) -> list[dict[str, Any]]:
+    """If gate requested simulate and model called something else, rewrite first use.
+
+    Keeps every Bedrock toolUseId (required for Converse). Extra parallel tool uses
+    are marked deferred so the loop returns a toolResult for each id.
+    """
+    if "simulate_perturbations" in tools_called:
+        return tool_uses
+    pending = bool(
+        last_gate is not None
+        and getattr(last_gate, "next_tool", None) == "simulate_perturbations"
+    )
+    if not pending:
+        return tool_uses
+    if any(tu.get("name") == "simulate_perturbations" for tu in tool_uses):
+        return tool_uses
+
+    gene = focus.get("gene")
+    cell_id = focus.get("cell_id")
+    if not gene or not cell_id:
+        return tool_uses
+
+    first = dict(tool_uses[0])
+    replaced = first.get("name")
+    first["name"] = "simulate_perturbations"
+    first["input"] = {"gene": str(gene), "cell_id": str(cell_id)}
+    out: list[dict[str, Any]] = [first]
+    for tu in tool_uses[1:]:
+        deferred = dict(tu)
+        deferred["_defer_for_sim_workflow"] = True
+        out.append(deferred)
+    trace.log(
+        "workflow_forced_simulate",
+        replaced_tool=replaced,
+        deferred_tools=[tu.get("name") for tu in tool_uses[1:]],
+        gene=gene,
+        cell_id=cell_id,
+        message=(
+            "Canonical workflow: rewrote first tool use to simulate_perturbations; "
+            "deferred siblings keep toolUseIds for Bedrock."
+        ),
+    )
+    return out
+
+
 def _preview(raw: dict[str, Any], limit: int = 600) -> Any:
     text = json.dumps(raw, default=str)
     if len(text) <= limit:
         return raw
     return text[:limit] + "…"
+
+
+# Tools whose gene/genes args must match the committed hypothesis after COMMIT.
+_GENE_BOUND_TOOLS = frozenset(
+    {
+        "find_measured_perturbation_evidence",
+        "search_literature",
+        "simulate_perturbations",
+        "differential_survival_analysis",
+    }
+)
+
+
+def _enforce_committed_gene(
+    focus: dict[str, Any], tool: str, args: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    """After COMMIT, force evidence-tool gene args to the locked hypothesis gene.
+
+    Returns (possibly rewritten args, correction_info | None).
+    Correction is logged by the caller; we rewrite rather than reject so a single
+    turn can still gather evidence for the committed gene.
+    """
+    if tool not in _GENE_BOUND_TOOLS:
+        return args, None
+    if not focus.get("gene_locked"):
+        return args, None
+    locked = str(focus.get("gene") or "").strip().upper()
+    if not locked or locked == "UNSPECIFIED":
+        return args, None
+
+    out = dict(args)
+    passed_gene = out.get("gene")
+    passed_genes = out.get("genes")
+    changed = False
+    passed_summary: Any = passed_gene if passed_gene is not None else passed_genes
+
+    if "gene" in out or tool != "differential_survival_analysis":
+        if not passed_gene or str(passed_gene).strip().upper() != locked:
+            out["gene"] = locked
+            changed = True
+
+    if isinstance(passed_genes, list):
+        upper = [str(g).strip().upper() for g in passed_genes if g]
+        if upper != [locked]:
+            # Keep committed gene only — adjacent genes are a new investigation
+            out["genes"] = [locked]
+            changed = True
+    elif tool in ("search_literature", "differential_survival_analysis"):
+        out["genes"] = [locked]
+        changed = True
+
+    if not changed:
+        return out, None
+    return out, {
+        "action": "rewrite",
+        "passed": passed_summary,
+        "forced": locked,
+        "message": (
+            f"Post-COMMIT gene binding: rewrote {tool} gene args "
+            f"from {passed_summary!r} → {locked!r}."
+        ),
+    }
 
 
 def _update_focus(
@@ -532,29 +693,62 @@ def _update_focus(
     raw: dict[str, Any],
     items: list[EvidenceItem],
 ) -> None:
+    """Update spatial focus. Gene is write-once (locked) once set from a biology tool.
+
+    Prior findings must never set/overwrite the hypothesis gene — that was the
+    PDCD1-claim / TOX-evidence drift path.
+    """
     if tool == "list_candidate_cells" and (raw.get("cells") or []):
         c = raw["cells"][0]
         focus["cell_id"] = c.get("id")
         focus["niche"] = c.get("niche")
         focus["cell_type"] = c.get("cell_type")
         focus["sample_id"] = raw.get("sample_id") or args.get("sample_id")
+
+    # Gene lock sources: evidence tools + optional pre-lock — never priors.
+    # suggest_perturbations does NOT lock: rank-1 is a proposal. Lock comes from
+    # commit_gene prelock or the first gene-bound evidence tool call. If already
+    # pre-locked, suggest cannot overwrite.
+    if not focus.get("gene_locked"):
+        candidate: str | None = None
+        if tool == "simulate_perturbations" and raw.get("ok") is not False:
+            candidate = raw.get("gene") or args.get("gene")
+        elif tool == "find_measured_perturbation_evidence" and raw.get("ok") is not False:
+            candidate = raw.get("gene") or args.get("gene")
+        elif tool == "search_literature":
+            genes = args.get("genes") or []
+            candidate = args.get("gene") or (genes[0] if genes else None)
+        elif tool == "differential_survival_analysis":
+            genes = args.get("genes") or []
+            candidate = genes[0] if genes else None
+        if candidate:
+            focus["gene"] = str(candidate).strip().upper()
+            focus["gene_locked"] = True
+    elif tool == "suggest_perturbations":
+        # Soft note only — do not overwrite locked gene
+        pass
+
     if tool == "suggest_perturbations" and (raw.get("suggestions") or []):
         s = raw["suggestions"][0]
-        focus["gene"] = s.get("gene")
         focus["cell_id"] = focus.get("cell_id") or raw.get("cell_id")
         focus["niche"] = focus.get("niche") or raw.get("niche")
         focus["cell_type"] = focus.get("cell_type") or raw.get("phenotype")
+        # Prefer citation for the locked gene if present among suggestions
+        locked = (focus.get("gene") or "").upper()
+        for sug in raw.get("suggestions") or []:
+            if locked and str(sug.get("gene") or "").upper() == locked:
+                s = sug
+                break
         cites = s.get("citations") or []
         if cites:
             focus["citation"] = cites[0]
     if tool == "simulate_perturbations" and raw.get("ok") is not False:
-        focus["gene"] = raw.get("gene") or args.get("gene") or focus.get("gene")
         focus["cell_id"] = raw.get("cell_id") or focus.get("cell_id")
         focus["niche"] = raw.get("niche") or focus.get("niche")
         focus["cell_type"] = raw.get("cell_type") or focus.get("cell_type")
         focus["perturbation"] = {
             "cell_id": raw.get("cell_id"),
-            "gene": raw.get("gene"),
+            "gene": focus.get("gene") or raw.get("gene"),
             "before": raw.get("before"),
             "after": raw.get("after"),
             "deltas": raw.get("deltas"),
@@ -569,9 +763,15 @@ def _update_focus(
             }
     for it in items:
         md = it.metadata or {}
-        for k in ("cell_id", "niche", "gene", "cell_type", "sample_id"):
+        # Never take gene from prior_finding / record — locks H to a memory gene.
+        if it.evidence_type == "prior_finding":
+            continue
+        for k in ("cell_id", "niche", "cell_type", "sample_id"):
             if md.get(k) and not focus.get(k):
                 focus[k] = md[k]
+        if md.get("gene") and not focus.get("gene_locked"):
+            focus["gene"] = str(md["gene"]).strip().upper()
+            focus["gene_locked"] = True
         if md.get("citation") and not focus.get("citation"):
             focus["citation"] = md["citation"]
 

@@ -141,6 +141,12 @@ def _from_literature(
     focus_gene: str | None = None,
 ) -> list[EvidenceItem]:
     """Map structured evidence_cards (preferred) or legacy citations → literature items."""
+    arg_gene = (
+        (arguments.get("gene") or focus_gene or "")
+        or ((arguments.get("genes") or [None])[0] or "")
+    )
+    arg_gene = str(arg_gene).strip().upper() or None
+
     if result.get("ok") is False:
         return [
             EvidenceItem(
@@ -149,7 +155,7 @@ def _from_literature(
                 source_id="search_literature:error",
                 polarity="neutral",
                 strength=0.0,
-                metadata={"error": result.get("error")},
+                metadata={"error": result.get("error"), "gene": arg_gene},
             )
         ]
 
@@ -256,6 +262,7 @@ def _from_literature(
                 polarity=polarity,  # type: ignore[arg-type]
                 strength=strength,
                 metadata={
+                    "gene": arg_gene,
                     "title": title,
                     "source": c.get("source"),
                     "url": c.get("url"),

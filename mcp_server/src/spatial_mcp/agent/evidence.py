@@ -27,8 +27,11 @@ from spatial_mcp.agent.independence import (
     GROUNDED_TYPES,
     cluster_items,
     count_independent_sources,
+    gene_matches_hypothesis,
+    has_external_grounded_source,
     has_grounded_source,
     independence_key,
+    is_self_citation_prior,
     summarize_clusters,
 )
 
@@ -220,16 +223,36 @@ def aggregate_evidence(
     ]
 
     hyp_dict: dict[str, Any] | None = None
+    hyp_gene: str | None = None
+    hyp_claim: str | None = None
     if hypothesis is not None:
         if isinstance(hypothesis, Hypothesis):
             hyp_dict = hypothesis.to_dict()
         else:
             hyp_dict = Hypothesis.from_dict(hypothesis).to_dict()
+        hyp_gene = (hyp_dict.get("gene") or "").strip().upper() or None
+        if hyp_gene == "UNSPECIFIED":
+            hyp_gene = None
+        hyp_claim = hyp_dict.get("claim")
 
-    # Per-item raw LRs
+    # Per-item raw LRs — gene-mismatched and self-citation priors contribute 0 bits
     raw: list[tuple[EvidenceItem, float, str, str]] = []
     for it in parsed:
         bits, tier, note = item_log_lr_bits(it)
+        if hyp_gene and not gene_matches_hypothesis(it, hyp_gene):
+            bits = 0.0
+            note = (
+                f"Gene mismatch: item gene ≠ hypothesis gene {hyp_gene} "
+                f"— contributes 0 bits (evidence must bind to H)."
+            )
+            tier = "gene_binding"
+        elif is_self_citation_prior(it, hyp_gene=hyp_gene, hyp_claim=hyp_claim):
+            bits = 0.0
+            note = (
+                "Self-citation prior (same hypothesis already recorded) "
+                "— contributes 0 bits (independence: memory ≠ corroboration)."
+            )
+            tier = "self_citation"
         raw.append((it, bits, tier, note))
 
     clusters = cluster_items(parsed)
@@ -321,10 +344,20 @@ def aggregate_evidence(
         [i for i in parsed if i.polarity != "neutral"],
         bits_by_source_id=contrib_bits,
     )
-    grounded = has_grounded_source(parsed)
+    grounded = has_grounded_source(
+        [i for i in parsed if gene_matches_hypothesis(i, hyp_gene)]
+    )
+    external_grounded = has_external_grounded_source(
+        [i for i in parsed if gene_matches_hypothesis(i, hyp_gene)],
+        bits_by_source_id=contrib_bits,
+    )
 
     coverage = {
-        "literature": any(i.evidence_type == "literature" for i in parsed),
+        # Failed lit calls must not count as a grounded modality
+        "literature": any(
+            i.evidence_type == "literature" and not i.metadata.get("error")
+            for i in parsed
+        ),
         "simulation": any(i.evidence_type == "simulation" for i in parsed),
         "cohort_prognostic": any(
             i.evidence_type == "cohort_prognostic" for i in parsed
@@ -341,7 +374,9 @@ def aggregate_evidence(
             for i in parsed
         ),
         "grounded": grounded,
+        "external_grounded": external_grounded,
         "independent_ge_2": n_indep >= 2,
+        "hypothesis_gene": hyp_gene,
     }
 
     # Contributions alias = budget evidence rows (waterfall-friendly for report/CLI)

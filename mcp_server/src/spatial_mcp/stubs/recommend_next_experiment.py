@@ -189,6 +189,23 @@ def recommend_next_experiment(args: dict[str, Any]) -> dict[str, Any]:
 
     candidates: list[dict[str, Any]] = []
 
+    # Lane 0: explicit gene from the stalled investigation (DISCARD / GATHER_MORE)
+    focus_gene = (args.get("gene") or "").strip().upper()
+    if focus_gene:
+        candidates.append(
+            {
+                "gene": focus_gene,
+                "origin": "active_hypothesis",
+                "finding_id": None,
+                "finding_summary": args.get("hypothesis")
+                or f"Active investigation of {focus_gene} (no recorded finding yet).",
+                "sample_id": sample_id,
+                "niche": niche,
+                "missing_evidence_type": "literature",
+                "graph_path": None,
+            }
+        )
+
     # Lane 1: open findings / genes already under investigation
     for f in findings:
         gene = (f.get("gene") or "").upper()

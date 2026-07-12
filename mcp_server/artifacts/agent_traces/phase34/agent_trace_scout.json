@@ -1,0 +1,1176 @@
+{
+  "research_question": "Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Use the tools to resolve candidate cells, check priors, propose and evaluate a perturbation hypothesis worth pursuing, gather independent evidence, and conclude (REPORT/DISCARD) when the gate allows. Do not invent evidence; keep honest ok:false results.",
+  "reports": [
+    {
+      "hypothesis": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_margin produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay.",
+      "cell_id": "aakcingf-1",
+      "niche": "tumor_margin",
+      "gene": "PDCD1",
+      "cell_type": "CD4_Tex_term",
+      "confidence": 0.736,
+      "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. literature from search_literature:error: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. measured from training:state:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits. measured from training:scldm_cd4:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits. prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. prior_finding from query_prior_findings: redundant within independence cluster 'prior:query_prior_findings' (evidence combines by independence, not by count). Raw would have been +0.000 bits. red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. Posterior logit\u2082=1.479 bits \u2192 P(H|E)=0.736 (7 independent sources; grounded=True).",
+      "evidence": [
+        {
+          "evidence_type": "cell_context",
+          "source_id": "aakcingf-1",
+          "note": "cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+          "summary": "Resolved 200 cells; top=aakcingf-1 CD4_Tex_term in tumor_margin (exhaustion_score=1.0).",
+          "delta": 0.3
+        },
+        {
+          "evidence_type": "literature",
+          "source_id": "search_literature:error",
+          "note": "literature from search_literature:error: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "AttributeError: 'BedrockConverse' object has no attribute 'converse_text'",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "measured",
+          "source_id": "training:state:TOX",
+          "note": "measured from training:state:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+          "summary": "Measured hit for TOX via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+          "delta": 1.8788
+        },
+        {
+          "evidence_type": "measured",
+          "source_id": "training:scldm_cd4:TOX",
+          "note": "measured from training:scldm_cd4:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+          "summary": "Measured hit for TOX via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+          "delta": 2.0
+        },
+        {
+          "evidence_type": "prior_finding",
+          "source_id": "finding-679bce0423",
+          "note": "prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits.",
+          "summary": "E2E PDCD1 on cell dhclfnji-1 (CD4_Tex_term/tumor_core). sim_ok=False. gate=GATHER_MORE",
+          "delta": 0.14
+        },
+        {
+          "evidence_type": "prior_finding",
+          "source_id": "query_prior_findings",
+          "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+          "summary": "Prior-findings query executed (anti-duplication check).",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "prior_finding",
+          "source_id": "query_prior_findings",
+          "note": "prior_finding from query_prior_findings: redundant within independence cluster 'prior:query_prior_findings' (evidence combines by independence, not by count). Raw would have been +0.000 bits.",
+          "summary": "Prior-findings query executed (anti-duplication check).",
+          "delta": 0.0
+        },
+        {
+          "evidence_type": "red_team",
+          "source_id": "confound:bulk_confound",
+          "note": "red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+          "summary": "Surviving alternative: TCGA / bulk association reflects tumor-intrinsic or stromal expression, not the CD4 T-cell mechanism under test (ecological inference).",
+          "delta": -0.28
+        },
+        {
+          "evidence_type": "red_team",
+          "source_id": "confound:compensation",
+          "note": "red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+          "summary": "Surviving alternative: Redundant checkpoints compensate for PDCD1 loss in vivo, so primary assay effects will not translate.",
+          "delta": -0.28
+        },
+        {
+          "evidence_type": "red_team",
+          "source_id": "confound:off_target",
+          "note": "red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+          "summary": "Surviving alternative: Observed phenotype after PDCD1 perturbation is an off-target CRISPR effect, not on-target loss of function.",
+          "delta": -0.28
+        }
+      ],
+      "citation": null,
+      "perturbation": null,
+      "gate_decision": "REPORT",
+      "research_question": "Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Use the tools to resolve candidate cells, check priors, propose and evaluate a perturbation hypothesis worth pursuing, gather independent evidence, and conclude (REPORT/DISCARD) when the gate allows. Do not invent evidence; keep honest ok:false results.",
+      "created_at": "2026-07-12T21:08:48.689376+00:00",
+      "suggestion": {
+        "gene": "PDCD1",
+        "rationale": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_margin produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay.",
+        "citation": {
+          "title": "See evidence list",
+          "source": "agent",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/"
+        }
+      }
+    }
+  ],
+  "discarded": [],
+  "gate_summary": [
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.216; not yet report-ready (posterior 0.216 < 0.7).",
+      "next_tool": "list_candidate_cells",
+      "next_tool_reason": "Need resolved cells/niche context."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.253; not yet report-ready (posterior 0.253 < 0.7).",
+      "next_tool": "search_literature",
+      "next_tool_reason": "Need literature grounding (symmetric search preferred)."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.253; not yet report-ready (posterior 0.253 < 0.7).",
+      "next_tool": "search_literature",
+      "next_tool_reason": "Need literature grounding (symmetric search preferred)."
+    },
+    {
+      "decision": "GATHER_MORE",
+      "reason": "Posterior 0.253; not yet report-ready (posterior 0.253 < 0.7).",
+      "next_tool": "find_measured_perturbation_evidence",
+      "next_tool_reason": "Check for real measured perturbation evidence before trusting simulation."
+    },
+    {
+      "decision": "REPORT",
+      "reason": "Posterior P(H|E)=0.833 \u2265 0.7; 4 independent sources; grounded evidence present; priors checked; no unresolved conflict.",
+      "next_tool": null,
+      "next_tool_reason": null
+    },
+    {
+      "decision": "REPORT",
+      "reason": "Posterior P(H|E)=0.736 \u2265 0.7; 7 independent sources; grounded evidence present; priors checked; no unresolved conflict.",
+      "next_tool": null,
+      "next_tool_reason": null
+    }
+  ],
+  "final_text": "Excellent data. Key findings so far:\n- **Prior**: One prior session investigated PDCD1 on cell `dhclfnji-1` (tumor_core) \u2014 simulation failed (sim_ok=False), gate=GATHER_MORE\n- **Cells**: 12,320 CD4_Tex_term cells; overwhelmingly exhaustion_score=1.0. Niche composition: tumor_margin (8,992) >> lymphoid_proximal (2,062) > tumor_core (1,266)\n- **Expression patterns**: Cells show high CTLA4 (2\u20134.7), variable TOX, PDCD1, LAG3, GZMB \u2014 but **zero TCF7, IL7R** across all cells (deep terminal exhaustion)\n\nNow I'll select a high-value target cell from tumor_core (most immunosuppressive niche), check prior findings for TOX (a master exhaustion TF not yet explored), and search literature simultaneously.",
+  "trace": {
+    "research_question": "Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Use the tools to resolve candidate cells, check priors, propose and evaluate a perturbation hypothesis worth pursuing, gather independent evidence, and conclude (REPORT/DISCARD) when the gate allows. Do not invent evidence; keep honest ok:false results.",
+    "n_events": 21,
+    "events": [
+      {
+        "step": 1,
+        "event": "tools_fetched",
+        "payload": {
+          "n": 12,
+          "names": [
+            "list_candidate_cells",
+            "map_spatial_to_single",
+            "search_literature",
+            "suggest_perturbations",
+            "simulate_perturbations",
+            "differential_survival_analysis",
+            "find_measured_perturbation_evidence",
+            "recommend_next_experiment",
+            "record_finding",
+            "query_prior_findings",
+            "evaluate_evidence",
+            "decide_next_action"
+          ]
+        },
+        "ts": "2026-07-12T21:08:31.912091+00:00"
+      },
+      {
+        "step": 2,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 1
+        },
+        "ts": "2026-07-12T21:08:31.912217+00:00"
+      },
+      {
+        "step": 3,
+        "event": "llm_text",
+        "payload": {
+          "text": "I'll systematically investigate CD4 T-cell exhaustion in sample **atera-cervical-01**. Let me start by checking prior findings and resolving candidate cells in parallel."
+        },
+        "ts": "2026-07-12T21:08:34.357423+00:00"
+      },
+      {
+        "step": 4,
+        "event": "tool_call",
+        "payload": {
+          "tool": "query_prior_findings",
+          "arguments": {
+            "sample_id": "atera-cervical-01"
+          },
+          "result_preview": {
+            "filters": {
+              "sample_id": "atera-cervical-01",
+              "niche": null,
+              "gene": null
+            },
+            "n": 1,
+            "findings": [
+              {
+                "id": "finding-679bce0423",
+                "sample_id": "atera-cervical-01",
+                "cell_id": "dhclfnji-1",
+                "niche": "tumor_core",
+                "gene": "PDCD1",
+                "finding_summary": "E2E PDCD1 on cell dhclfnji-1 (CD4_Tex_term/tumor_core). sim_ok=False. gate=GATHER_MORE",
+                "citations": [],
+                "created_at": "2026-07-12T21:00:37.884064+00:00"
+              }
+            ]
+          },
+          "is_error": false
+        },
+        "ts": "2026-07-12T21:08:34.365539+00:00"
+      },
+      {
+        "step": 5,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.216,
+          "posterior_log_odds_bits": -1.86,
+          "n_independent_sources": 1,
+          "has_grounded_source": false,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": false,
+            "prior_finding": true,
+            "cell_context": false,
+            "atlas_mapping": false,
+            "suggestion": false,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": false,
+            "independent_ge_2": false
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.216; not yet report-ready (posterior 0.216 < 0.7).",
+            "next_tool": "list_candidate_cells",
+            "next_tool_reason": "Need resolved cells/niche context."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "finding-679bce0423",
+              "bits": 0.14,
+              "signed_bits": 0.14,
+              "raw_bits": 0.14,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits.",
+              "summary": "E2E PDCD1 on cell dhclfnji-1 (CD4_Tex_term/tumor_core). sim_ok=False. gate=GATHER_MORE",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "prior:finding-679bce0423",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query_prior_findings",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. Posterior logit\u2082=-1.860 bits \u2192 P(H|E)=0.216 (1 independent sources; grounded=False).",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_T",
+            "niche": "tumor_core",
+            "cell_id": null,
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_T from niche tumor_core produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T21:08:34.365845+00:00"
+      },
+      {
+        "step": 6,
+        "event": "tool_call",
+        "payload": {
+          "tool": "list_candidate_cells",
+          "arguments": {
+            "sample_id": "atera-cervical-01",
+            "cell_type": "CD4_Tex_term"
+          },
+          "result_preview": "{\"ok\": true, \"sample_id\": \"atera-cervical-01\", \"n\": 12320, \"cells\": [{\"id\": \"aakcingf-1\", \"x\": 642.5, \"y\": 1815.199951171875, \"cell_type\": \"CD4_Tex_term\", \"niche\": \"tumor_margin\", \"exhaustion_state\": \"terminally_exhausted\", \"exhaustion_score\": 1.0, \"expression\": {\"PDCD1\": 2.069999933242798, \"TCF7\": 0.0, \"TOX\": 0.0, \"LAG3\": 0.0, \"GZMB\": 2.069999933242798, \"IL7R\": 0.0, \"CTLA4\": 2.069999933242798, \"FOXP3\": 0.0}}, {\"id\": \"aajommok-1\", \"x\": 744.2000122070312, \"y\": 1666.9000244140625, \"cell_type\": \"CD4_Tex_term\", \"niche\": \"tumor_margin\", \"exhaustion_state\": \"terminally_exhausted\", \"exhaustion_score\"\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T21:08:35.065379+00:00"
+      },
+      {
+        "step": 7,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.253,
+          "posterior_log_odds_bits": -1.56,
+          "n_independent_sources": 2,
+          "has_grounded_source": false,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": false,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": false,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": false,
+            "independent_ge_2": true
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.253; not yet report-ready (posterior 0.253 < 0.7).",
+            "next_tool": "search_literature",
+            "next_tool_reason": "Need literature grounding (symmetric search preferred)."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "aakcingf-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=aakcingf-1 CD4_Tex_term in tumor_margin (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "finding-679bce0423",
+              "bits": 0.14,
+              "signed_bits": 0.14,
+              "raw_bits": 0.14,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits.",
+              "summary": "E2E PDCD1 on cell dhclfnji-1 (CD4_Tex_term/tumor_core). sim_ok=False. gate=GATHER_MORE",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "prior:finding-679bce0423",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query_prior_findings",
+              "redundant": false
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. Posterior logit\u2082=-1.560 bits \u2192",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_margin",
+            "cell_id": "aakcingf-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_margin produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T21:08:35.065712+00:00"
+      },
+      {
+        "step": 8,
+        "event": "llm_turn_start",
+        "payload": {
+          "iteration": 2
+        },
+        "ts": "2026-07-12T21:08:35.065966+00:00"
+      },
+      {
+        "step": 9,
+        "event": "llm_text",
+        "payload": {
+          "text": "Excellent data. Key findings so far:\n- **Prior**: One prior session investigated PDCD1 on cell `dhclfnji-1` (tumor_core) \u2014 simulation failed (sim_ok=False), gate=GATHER_MORE\n- **Cells**: 12,320 CD4_Tex_term cells; overwhelmingly exhaustion_score=1.0. Niche composition: tumor_margin (8,992) >> lymphoid_proximal (2,062) > tumor_core (1,266)\n- **Expression patterns**: Cells show high CTLA4 (2\u20134.7), variable TOX, PDCD1, LAG3, GZMB \u2014 but **zero TCF7, IL7R** across all cells (deep terminal exhaustion)"
+        },
+        "ts": "2026-07-12T21:08:45.020661+00:00"
+      },
+      {
+        "step": 10,
+        "event": "tool_call",
+        "payload": {
+          "tool": "query_prior_findings",
+          "arguments": {
+            "sample_id": "atera-cervical-01",
+            "gene": "TOX"
+          },
+          "result_preview": {
+            "filters": {
+              "sample_id": "atera-cervical-01",
+              "niche": null,
+              "gene": "TOX"
+            },
+            "n": 0,
+            "findings": []
+          },
+          "is_error": false
+        },
+        "ts": "2026-07-12T21:08:45.028101+00:00"
+      },
+      {
+        "step": 11,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.253,
+          "posterior_log_odds_bits": -1.56,
+          "n_independent_sources": 2,
+          "has_grounded_source": false,
+          "has_conflict": false,
+          "coverage": {
+            "literature": false,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": false,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": false,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": false,
+            "independent_ge_2": true
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.253; not yet report-ready (posterior 0.253 < 0.7).",
+            "next_tool": "search_literature",
+            "next_tool_reason": "Need literature grounding (symmetric search preferred)."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "aakcingf-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=aakcingf-1 CD4_Tex_term in tumor_margin (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "finding-679bce0423",
+              "bits": 0.14,
+              "signed_bits": 0.14,
+              "raw_bits": 0.14,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits.",
+              "summary": "E2E PDCD1 on cell dhclfnji-1 (CD4_Tex_term/tumor_core). sim_ok=False. gate=GATHER_MORE",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "prior:finding-679bce0423",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query_prior_findings",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: redundant within independence cluster 'prior:query_prior_findings' (evidence combines by independence, not by count). Raw would have been +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query_prior_findings",
+              "redundant": true
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. prior_finding from query_prior",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_margin",
+            "cell_id": "aakcingf-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_margin produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T21:08:45.028388+00:00"
+      },
+      {
+        "step": 12,
+        "event": "tool_call",
+        "payload": {
+          "tool": "search_literature",
+          "arguments": {
+            "query": "TOX transcription factor CD4 T-cell exhaustion tumor knockout reversal",
+            "context": "CD4_Tex_term in tumor_core, cervical cancer, TOX knockout hypothesis"
+          },
+          "result_preview": {
+            "ok": false,
+            "error": "tool_execution_error",
+            "message": "AttributeError: 'BedrockConverse' object has no attribute 'converse_text'"
+          },
+          "is_error": true
+        },
+        "ts": "2026-07-12T21:08:48.661564+00:00"
+      },
+      {
+        "step": 13,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.253,
+          "posterior_log_odds_bits": -1.56,
+          "n_independent_sources": 2,
+          "has_grounded_source": false,
+          "has_conflict": false,
+          "coverage": {
+            "literature": true,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": false,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": false,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": false,
+            "independent_ge_2": true
+          },
+          "gate": {
+            "decision": "GATHER_MORE",
+            "reason": "Posterior 0.253; not yet report-ready (posterior 0.253 < 0.7).",
+            "next_tool": "find_measured_perturbation_evidence",
+            "next_tool_reason": "Check for real measured perturbation evidence before trusting simulation."
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "aakcingf-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=aakcingf-1 CD4_Tex_term in tumor_margin (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "search_literature:error",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from search_literature:error: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "AttributeError: 'BedrockConverse' object has no attribute 'converse_text'",
+              "polarity": "neutral",
+              "strength": 0.0,
+              "independence_key": "literature:search_literature:error",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "finding-679bce0423",
+              "bits": 0.14,
+              "signed_bits": 0.14,
+              "raw_bits": 0.14,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits.",
+              "summary": "E2E PDCD1 on cell dhclfnji-1 (CD4_Tex_term/tumor_core). sim_ok=False. gate=GATHER_MORE",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "prior:finding-679bce0423",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query_prior_findings",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: redundant within independence cluster 'prior:query_prior_findings' (evidence combines by independence, not by count). Raw would have been +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query_prior_findings",
+              "redundant": true
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. literature from search_literature:error: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits. prior_finding from query_prior",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_margin",
+            "cell_id": "aakcingf-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_margin produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T21:08:48.661866+00:00"
+      },
+      {
+        "step": 14,
+        "event": "preregistration",
+        "payload": {
+          "id": "prereg-5008726e1c",
+          "tool": "find_measured_perturbation_evidence",
+          "predicted_direction": "up",
+          "gene": "TOX"
+        },
+        "ts": "2026-07-12T21:08:48.662427+00:00"
+      },
+      {
+        "step": 15,
+        "event": "preregistration_resolved",
+        "payload": {
+          "id": "prereg-5008726e1c",
+          "confirmed": true,
+          "observed": "up"
+        },
+        "ts": "2026-07-12T21:08:48.685907+00:00"
+      },
+      {
+        "step": 16,
+        "event": "tool_call",
+        "payload": {
+          "tool": "find_measured_perturbation_evidence",
+          "arguments": {
+            "gene": "TOX",
+            "cell_type": "CD4_T",
+            "perturbation_type": "knockout"
+          },
+          "result_preview": "{\"ok\": true, \"gene\": \"TOX\", \"cell_type\": \"CD4_T\", \"perturbation_type\": \"knockout\", \"n_hits\": 2, \"hits\": [{\"source_type\": \"training_corpus\", \"dataset\": \"scLDM-CD4\", \"accession\": \"https://virtualcellmodels.cziscience.com/model/scldm-cd4\", \"source_id\": \"training:scldm_cd4:TOX\", \"effect\": {\"kind\": \"training_membership\", \"note\": \"Gene is an actual perturbation target in scLDM-CD4's published guide/vocabulary set \\u2014 closer to ground truth the model saw than a de-novo out-of-distribution inference.\", \"markers_of_interest\": [\"PDCD1\", \"TCF7\", \"TOX\", \"LAG3\", \"GZMB\", \"IL7R\", \"CTLA4\", \"FOXP3\"]}, \"effe\u2026",
+          "is_error": false
+        },
+        "ts": "2026-07-12T21:08:48.686002+00:00"
+      },
+      {
+        "step": 17,
+        "event": "aggregate_and_gate",
+        "payload": {
+          "confidence": 0.833,
+          "posterior_log_odds_bits": 2.3188,
+          "n_independent_sources": 4,
+          "has_grounded_source": true,
+          "has_conflict": false,
+          "coverage": {
+            "literature": true,
+            "simulation": false,
+            "cohort_prognostic": false,
+            "measured": true,
+            "prior_finding": true,
+            "cell_context": true,
+            "atlas_mapping": false,
+            "suggestion": false,
+            "red_team": false,
+            "queried_priors": true,
+            "grounded": true,
+            "independent_ge_2": true
+          },
+          "gate": {
+            "decision": "REPORT",
+            "reason": "Posterior P(H|E)=0.833 \u2265 0.7; 4 independent sources; grounded evidence present; priors checked; no unresolved conflict.",
+            "next_tool": null,
+            "next_tool_reason": null
+          },
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "aakcingf-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=aakcingf-1 CD4_Tex_term in tumor_margin (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "search_literature:error",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from search_literature:error: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "AttributeError: 'BedrockConverse' object has no attribute 'converse_text'",
+              "polarity": "neutral",
+              "strength": 0.0,
+              "independence_key": "literature:search_literature:error",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:state:TOX",
+              "bits": 1.8788,
+              "signed_bits": 1.8788,
+              "raw_bits": 1.8788,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:state:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+              "summary": "Measured hit for TOX via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 0.9394,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:scldm_cd4:TOX",
+              "bits": 2.0,
+              "signed_bits": 2.0,
+              "raw_bits": 2.0,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:scldm_cd4:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+              "summary": "Measured hit for TOX via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/model/scldm-cd4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "finding-679bce0423",
+              "bits": 0.14,
+              "signed_bits": 0.14,
+              "raw_bits": 0.14,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits.",
+              "summary": "E2E PDCD1 on cell dhclfnji-1 (CD4_Tex_term/tumor_core). sim_ok=False. gate=GATHER_MORE",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "prior:finding-679bce0423",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query_prior_findings",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: redundant within independence cluster 'prior:query_prior_findings' (evidence combines by independence, not by count). Raw would have been +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query_prior_findings",
+              "redundant": true
+            }
+          ],
+          "rationale": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. literature from search_literature:error: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. measured from training:state:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits. measured from",
+          "hypothesis": {
+            "gene": "PDCD1",
+            "cell_type": "CD4_Tex_term",
+            "niche": "tumor_margin",
+            "cell_id": "aakcingf-1",
+            "sample_id": "atera-cervical-01",
+            "assay": "primary_human_t_cell_crispr_ko",
+            "effect_direction": "increase",
+            "effect_markers": [
+              "TCF7",
+              "IL7R",
+              "GZMB"
+            ],
+            "claim": "CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_margin produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay."
+          }
+        },
+        "ts": "2026-07-12T21:08:48.686284+00:00"
+      },
+      {
+        "step": 18,
+        "event": "forced_stop",
+        "payload": {
+          "gate": {
+            "decision": "REPORT",
+            "reason": "Posterior P(H|E)=0.833 \u2265 0.7; 4 independent sources; grounded evidence present; priors checked; no unresolved conflict.",
+            "next_tool": null,
+            "next_tool_reason": null
+          }
+        },
+        "ts": "2026-07-12T21:08:48.686679+00:00"
+      },
+      {
+        "step": 19,
+        "event": "red_team_confounds",
+        "payload": {
+          "n_confounds": 5,
+          "n_surviving": 3,
+          "surviving": [
+            "off_target",
+            "bulk_confound",
+            "compensation"
+          ],
+          "posterior_after": 0.736
+        },
+        "ts": "2026-07-12T21:08:48.689296+00:00"
+      },
+      {
+        "step": 20,
+        "event": "report_epistemics",
+        "payload": {
+          "evidence_budget": [
+            {
+              "role": "prior",
+              "evidence_type": "prior",
+              "source_id": "prior",
+              "bits": -2.0,
+              "signed_bits": -2.0,
+              "lr_tier": "documented_prior",
+              "note": "Prior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior).",
+              "summary": "Prior belief",
+              "independence_key": "prior",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "cell_context",
+              "source_id": "aakcingf-1",
+              "bits": 0.3,
+              "signed_bits": 0.3,
+              "raw_bits": 0.3,
+              "lr_tier": "documented_prior",
+              "note": "cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.",
+              "summary": "Resolved 200 cells; top=aakcingf-1 CD4_Tex_term in tumor_margin (exhaustion_score=1.0).",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "cell_context:atera-cervical-01",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "literature",
+              "source_id": "search_literature:error",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "literature from search_literature:error: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "AttributeError: 'BedrockConverse' object has no attribute 'converse_text'",
+              "polarity": "neutral",
+              "strength": 0.0,
+              "independence_key": "literature:search_literature:error",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:state:TOX",
+              "bits": 1.8788,
+              "signed_bits": 1.8788,
+              "raw_bits": 1.8788,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:state:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.",
+              "summary": "Measured hit for TOX via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 0.9394,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "measured",
+              "source_id": "training:scldm_cd4:TOX",
+              "bits": 2.0,
+              "signed_bits": 2.0,
+              "raw_bits": 2.0,
+              "lr_tier": "documented_prior",
+              "note": "measured from training:scldm_cd4:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.",
+              "summary": "Measured hit for TOX via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)",
+              "polarity": "supports",
+              "strength": 1.0,
+              "independence_key": "measured:https://virtualcellmodels.cziscience.com/model/scldm-cd4",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "finding-679bce0423",
+              "bits": 0.14,
+              "signed_bits": 0.14,
+              "raw_bits": 0.14,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits.",
+              "summary": "E2E PDCD1 on cell dhclfnji-1 (CD4_Tex_term/tumor_core). sim_ok=False. gate=GATHER_MORE",
+              "polarity": "supports",
+              "strength": 0.7,
+              "independence_key": "prior:finding-679bce0423",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query_prior_findings",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "prior_finding",
+              "source_id": "query_prior_findings",
+              "bits": 0.0,
+              "signed_bits": 0.0,
+              "raw_bits": 0.0,
+              "lr_tier": "documented_prior",
+              "note": "prior_finding from query_prior_findings: redundant within independence cluster 'prior:query_prior_findings' (evidence combines by independence, not by count). Raw would have been +0.000 bits.",
+              "summary": "Prior-findings query executed (anti-duplication check).",
+              "polarity": "neutral",
+              "strength": 0.5,
+              "independence_key": "prior:query_prior_findings",
+              "redundant": true
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "red_team",
+              "source_id": "confound:bulk_confound",
+              "bits": -0.28,
+              "signed_bits": -0.28,
+              "raw_bits": -0.28,
+              "lr_tier": "documented_prior",
+              "note": "red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+              "summary": "Surviving alternative: TCGA / bulk association reflects tumor-intrinsic or stromal expression, not the CD4 T-cell mechanism under test (ecological inference).",
+              "polarity": "contradicts",
+              "strength": 0.35,
+              "independence_key": "red_team:confound:bulk_confound",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "red_team",
+              "source_id": "confound:compensation",
+              "bits": -0.28,
+              "signed_bits": -0.28,
+              "raw_bits": -0.28,
+              "lr_tier": "documented_prior",
+              "note": "red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+              "summary": "Surviving alternative: Redundant checkpoints compensate for PDCD1 loss in vivo, so primary assay effects will not translate.",
+              "polarity": "contradicts",
+              "strength": 0.35,
+              "independence_key": "red_team:confound:compensation",
+              "redundant": false
+            },
+            {
+              "role": "evidence",
+              "evidence_type": "red_team",
+              "source_id": "confound:off_target",
+              "bits": -0.28,
+              "signed_bits": -0.28,
+              "raw_bits": -0.28,
+              "lr_tier": "documented_prior",
+              "note": "red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.",
+              "summary": "Surviving alternative: Observed phenotype after PDCD1 perturbation is an off-target CRISPR effect, not on-target loss of function.",
+              "polarity": "contradicts",
+              "strength": 0.35,
+              "independence_key": "red_team:confound:off_target",
+              "redundant": false
+            }
+          ],
+          "surviving_alternative_explanations": [
+            {
+              "id": "off_target",
+              "explanation": "Observed phenotype after PDCD1 perturbation is an off-target CRISPR effect, not on-target loss of function.",
+              "ruled_out_by": [],
+              "surviving": true
+            },
+            {
+              "id": "bulk_confound",
+              "explanation": "TCGA / bulk association reflects tumor-intrinsic or stromal expression, not the CD4 T-cell mechanism under test (ecological inference).",
+              "ruled_out_by": [],
+              "surviving": true
+            },
+            {
+              "id": "compensation",
+              "explanation": "Redundant checkpoints compensate for PDCD1 loss in vivo, so primary assay effects will not translate.",
+              "ruled_out_by": [],
+              "surviving": true
+            }
+          ],
+          "posterior_log_odds_bits": 1.4788
+        },
+        "ts": "2026-07-12T21:08:48.689382+00:00"
+      },
+      {
+        "step": 21,
+        "event": "finding_recorded",
+        "payload": {
+          "gene": "PDCD1"
+        },
+        "ts": "2026-07-12T21:08:48.705277+00:00"
+      }
+    ]
+  },
+  "markdown": "# Hypothesis report (confidence 0.736)\n\n**Question:** Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Use the tools to resolve candidate cells, check priors, propose and evaluate a perturbation hypothesis worth pursuing, gather independent evidence, and conclude (REPORT/DISCARD) when the gate allows. Do not invent evidence; keep honest ok:false results.\n\n**Claim:** CRISPR knockout of PDCD1 in CD4_Tex_term from niche tumor_margin produces a significant increase in effector-function markers (TCF7/IL7R/GZMB) in a primary human T-cell assay.\n\n| Field | Value |\n|---|---|\n| Gene | `PDCD1` |\n| Cell | `aakcingf-1` |\n| Cell type | CD4_Tex_term |\n| Niche | tumor_margin |\n| Gate | REPORT |\n\n## Why this confidence\n\nPrior P(H)=0.20 \u2192 logit\u2082=-2.000 bits (skeptical wet-lab claim prior). cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits. literature from search_literature:error: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. measured from training:state:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits. measured from training:scldm_cd4:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits. prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits. prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits. prior_finding from query_prior_findings: redundant within independence cluster 'prior:query_prior_findings' (evidence combines by independence, not by count). Raw would have been +0.000 bits. red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits. Posterior logit\u2082=1.479 bits \u2192 P(H|E)=0.736 (7 independent sources; grounded=True).\n\n## Evidence (ordered)\n\n1. **cell_context** (`aakcingf-1`, \u0394+0.300): Resolved 200 cells; top=aakcingf-1 CD4_Tex_term in tumor_margin (exhaustion_score=1.0).\n   - cell_context from aakcingf-1: Documented prior \u22480.3 bits: relevant cells exist \u2014 weak for H. \u2192 +0.300 bits.\n2. **literature** (`search_literature:error`, \u03940): AttributeError: 'BedrockConverse' object has no attribute 'converse_text'\n   - literature from search_literature:error: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n3. **measured** (`training:state:TOX`, \u0394+1.879): Measured hit for TOX via STATE: context_match=0.798 (cell=0.55, species=1.0, mechanism=1.0)\n   - measured from training:state:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +1.879 bits.\n4. **measured** (`training:scldm_cd4:TOX`, \u0394+2.000): Measured hit for TOX via scLDM-CD4: context_match=1.0 (cell=1.0, species=1.0, mechanism=1.0)\n   - measured from training:scldm_cd4:TOX: Documented prior \u22482 bits: well context-matched measured perturbation. \u2192 +2.000 bits.\n5. **prior_finding** (`finding-679bce0423`, \u0394+0.140): E2E PDCD1 on cell dhclfnji-1 (CD4_Tex_term/tumor_core). sim_ok=False. gate=GATHER_MORE\n   - prior_finding from finding-679bce0423: Documented prior \u22480.2 bits: prior session note. \u2192 +0.140 bits.\n6. **prior_finding** (`query_prior_findings`, \u03940): Prior-findings query executed (anti-duplication check).\n   - prior_finding from query_prior_findings: Neutral polarity \u2192 LR=1 \u2192 0 bits. \u2192 +0.000 bits.\n7. **prior_finding** (`query_prior_findings`, \u03940): Prior-findings query executed (anti-duplication check).\n   - prior_finding from query_prior_findings: redundant within independence cluster 'prior:query_prior_findings' (evidence combines by independence, not by count). Raw would have been +0.000 bits.\n8. **red_team** (`confound:bulk_confound`, \u0394-0.280): Surviving alternative: TCGA / bulk association reflects tumor-intrinsic or stromal expression, not the CD4 T-cell mechanism under test (ecological inference).\n   - red_team from confound:bulk_confound: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.\n9. **red_team** (`confound:compensation`, \u0394-0.280): Surviving alternative: Redundant checkpoints compensate for PDCD1 loss in vivo, so primary assay effects will not translate.\n   - red_team from confound:compensation: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.\n10. **red_team** (`confound:off_target`, \u0394-0.280): Surviving alternative: Observed phenotype after PDCD1 perturbation is an off-target CRISPR effect, not on-target loss of function.\n   - red_team from confound:off_target: Contradicts \u2192 negative log-LR. Documented prior \u22480.8 bits: unrebutted steelman objection. \u2192 -0.280 bits.\n"
+}

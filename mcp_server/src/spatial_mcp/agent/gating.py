@@ -1,8 +1,12 @@
 """Stopping / gating policy — independence + groundedness, not tool checklist.
 
 Simulation is optional weak corroboration and can never be load-bearing.
-REPORT requires posterior mass, ≥2 independent sources, ≥1 grounded source
-(measured / cohort / literature), no unresolved contradiction, and priors checked.
+REPORT requires posterior mass, ≥2 independent sources, ≥1 *external* grounded
+source (measured / cohort / literature with non-zero gene-bound bits),
+≥2 distinct grounded *modalities* (measured alone is not enough — need
+literature and/or cohort as an independent check), no unresolved contradiction,
+priors checked, and a locked hypothesis gene.
+Priors and cell_context alone cannot open REPORT.
 """
 
 from __future__ import annotations
@@ -18,6 +22,10 @@ GateDecision = Literal["REPORT", "GATHER_MORE", "DISCARD"]
 REPORT_CONFIDENCE = 0.70
 DISCARD_CONFIDENCE = 0.30
 MIN_INDEPENDENT_SOURCES = 2
+# Distinct evidence *kinds* that can carry a claim. Two measured hits from the
+# same tool are one modality. REPORT needs a second check (lit and/or cohort).
+GROUNDED_MODALITIES = ("literature", "measured", "cohort_prognostic")
+MIN_GROUNDED_MODALITIES = 2
 
 
 @dataclass
@@ -49,6 +57,10 @@ def _score_fields(evidence_score: EvidenceScore | dict[str, Any]) -> dict[str, A
                 or coverage.get("measured")
                 or coverage.get("cohort_prognostic")
             ),
+            "external_grounded": bool(
+                coverage.get("external_grounded")
+                or evidence_score.get("has_external_grounded_source")
+            ),
             "surviving_alternatives": list(
                 evidence_score.get("surviving_alternative_explanations") or []
             ),
@@ -60,6 +72,7 @@ def _score_fields(evidence_score: EvidenceScore | dict[str, Any]) -> dict[str, A
                 evidence_score.get("symmetric_search_complete")
                 or coverage.get("symmetric_search")
             ),
+            "hypothesis_gene": coverage.get("hypothesis_gene"),
         }
     coverage = dict(evidence_score.coverage)
     return {
@@ -68,10 +81,16 @@ def _score_fields(evidence_score: EvidenceScore | dict[str, Any]) -> dict[str, A
         "has_conflict": evidence_score.has_conflict,
         "n_independent": evidence_score.n_independent_sources,
         "grounded": evidence_score.has_grounded_source or bool(coverage.get("grounded")),
+        "external_grounded": bool(coverage.get("external_grounded")),
         "surviving_alternatives": [],
         "red_team_done": bool(coverage.get("red_team")),
         "symmetric_search_done": bool(coverage.get("symmetric_search")),
+        "hypothesis_gene": coverage.get("hypothesis_gene"),
     }
+
+
+def _grounded_modalities(coverage: dict[str, Any]) -> list[str]:
+    return [m for m in GROUNDED_MODALITIES if coverage.get(m)]
 
 
 def _report_ready(f: dict[str, Any], called: set[str]) -> tuple[bool, str]:
@@ -90,12 +109,30 @@ def _report_ready(f: dict[str, Any], called: set[str]) -> tuple[bool, str]:
             "no grounded source (need measured / cohort / literature — "
             "simulation alone cannot carry REPORT)",
         )
+    # Memory reads + cell_context cannot open REPORT — need lit/measured/cohort
+    # that actually contributed bits (gene-bound).
+    if not f.get("external_grounded"):
+        return (
+            False,
+            "no external grounded evidence with non-zero bits "
+            "(need literature / measured / cohort for the hypothesis gene — "
+            "priors and cell_context alone cannot open REPORT)",
+        )
+    modalities = _grounded_modalities(f["coverage"])
+    if len(modalities) < MIN_GROUNDED_MODALITIES:
+        return (
+            False,
+            f"only {len(modalities)} grounded modality(ies) {modalities or '[]'} "
+            f"(need ≥{MIN_GROUNDED_MODALITIES} of {list(GROUNDED_MODALITIES)}; "
+            "two measured hits are still one modality — gather literature or cohort)",
+        )
     if f["has_conflict"]:
         return False, "unresolved contradiction between grounded sources"
     if "query_prior_findings" not in called and not f["coverage"].get("queried_priors"):
         return False, "priors not checked"
-    # Surviving alternatives affect the posterior via red_team bits; they do not
-    # hard-veto REPORT on count alone (that would always fire on the confound list).
+    gene = f.get("hypothesis_gene") or f["coverage"].get("hypothesis_gene")
+    if not gene or gene == "UNSPECIFIED":
+        return False, "hypothesis gene not locked — cannot REPORT without a bound gene"
     return True, "ok"
 
 
@@ -137,6 +174,22 @@ def decide_next_action(
 
     ready, ready_why = _report_ready(f, called)
     if ready:
+        # Workflow completeness (NOT an evidence bar): run virtual-cell once so the
+        # trace shows scLDM deltas or ok:false. Simulation still cannot carry REPORT.
+        if "simulate_perturbations" not in called and not exhausted:
+            return GateResult(
+                decision="GATHER_MORE",
+                reason=(
+                    "Evidence bar met, but canonical workflow still needs "
+                    "simulate_perturbations once (non-load-bearing calibration check) "
+                    "before REPORT."
+                ),
+                next_tool="simulate_perturbations",
+                next_tool_reason=(
+                    "Call scLDM on the committed gene + cell; note real deltas or "
+                    "ok:false. Do not treat simulation as grounded evidence."
+                ),
+            )
         return GateResult(
             decision="REPORT",
             reason=(
@@ -228,14 +281,38 @@ def _pick_next_tool(
     confidence: float,
     fields: dict[str, Any],
 ) -> tuple[str | None, str | None]:
-    """Deterministic gap-filling: priors → cells → lit → measured → suggest → cohort → sim."""
+    """Deterministic gap-filling: priors → cells → suggest (lock gene) → lit → measured → cohort → sim."""
     if "query_prior_findings" not in called:
         return "query_prior_findings", "Check prior findings before proposing anything new."
 
     if not coverage.get("cell_context") and "list_candidate_cells" not in called:
         return "list_candidate_cells", "Need resolved cells/niche context."
 
-    # Grounded evidence first — simulation is last and optional
+    # Lock a gene via suggest before gene-bound evidence gathering.
+    if not coverage.get("suggestion") and "suggest_perturbations" not in called:
+        return (
+            "suggest_perturbations",
+            "Lock a candidate gene before gathering gene-bound evidence.",
+        )
+
+    # External grounded evidence is required for REPORT — not optional.
+    if not coverage.get("external_grounded"):
+        if "search_literature" not in called:
+            return (
+                "search_literature",
+                "Need literature grounding for the locked gene (required for REPORT).",
+            )
+        if "find_measured_perturbation_evidence" not in called:
+            return (
+                "find_measured_perturbation_evidence",
+                "Need measured perturbation evidence for the locked gene.",
+            )
+        if "differential_survival_analysis" not in called:
+            return (
+                "differential_survival_analysis",
+                "Cohort association can supply external grounded evidence.",
+            )
+
     if not coverage.get("literature") and "search_literature" not in called:
         return "search_literature", "Need literature grounding (symmetric search preferred)."
 
@@ -245,10 +322,19 @@ def _pick_next_tool(
             "Check for real measured perturbation evidence before trusting simulation.",
         )
 
-    if not coverage.get("suggestion") and "suggest_perturbations" not in called:
-        if not coverage.get("cell_context") and "list_candidate_cells" not in called:
-            return "list_candidate_cells", "Resolve candidate cells before suggesting knockouts."
-        return "suggest_perturbations", "Need ranked knockout candidates."
+    # Measured-only is one modality — force a second check before REPORT.
+    modalities = _grounded_modalities(coverage)
+    if len(modalities) < MIN_GROUNDED_MODALITIES:
+        if "search_literature" not in called:
+            return (
+                "search_literature",
+                "Need a second grounded modality (literature) — measured alone cannot REPORT.",
+            )
+        if "differential_survival_analysis" not in called:
+            return (
+                "differential_survival_analysis",
+                "Need a second grounded modality (cohort) — measured alone cannot REPORT.",
+            )
 
     if (
         not coverage.get("cohort_prognostic")
@@ -259,7 +345,7 @@ def _pick_next_tool(
             "Cohort association can add grounded prognostic evidence.",
         )
 
-    # Simulation is optional corroboration only — skip if already grounded+confident
+    # Simulation is optional corroboration only
     if (
         not coverage.get("simulation")
         and "simulate_perturbations" not in called
@@ -271,15 +357,15 @@ def _pick_next_tool(
             "Optional weak corroboration from virtual-cell model (not load-bearing).",
         )
 
-    if confidence < REPORT_CONFIDENCE and not fields.get("grounded"):
-        if "search_literature" in called and "find_measured_perturbation_evidence" in called:
-            return None, None
+    if confidence < REPORT_CONFIDENCE and not fields.get("external_grounded"):
         if "search_literature" not in called:
-            return "search_literature", "Still need grounded literature."
-        return (
-            "find_measured_perturbation_evidence",
-            "Still need grounded measured evidence.",
-        )
+            return "search_literature", "Still need external grounded literature."
+        if "find_measured_perturbation_evidence" not in called:
+            return (
+                "find_measured_perturbation_evidence",
+                "Still need external grounded measured evidence.",
+            )
+        return None, None
 
     if confidence < REPORT_CONFIDENCE:
         if "recommend_next_experiment" not in called:

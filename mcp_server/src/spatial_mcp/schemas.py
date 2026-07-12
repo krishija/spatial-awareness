@@ -159,11 +159,10 @@ SEARCH_LITERATURE = {
     "description": (
         "Search the scientific literature for papers relevant to a free-text query "
         "about CD4 T-cell exhaustion, spatial niches, immune checkpoints, or gene "
-        "perturbations. Returns a ranked array of citations (title, source, url, "
-        "one-line relevance snippet). Pass optional context (e.g. cell phenotype or "
-        "niche) to bias ranking toward papers that ground a subsequent "
-        "suggest_perturbations call. Prefer calling this (and query_prior_findings) "
-        "before proposing new knockouts."
+        "perturbations. Returns structured evidence_cards with claim/stance (not just "
+        "links). Pass gene / genes / phenotype / niche so sub-queries stay bound to "
+        "the committed hypothesis. Prefer calling this (and query_prior_findings) "
+        "before proposing new knockouts. Search for support AND contradiction."
     ),
     "input_schema": {
         "type": "object",
@@ -177,6 +176,31 @@ SEARCH_LITERATURE = {
                 "description": (
                     "Optional biological context, e.g. 'CD4_Tex_term in tumor_core'."
                 ),
+            },
+            "hypothesis": {
+                "type": "string",
+                "description": "Optional one-line hypothesis claim being tested.",
+            },
+            "gene": {
+                "type": "string",
+                "description": "Committed hypothesis gene (Hugo symbol).",
+            },
+            "genes": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Gene symbols to bind / expand aliases for.",
+            },
+            "phenotype": {
+                "type": "string",
+                "description": "Cell phenotype / cell_type for context-matched search.",
+            },
+            "niche": {
+                "type": "string",
+                "description": "Tissue niche for context-matched search.",
+            },
+            "cell_type": {
+                "type": "string",
+                "description": "Alias for phenotype when the agent passes cell_type.",
             },
         },
         "required": ["query"],

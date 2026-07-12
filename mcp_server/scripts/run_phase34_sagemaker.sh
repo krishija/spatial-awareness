@@ -21,6 +21,8 @@ nvidia-smi -L || true
 
 aws s3 cp "s3://$BUCKET/artifacts/mcp_data/spatial.env" "$WORK/spatial.env"
 set -a; source "$WORK/spatial.env"; set +a
+# Auth is exclusive: if AWS_BEARER_TOKEN_BEDROCK is present, Bedrock uses it only
+# (and fails loud if expired). Omit it from spatial.env to use IAM/instance role.
 aws s3 cp "s3://$BUCKET/artifacts/mcp_data/spatial-awareness-code.tgz" "$WORK/downloads/code.tgz"
 rm -rf "$REPO"; mkdir -p "$REPO"
 tar xzf "$WORK/downloads/code.tgz" -C "$REPO"
@@ -31,6 +33,10 @@ export SPATIAL_MCP_DB="$WORK/findings.db"
 export SPATIAL_PREREG_PATH="$DATA/preregistrations.jsonl"
 export REPO_ROOT="$REPO"
 export E2E_OUT="$OUT/e2e_tool_sequence"
+# Clean slate before server starts — no prior-session self-citation
+rm -f "$SPATIAL_MCP_DB"
+: >"$SPATIAL_PREREG_PATH" || true
+
 export PATH="/home/ec2-user/.local/bin:$PATH"
 if ! command -v uv >/dev/null 2>&1; then curl -LsSf https://astral.sh/uv/install.sh | sh; fi
 export PATH="/home/ec2-user/.local/bin:$PATH"
@@ -102,6 +108,9 @@ nohup env \
   SCLDM_ROOT="${SCLDM_ROOT:-}" \
   SCLDM_DEVICE=cuda \
   YOU_API_KEY="${YOU_API_KEY:-}" \
+  AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-}" \
+  AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-}" \
+  AWS_SESSION_TOKEN="${AWS_SESSION_TOKEN:-}" \
   AWS_BEARER_TOKEN_BEDROCK="${AWS_BEARER_TOKEN_BEDROCK:-}" \
   AWS_DEFAULT_REGION="$AWS_DEFAULT_REGION" \
   PYTHONPATH="$REPO/mcp_server/src" \
@@ -115,19 +124,29 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
 done
 head -60 "$WORK/mcp_server.log" || true
 
-# Run agent against local MCP
-QUESTION='For atera-cervical-01 tumor-core CD4_Tex_term cell coafefcd-1, evaluate whether LCP2 knockout is a justified next perturbation. Use real tools; do not invent evidence.'
+# Run agent against local MCP.
+# Cell is free (list_candidate_cells). Gene pre-locked to PDCD1 so
+# simulate_perturbations can return a real scLDM delta (in KNOWN_GUIDE_SYMBOLS).
+QUESTION='Investigate CD4 T-cell exhaustion in sample atera-cervical-01. Resolve candidate cells and check priors. Call suggest_perturbations for orientation, then COMMIT to PDCD1 (pre-locked). Gather grounded evidence (measured + literature with support AND contradiction). After grounded evidence is in, ALWAYS call simulate_perturbations on the committed gene and resolved cell — note the deltas or ok:false; do not rely on simulation for the conclusion. Then conclude REPORT/DISCARD when the gate allows. Do not invent evidence; keep honest ok:false results.'
 cd "$REPO/mcp_server"
+
 EC=0
+echo "=== AGENT RUN clean PDCD1 + simulate ==="
 "$RUN_PY" -m spatial_mcp.agent.cli \
   --mcp-url http://127.0.0.1:8000/mcp \
   --sample atera-cervical-01 \
-  --max-iterations 8 \
-  --wall-clock 240 \
+  --commit-gene PDCD1 \
+  --max-iterations 12 \
+  --wall-clock 480 \
   --json "$OUT/agent_trace.json" \
   --md "$OUT/agent_trace.md" \
   "$QUESTION" || EC=$?
 echo "AGENT_EXIT=$EC"
+cp -f "$OUT/agent_trace.json" "$OUT/agent_trace_pdcd1_sim.json" 2>/dev/null || true
+cp -f "$OUT/agent_trace.md" "$OUT/agent_trace_pdcd1_sim.md" 2>/dev/null || true
+cp -f "$OUT/agent_trace.json" "$OUT/agent_trace_clean.json" 2>/dev/null || true
+cp -f "$OUT/agent_trace.md" "$OUT/agent_trace_clean.md" 2>/dev/null || true
+
 
 # Deterministic tool-sequence smoke (uses REPO_ROOT / SPATIAL_PREREG_PATH / E2E_OUT)
 "$RUN_PY" "$REPO/mcp_server/scripts/run_e2e_tool_sequence.py" || true

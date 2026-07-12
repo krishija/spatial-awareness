@@ -120,14 +120,18 @@ def test_gating_reports_with_grounded_independence_no_sim():
                 "prior_finding", "ok", "q", "neutral", 0.5, {"queried_priors": True}
             ),
             EvidenceItem("cell_context", "c", "c", "supports", 0.9),
-            EvidenceItem("literature", "lit", "l", "supports", 1.0),
+            EvidenceItem(
+                "literature", "lit", "l", "supports", 1.0, {"gene": "PDCD1", "pmid": "1"}
+            ),
             EvidenceItem(
                 "measured", "meas", "m", "supports", 1.0,
-                {"accession": "lincs:1", "context_match_score": 0.9},
+                {"gene": "PDCD1", "accession": "lincs:1", "context_match_score": 0.9},
             ),
-        ]
+        ],
+        hypothesis=Hypothesis(gene="PDCD1", cell_type="CD4_T", niche="tumor_core"),
     )
     assert score.has_grounded_source
+    assert score.coverage.get("external_grounded")
     assert score.n_independent_sources >= 2
     gate = decide_next_action(
         evidence_score=score,
@@ -140,7 +144,22 @@ def test_gating_reports_with_grounded_independence_no_sim():
         max_iterations=8,
         iteration=5,
     )
-    assert gate.decision == "REPORT"
+    # Evidence bar met → still defer REPORT until simulate runs once (workflow)
+    assert gate.decision == "GATHER_MORE"
+    assert gate.next_tool == "simulate_perturbations"
+    gate2 = decide_next_action(
+        evidence_score=score,
+        tools_called=[
+            "query_prior_findings",
+            "list_candidate_cells",
+            "search_literature",
+            "find_measured_perturbation_evidence",
+            "simulate_perturbations",
+        ],
+        max_iterations=8,
+        iteration=6,
+    )
+    assert gate2.decision == "REPORT"
     assert score.confidence >= 0.70
 
 

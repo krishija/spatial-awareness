@@ -464,15 +464,33 @@ def run_live_knockout(gene: str) -> KnockoutResult:
 
 
 def evaluate_knockout(gene: str) -> KnockoutResult:
-    """Live scLDM only. Raises if weights/deps are missing or inference fails."""
+    """Prefer live scLDM; fall back to labeled surrogate if weights/deps are missing.
+
+    Surrogate is never silent — backend=`scldm_surrogate` is explicit in the payload
+    so the agent/frontend can show it as calibrated-weak, not live inference.
+    """
     gene = gene.upper()
     if gene not in KNOWN_GUIDE_SYMBOLS and resolve_ensembl(gene) is None:
         raise ValueError(f"gene_out_of_vocabulary:{gene}")
 
-    if not scldm_available():
-        raise RuntimeError(
-            "scLDM not available. Set SCLDM_ROOT (and optionally SCLDM_CHECKPOINT) "
-            "to an installed scLDM-CD4 checkout with weights. "
-            "Surrogate deltas are disabled — refusing to invent knockout effects."
-        )
-    return run_live_knockout(gene)
+    if scldm_available():
+        try:
+            return run_live_knockout(gene)
+        except Exception as exc:  # noqa: BLE001
+            # Weights/config often missing on workshop boxes — fail over loudly labeled.
+            result = run_surrogate_knockout(gene)
+            details = dict(result.details or {})
+            details["live_error"] = f"{type(exc).__name__}: {exc}"
+            details["fallback"] = "scldm_surrogate_after_live_failure"
+            return KnockoutResult(
+                gene=result.gene,
+                ensembl_id=result.ensembl_id,
+                backend="scldm_surrogate",
+                mean_control=result.mean_control,
+                mean_knockout=result.mean_knockout,
+                deltas=result.deltas,
+                top_effects=result.top_effects,
+                details=details,
+            )
+
+    return run_surrogate_knockout(gene)

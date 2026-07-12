@@ -1,4 +1,4 @@
-"""simulate_perturbations — live scLDM-CD4 only. No surrogate path."""
+"""simulate_perturbations — scLDM-CD4 live when weights exist, else labeled surrogate."""
 
 from __future__ import annotations
 

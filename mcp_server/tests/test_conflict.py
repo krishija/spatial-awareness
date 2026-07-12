@@ -10,20 +10,33 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from spatial_mcp.agent.evidence import EvidenceItem, EvidenceScore, aggregate_evidence
 from spatial_mcp.agent.gating import decide_next_action
+from spatial_mcp.agent.hypothesis import Hypothesis
 from spatial_mcp.agent.report import build_report, render_markdown
 from spatial_mcp.registry import build_default_registry
 
 
 def test_conflicting_lit_vs_measured_ordering_and_gate():
+    hyp = Hypothesis(gene="PDCD1", cell_type="CD4_Tex_term", niche="tumor_core")
     supporting = [
         EvidenceItem(
             "prior_finding", "checked", "q", "neutral", 0.5, {"queried_priors": True}
         ),
         EvidenceItem("cell_context", "Tex core", "c", "supports", 0.9),
-        EvidenceItem("literature", "PD-1 restores effectors", "lit", "supports", 0.95),
-        EvidenceItem("measured", "LINCS hit", "meas", "supports", 0.95),
-        EvidenceItem("suggestion", "PDCD1", "sug", "supports", 0.85),
-        EvidenceItem("simulation", "PDCD1 KO effector-like", "sim", "supports", 0.95),
+        EvidenceItem(
+            "literature", "PD-1 restores effectors", "lit", "supports", 0.95,
+            {"gene": "PDCD1", "pmid": "1"},
+        ),
+        EvidenceItem(
+            "measured", "LINCS hit", "meas", "supports", 0.95,
+            {"gene": "PDCD1", "accession": "lincs"},
+        ),
+        EvidenceItem(
+            "suggestion", "PDCD1", "sug", "supports", 0.85, {"gene": "PDCD1"}
+        ),
+        EvidenceItem(
+            "simulation", "PDCD1 KO effector-like", "sim", "supports", 0.95,
+            {"gene": "PDCD1"},
+        ),
     ]
     conflicting = [
         EvidenceItem(
@@ -36,13 +49,20 @@ def test_conflicting_lit_vs_measured_ordering_and_gate():
             "lit",
             "contradicts",
             0.9,
+            {"gene": "PDCD1", "pmid": "2"},
         ),
-        EvidenceItem("measured", "LINCS hit", "meas", "supports", 0.95),
-        EvidenceItem("simulation", "PDCD1 KO effector-like", "sim", "supports", 0.95),
+        EvidenceItem(
+            "measured", "LINCS hit", "meas", "supports", 0.95,
+            {"gene": "PDCD1", "accession": "lincs"},
+        ),
+        EvidenceItem(
+            "simulation", "PDCD1 KO effector-like", "sim", "supports", 0.95,
+            {"gene": "PDCD1"},
+        ),
     ]
 
-    s_ok = aggregate_evidence(supporting)
-    s_bad = aggregate_evidence(conflicting)
+    s_ok = aggregate_evidence(supporting, hypothesis=hyp)
+    s_bad = aggregate_evidence(conflicting, hypothesis=hyp)
     assert s_ok.confidence > s_bad.confidence
     assert s_bad.has_conflict is True
 
@@ -52,7 +72,14 @@ def test_conflicting_lit_vs_measured_ordering_and_gate():
             confidence=0.78,
             rationale=s_ok.rationale,
             contributions=s_ok.contributions,
-            coverage={**s_ok.coverage, "literature": True, "measured": True, "grounded": True},
+            coverage={
+                **s_ok.coverage,
+                "literature": True,
+                "measured": True,
+                "grounded": True,
+                "external_grounded": True,
+                "hypothesis_gene": "PDCD1",
+            },
             has_conflict=False,
             n_independent_sources=max(2, s_ok.n_independent_sources),
             has_grounded_source=True,

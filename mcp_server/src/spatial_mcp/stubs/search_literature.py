@@ -64,7 +64,7 @@ def search_literature(args: dict[str, Any]) -> dict[str, Any]:
 
     context = (args.get("context") or "").strip()
     hypothesis = (args.get("hypothesis") or query).strip()
-    phenotype = args.get("phenotype")
+    phenotype = args.get("phenotype") or args.get("cell_type")
     niche = args.get("niche")
     gene = (args.get("gene") or "").strip() or None
     genes = [str(g).strip() for g in (args.get("genes") or []) if str(g).strip()]

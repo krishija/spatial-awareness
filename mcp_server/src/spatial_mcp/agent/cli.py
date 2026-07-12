@@ -124,6 +124,7 @@ async def run_live(args: argparse.Namespace) -> int:
             model_id=args.model,
             region=args.region,
             sample_id_default=args.sample,
+            commit_gene=args.commit_gene,
         )
     )
     result = await agent.run(args.question)
@@ -171,6 +172,11 @@ def main() -> None:
         default=os.environ.get("AWS_REGION") or os.environ.get("BEDROCK_REGION"),
     )
     parser.add_argument("--sample", default="crc-01")
+    parser.add_argument(
+        "--commit-gene",
+        default=None,
+        help="Pre-lock hypothesis gene (skips suggest rank-1 lock). E.g. HAVCR2.",
+    )
     parser.add_argument("--json", dest="json", default=None)
     parser.add_argument("--md", default=None)
     parser.add_argument(

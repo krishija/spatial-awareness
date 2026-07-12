@@ -1,8 +1,10 @@
-"""Amazon Bedrock Converse client using bearer-token auth.
+"""Amazon Bedrock Converse client.
 
-Auth: set AWS_BEARER_TOKEN_BEDROCK (Bedrock API key). boto3 detects it for
-bedrock-runtime; we also support a direct HTTP path with
-Authorization: Bearer <token> as documented by AWS.
+Auth (exactly one path — no fallbacks):
+- If AWS_BEARER_TOKEN_BEDROCK is set → bearer HTTP Converse only.
+- Else → boto3 with the ambient AWS credential chain (env / instance role) only.
+
+Fail loud on auth or invoke errors. Do not silently switch auth modes.
 """
 
 from __future__ import annotations
@@ -24,14 +26,9 @@ DEFAULT_REGION = os.environ.get("AWS_REGION") or os.environ.get(
 )
 
 
-def load_bearer_token() -> str:
+def load_bearer_token() -> str | None:
     token = os.environ.get("AWS_BEARER_TOKEN_BEDROCK", "").strip().strip('"')
-    if not token:
-        raise RuntimeError(
-            "AWS_BEARER_TOKEN_BEDROCK is not set. Export your Bedrock API key "
-            "or place it in the repo .env (loaded by the CLI)."
-        )
-    return token
+    return token or None
 
 
 def mcp_tools_to_bedrock(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -64,14 +61,10 @@ class BedrockConverse:
         self.max_tokens = max_tokens
         self.token = load_bearer_token()
         self._boto = None
-        try:
+        if self.token is None:
             import boto3
 
-            # Ensure env var is set for SDK auto-detection
-            os.environ["AWS_BEARER_TOKEN_BEDROCK"] = self.token
             self._boto = boto3.client("bedrock-runtime", region_name=self.region)
-        except Exception:
-            self._boto = None
 
     def converse(
         self,
@@ -86,13 +79,41 @@ class BedrockConverse:
             "inferenceConfig": {"maxTokens": self.max_tokens, "temperature": 0.2},
             "toolConfig": {"tools": mcp_tools_to_bedrock(tools)},
         }
-        if self._boto is not None:
-            try:
-                return self._boto.converse(modelId=self.model_id, **body)
-            except Exception:
-                # Fall through to HTTP bearer path
-                pass
-        return self._converse_http(body)
+        if self.token is not None:
+            return self._converse_http(body)
+        if self._boto is None:
+            raise RuntimeError(
+                "No Bedrock auth configured. Set AWS_BEARER_TOKEN_BEDROCK "
+                "or provide AWS credentials for boto3."
+            )
+        return self._boto.converse(modelId=self.model_id, **body)
+
+    def converse_text(
+        self,
+        *,
+        system: str,
+        user: str,
+        max_tokens: int | None = None,
+    ) -> str:
+        """Plain text completion (no tools). Same exclusive auth as converse()."""
+        body = {
+            "messages": [{"role": "user", "content": [{"text": user}]}],
+            "system": [{"text": system}],
+            "inferenceConfig": {
+                "maxTokens": max_tokens or self.max_tokens,
+                "temperature": 0.2,
+            },
+        }
+        if self.token is not None:
+            resp = self._converse_http(body)
+        elif self._boto is not None:
+            resp = self._boto.converse(modelId=self.model_id, **body)
+        else:
+            raise RuntimeError(
+                "No Bedrock auth configured. Set AWS_BEARER_TOKEN_BEDROCK "
+                "or provide AWS credentials for boto3."
+            )
+        return extract_text(resp)
 
     def _converse_http(self, body: dict[str, Any]) -> dict[str, Any]:
         url = (
