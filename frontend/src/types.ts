@@ -6,24 +6,25 @@ export type ExhaustionState =
   | 'effector'
   | 'other';
 
-export type CellType =
-  | 'CD4_Tex_term'
-  | 'CD4_Tex_prog'
-  | 'CD4_Teff'
-  | 'CD4_Treg'
-  | 'myeloid'
-  | 'tumor'
-  | 'stromal';
+/**
+ * Cell type is an open string, not a closed enum — real samples carry all 25
+ * raw 10x labels (Regulatory T Cells, Hypoxic Tumor Cells, ...), matching
+ * explorer.html's "Cell types" dropdown exactly, alongside the fixture
+ * samples' own small label set. palettes.ts covers both with explicit
+ * entries; anything unlisted falls back to a neutral color.
+ */
+export type CellType = string;
 
+/** Gene panel ported from explorer.html's gene-paint dropdown. */
 export const MARKER_GENES = [
-  'PDCD1',
-  'TCF7',
-  'TOX',
-  'LAG3',
-  'GZMB',
-  'IL7R',
   'CTLA4',
   'FOXP3',
+  'CXCL9',
+  'STAT1',
+  'CXCR4',
+  'IL2RA',
+  'TNFRSF9',
+  'PDCD1',
 ] as const;
 
 export type MarkerGene = (typeof MARKER_GENES)[number];
@@ -33,10 +34,13 @@ export interface Cell {
   x: number;
   y: number;
   cell_type: CellType;
-  niche: Niche;
+  /** Only Tregs carry a niche (matches explorer.html's Treg-niches scope) — null otherwise. */
+  niche: Niche | null;
   exhaustion_state: ExhaustionState;
   /** Expression values rounded to 2 decimal places */
   expression: Record<MarkerGene, number>;
+  /** Atlas-only: infiltration score (atlas_score mode), unused for spatial cells. */
+  score?: number;
 }
 
 export interface Citation {
@@ -120,7 +124,18 @@ export interface SampleMeta {
 export interface SampleData {
   cells: Cell[];
   suggestions: AiSuggestion[];
-  nicheCenters: Record<Niche, { x: number; y: number; rx: number; ry: number }>;
 }
 
-export type ColorMode = 'cell_type' | 'expression';
+/**
+ * Cell Type / Treg Niches / Gene Expression — the spatial window's three map
+ * modes, ported from explorer.html's dropdown. atlas_score / atlas_selected
+ * are the UMAP window's other two modes (its "cell subtypes" mode reuses
+ * cell_type directly, since subtype IS cell_type for atlas points) — ported
+ * from atlas_explorer.html's dropdown.
+ */
+export type ColorMode =
+  | 'cell_type'
+  | 'treg_niches'
+  | 'expression'
+  | 'atlas_score'
+  | 'atlas_selected';

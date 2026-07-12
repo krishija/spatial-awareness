@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { Cell, ColorMode, MarkerGene } from '../types';
-import { CELL_TYPE_COLORS } from '../data/palettes';
-import { cellColor } from './Legend';
+import { cellColor, cellTypeColor } from '../data/palettes';
 
 interface Props {
   cells: Cell[];
@@ -46,11 +45,7 @@ export function MiniMap({ cells, selected, colorMode, selectedGene }: Props) {
       const { px, py } = toPx(cell.x, cell.y);
       ctx.beginPath();
       ctx.arc(px, py, r, 0, Math.PI * 2);
-      ctx.fillStyle = cellColor(
-        colorMode,
-        cell.cell_type,
-        cell.expression[selectedGene],
-      );
+      ctx.fillStyle = cellColor(cell, colorMode, selectedGene);
       ctx.globalAlpha = 0.55;
       ctx.fill();
     }
@@ -59,7 +54,7 @@ export function MiniMap({ cells, selected, colorMode, selectedGene }: Props) {
     const { px, py } = toPx(selected.x, selected.y);
     ctx.beginPath();
     ctx.arc(px, py, 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = CELL_TYPE_COLORS[selected.cell_type];
+    ctx.fillStyle = cellTypeColor(selected.cell_type);
     ctx.fill();
     ctx.strokeStyle = '#1a1a18';
     ctx.lineWidth = 1.25;

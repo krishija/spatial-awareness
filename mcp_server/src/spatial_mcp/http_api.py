@@ -10,6 +10,7 @@ server-side. Same ToolRegistry, same tool logic — just a different transport.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +27,53 @@ PORT = int(os.environ.get("SPATIAL_API_PORT", "8001"))
 ALLOWED_ORIGINS = os.environ.get("SPATIAL_API_ORIGINS", "http://localhost:5173").split(",")
 
 REGISTRY = build_default_registry()
+
+# ── Real Atera data, for the tissue map (bypasses list_candidate_cells' 200-cell
+# agent-context cap — the map needs a denser, visually representative sample).
+# cells_full.parquet has ALL 25 raw 10x cell-type labels (unlike cells.parquet,
+# which only covers the 13-label CD4-relevant subset) — matches explorer.html's
+# "Cell types" dropdown exactly. Gene panel matches explorer.html's gene-paint
+# dropdown, not the old marker panel. ──
+CELLS_PARQUET = Path(__file__).resolve().parents[2] / "data" / "cells_full.parquet"
+ATLAS_JSON = Path(__file__).resolve().parents[2] / "data" / "atlas_cells.json"
+MARKER_GENES = ["CTLA4", "FOXP3", "CXCL9", "STAT1", "CXCR4", "IL2RA", "TNFRSF9", "PDCD1"]
+REAL_SAMPLE_META = {
+    "atera-cervical-01": {
+        "id": "atera-cervical-01",
+        "name": "Atera-01 · cervical SCC (real, 715k cells)",
+        "description": "10x Atera whole-transcriptome in situ, cervical squamous cell carcinoma, one FFPE section (CC BY 4.0)",
+    }
+}
+# Regulatory T Cells capped looser — Treg-niches mode needs enough density to
+# read; everything else is backdrop/context and can be capped hard.
+CELL_TYPE_CAP = {
+    "Regulatory T Cells": 3000,
+    "Exhausted T Cells": 1200,
+    "Cytotoxic T Cells": 1200,
+}
+DEFAULT_CAP = 600
+
+_REAL_CELLS_DF = None
+_ATLAS_DATA = None
+
+
+def _load_real_cells():
+    global _REAL_CELLS_DF
+    if _REAL_CELLS_DF is None and CELLS_PARQUET.exists():
+        import pandas as pd
+
+        _REAL_CELLS_DF = pd.read_parquet(CELLS_PARQUET)
+    return _REAL_CELLS_DF
+
+
+def _load_atlas_data():
+    global _ATLAS_DATA
+    if _ATLAS_DATA is None and ATLAS_JSON.exists():
+        import json
+
+        with open(ATLAS_JSON) as f:
+            _ATLAS_DATA = json.load(f)
+    return _ATLAS_DATA
 
 app = FastAPI(title="spatial-awareness REST proxy")
 app.add_middleware(
@@ -69,6 +117,80 @@ class ChatRequest(BaseModel):
 @app.get("/api/health")
 def health() -> dict:
     return {"ok": True}
+
+
+@app.get("/api/real_samples")
+def real_samples() -> dict:
+    df = _load_real_cells()
+    if df is None:
+        return {"samples": []}
+    return {"samples": list(REAL_SAMPLE_META.values())}
+
+
+@app.get("/api/real_samples/{sample_id}")
+def real_sample(sample_id: str) -> dict:
+    import numpy as np
+
+    df = _load_real_cells()
+    if df is None:
+        return {"ok": False, "error": "no_data", "message": "cells_full.parquet not found on server."}
+    if sample_id not in REAL_SAMPLE_META:
+        return {"ok": False, "error": "unknown_sample", "message": f"Unknown sample_id '{sample_id}'."}
+
+    sub = df[df["sample_id"] == sample_id]
+
+    # Stratified subsample: bulk/backdrop types capped hard, Tregs (the
+    # niche-mode story) capped looser, so the map stays dense but readable.
+    rng = np.random.default_rng(0)
+    parts = []
+    for ct, group in sub.groupby("cell_type"):
+        cap = CELL_TYPE_CAP.get(ct, DEFAULT_CAP)
+        if len(group) > cap:
+            idx = rng.choice(len(group), cap, replace=False)
+            parts.append(group.iloc[idx])
+        else:
+            parts.append(group)
+    import pandas as pd
+
+    picked = pd.concat(parts, ignore_index=True)
+
+    # Normalize microns -> [0,100] square, preserving aspect ratio.
+    x = picked["x"].to_numpy(dtype=float)
+    y = picked["y"].to_numpy(dtype=float)
+    xmin, ymin = x.min(), y.min()
+    span = max(x.max() - xmin, y.max() - ymin) or 1.0
+    nx = (x - xmin) / span * 100
+    ny = (y - ymin) / span * 100
+
+    cells = []
+    for i, row in enumerate(picked.itertuples(index=False)):
+        cells.append(
+            {
+                "id": row.id,
+                "x": round(float(nx[i]), 2),
+                "y": round(float(ny[i]), 2),
+                "cell_type": row.cell_type,
+                "niche": row.niche if row.niche is not None else None,
+                "exhaustion_state": row.exhaustion_state,
+                "expression": {g: round(float(getattr(row, g)), 2) for g in MARKER_GENES},
+            }
+        )
+
+    return {
+        "cells": cells,
+        "suggestions": [],
+        "nicheCenters": {},
+        "n_total": int(len(sub)),
+        "n_shown": int(len(picked)),
+    }
+
+
+@app.get("/api/atlas_cells")
+def atlas_cells() -> dict:
+    data = _load_atlas_data()
+    if data is None:
+        return {"ok": False, "error": "no_data", "message": "atlas_cells.json not found on server."}
+    return data
 
 
 @app.post("/api/search_literature")

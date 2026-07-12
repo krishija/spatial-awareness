@@ -1,29 +1,35 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type {
+  Cell,
   ColorMode,
   MarkerGene,
   PerturbationResult,
-  SampleData,
-  SampleMeta,
   SuggestionCitationRef,
 } from './types';
-import { MARKER_GENES } from './types';
-import { listSamples, loadSample } from './api/client';
-import { SampleSelect } from './components/SampleSelect';
+import { loadAtlasData } from './api/client';
+import type { AtlasData } from './data/atlasData';
 import { TissueMap } from './components/TissueMap';
 import { CellPanel } from './components/CellPanel';
 import { HypothesisCard } from './components/HypothesisCard';
 import { LiteratureChat } from './components/LiteratureChat';
 import './styles.css';
 
-export default function App() {
-  const [sampleId, setSampleId] = useState<string | null>(null);
-  const [sampleMeta, setSampleMeta] = useState<SampleMeta[]>([]);
-  const [data, setData] = useState<SampleData | null>(null);
-  const [loadingSample, setLoadingSample] = useState(false);
+/**
+ * The UMAP window — same structural shell as the spatial App (toolbar / map /
+ * CellPanel), reused as-is per instruction, but showing the AIFI reference
+ * atlas instead of tissue: cell subtypes / infiltration score / selected
+ * barcodes, ported from atlas_explorer.html's dropdown. Opened via the
+ * spatial window's "UMAP ↗" button (?view=umap), in a new tab.
+ */
+export default function AtlasApp() {
+  const [atlas, setAtlas] = useState<AtlasData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null);
   const [colorMode, setColorMode] = useState<ColorMode>('cell_type');
-  const [selectedGene, setSelectedGene] = useState<MarkerGene>('PDCD1');
+  // No gene-expression mode in the atlas window — TissueMap/CellPanel/Legend
+  // still take a selectedGene prop, so this is a constant, not state.
+  const selectedGene: MarkerGene = 'PDCD1';
   const [perturbation, setPerturbation] = useState<PerturbationResult | null>(
     null,
   );
@@ -35,38 +41,25 @@ export default function App() {
   );
 
   useEffect(() => {
-    listSamples().then(setSampleMeta);
+    loadAtlasData()
+      .then(setAtlas)
+      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
+      .finally(() => setLoading(false));
   }, []);
 
-  const selectSample = useCallback(async (id: string) => {
-    setSampleId(id);
-    setLoadingSample(true);
-    setSelectedCellId(null);
-    setPerturbation(null);
-    setActiveSuggestion(null);
-    setData(null);
-    try {
-      const sample = await loadSample(id);
-      setData(sample);
-    } finally {
-      setLoadingSample(false);
-    }
-  }, []);
+  const cells: Cell[] = useMemo(() => {
+    if (!atlas) return [];
+    if (colorMode === 'atlas_score') return atlas.scoreCells;
+    if (colorMode === 'atlas_selected') return atlas.selectedCells;
+    return atlas.subtypeCells;
+  }, [atlas, colorMode]);
 
-  const resetToSelect = () => {
-    setSampleId(null);
-    setData(null);
-    setSelectedCellId(null);
-    setPerturbation(null);
-    setActiveSuggestion(null);
-  };
+  const data = useMemo(() => ({ cells, suggestions: [] }), [cells]);
 
   const selectedCell = useMemo(() => {
-    if (!data || !selectedCellId) return null;
-    return data.cells.find((c) => c.id === selectedCellId) ?? null;
-  }, [data, selectedCellId]);
-
-  const currentMeta = sampleMeta.find((s) => s.id === sampleId);
+    if (!selectedCellId) return null;
+    return cells.find((c) => c.id === selectedCellId) ?? null;
+  }, [cells, selectedCellId]);
 
   const handleSelectCell = (id: string | null) => {
     setSelectedCellId(id);
@@ -86,16 +79,24 @@ export default function App() {
     setPendingGene({ gene, nonce: Date.now() });
   };
 
-  if (!sampleId) {
-    return <SampleSelect onSelect={selectSample} />;
-  }
-
-  if (loadingSample || !data) {
+  if (loading) {
     return (
       <div className="loading-screen">
-        <div>Loading spatial sample…</div>
+        <div>Loading reference atlas…</div>
         <div className="loading-screen__bar">
           <span />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !atlas) {
+    return (
+      <div className="loading-screen">
+        <div>Couldn't load the atlas ({error ?? 'no data'}).</div>
+        <div style={{ fontSize: 12, marginTop: 6 }}>
+          Is <code>spatial-api</code> running, and does{' '}
+          <code>mcp_server/data/atlas_cells.json</code> exist?
         </div>
       </div>
     );
@@ -104,9 +105,9 @@ export default function App() {
   return (
     <div className="app">
       <header className="toolbar">
-        <span className="toolbar__brand">Spatial Exhaustion Explorer</span>
-        <span className="toolbar__sample" title={currentMeta?.name}>
-          {currentMeta?.name ?? sampleId}
+        <span className="toolbar__brand">AIFI Reference Atlas</span>
+        <span className="toolbar__sample" title="CD4 T cell atlas, healthy-donor PBMC">
+          {atlas.nAtlasTotal.toLocaleString()} cells · {atlas.nSelected} selected
         </span>
         <span className="toolbar__sep" />
 
@@ -118,58 +119,29 @@ export default function App() {
               className={`seg__btn${colorMode === 'cell_type' ? ' seg__btn--active' : ''}`}
               onClick={() => setColorMode('cell_type')}
             >
-              Cell Type
+              Cell Subtypes
             </button>
             <button
               type="button"
-              className={`seg__btn${colorMode === 'treg_niches' ? ' seg__btn--active' : ''}`}
-              onClick={() => setColorMode('treg_niches')}
+              className={`seg__btn${colorMode === 'atlas_score' ? ' seg__btn--active' : ''}`}
+              onClick={() => setColorMode('atlas_score')}
             >
-              Treg Niches
+              Infiltration Score
             </button>
             <button
               type="button"
-              className={`seg__btn${colorMode === 'expression' ? ' seg__btn--active' : ''}`}
-              onClick={() => setColorMode('expression')}
+              className={`seg__btn${colorMode === 'atlas_selected' ? ' seg__btn--active' : ''}`}
+              onClick={() => setColorMode('atlas_selected')}
             >
-              Gene Expression
+              Selected Barcodes
             </button>
           </div>
-          {colorMode === 'expression' && (
-            <select
-              value={selectedGene}
-              onChange={(e) => setSelectedGene(e.target.value as MarkerGene)}
-              aria-label="Marker gene"
-            >
-              {MARKER_GENES.map((g) => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
-              ))}
-            </select>
-          )}
         </div>
 
         <span className="toolbar__spacer" />
 
-        <a
-          href="/explorer.html"
-          target="_blank"
-          rel="noreferrer"
-          className="toolbar__back"
-          title="Full 715k-cell tissue view (all cell types, Treg niches, gene expression) — opens in a new tab"
-        >
-          Full tissue view ↗
-        </a>
-
-        <a
-          href="/?view=umap"
-          target="_blank"
-          rel="noreferrer"
-          className="toolbar__back"
-          title="AIFI reference atlas — cell subtypes, infiltration score, selected barcodes — opens in a new tab"
-        >
-          UMAP ↗
+        <a href="/" className="toolbar__back" title="Back to the spatial tissue view">
+          ← Spatial view
         </a>
 
         <button
@@ -178,10 +150,6 @@ export default function App() {
           onClick={() => setShowChat((v) => !v)}
         >
           Ask literature
-        </button>
-
-        <button type="button" className="toolbar__back" onClick={resetToSelect}>
-          Change sample
         </button>
       </header>
 

@@ -22,6 +22,16 @@ Optional: set `VITE_API_BASE_URL` (defaults to `http://localhost:8001`). Put `YO
 
 Without the proxy running, the demo still works — suggestions fall back to fixture citations and the chat panel shows a connection error.
 
+### "Full tissue view" link
+
+The toolbar's **Full tissue view ↗** button opens `/explorer.html` — Kriti's standalone 715k-cell Plotly explorer (all cell types / Treg niches / gene expression). It's gitignored (27MB, too large for git) so it does **not** come with a fresh clone. To make the button work locally, copy the file into `frontend/public/`:
+
+```bash
+cp "path/to/explorer.html" frontend/public/explorer.html
+```
+
+Without it, the button just 404s — everything else in the app works fine regardless.
+
 ## Layout
 
 ```

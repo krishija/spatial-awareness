@@ -10,10 +10,10 @@ import type {
 } from '../types';
 import { MARKER_GENES } from '../types';
 import {
-  CELL_TYPE_COLORS,
-  CELL_TYPE_LABELS,
   EXHAUSTION_LABELS,
   NICHE_LABELS,
+  cellTypeColor,
+  cellTypeLabel,
   formatCoord,
 } from '../data/palettes';
 import { nicheMeanExpression } from '../data/generate';
@@ -32,7 +32,6 @@ interface NormalizedSuggestion {
 type SuggestionsSource = 'you.com' | 'fallback' | 'local' | null;
 
 interface Props {
-  sampleId: string;
   data: SampleData;
   selectedCell: Cell | null;
   colorMode: ColorMode;
@@ -46,7 +45,6 @@ interface Props {
 }
 
 export function CellPanel({
-  sampleId,
   data,
   selectedCell,
   colorMode,
@@ -67,7 +65,7 @@ export function CellPanel({
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
 
   const nicheMean = useMemo(() => {
-    if (!selectedCell) return null;
+    if (!selectedCell || !selectedCell.niche) return null;
     return nicheMeanExpression(data.cells, selectedCell.niche);
   }, [data.cells, selectedCell]);
 
@@ -83,7 +81,9 @@ export function CellPanel({
   }, [data.suggestions, selectedCell]);
 
   useEffect(() => {
-    if (!selectedCell) {
+    if (!selectedCell || !selectedCell.niche) {
+      // No niche = no AI-suggestion context (real data only assigns niche to
+      // Regulatory T Cells, matching explorer.html's Treg-niches scope).
       setLiveSuggestions(null);
       setSuggestionsSource(null);
       return;
@@ -163,9 +163,10 @@ export function CellPanel({
     onPerturbation(null);
     try {
       const result = await runPerturbation(
-        sampleId,
         selectedCell.id,
         geneInput.trim(),
+        selectedCell.expression,
+        selectedCell.cell_type,
       );
       const matched =
         normalizedSuggestions.find((s) => s.key === selectedSuggestionKey) ??
@@ -182,7 +183,7 @@ export function CellPanel({
     }
   };
 
-  if (!selectedCell || !nicheMean) {
+  if (!selectedCell) {
     return (
       <aside className="cell-panel">
         <div className="cell-panel__empty">
@@ -242,11 +243,11 @@ export function CellPanel({
             <span className="badge">
               <span
                 className="badge__dot"
-                style={{ background: CELL_TYPE_COLORS[cell.cell_type] }}
+                style={{ background: cellTypeColor(cell.cell_type) }}
               />
-              {CELL_TYPE_LABELS[cell.cell_type]}
+              {cellTypeLabel(cell.cell_type)}
             </span>
-            <span className="badge">{NICHE_LABELS[cell.niche]}</span>
+            {cell.niche && <span className="badge">{NICHE_LABELS[cell.niche]}</span>}
           </div>
           <div className="cell-meta">
             <span>

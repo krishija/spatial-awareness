@@ -20,24 +20,21 @@ MAX_SUGGESTIONS = 5
 SEARCH_COUNT = 8
 
 # Genes this stub will look for in literature results, keyed by the canonical
-# symbol simulate_perturbations expects (so a suggested gene can actually be
-# run through a perturbation). Biomedical literature/abstracts overwhelmingly
-# use the common hyphenated name (PD-1, LAG-3, TIM-3, CD39, ...) rather than
-# the bare HGNC symbol, so each gene matches on its common aliases too —
-# matching only the bare symbol was silently missing most real mentions.
+# symbol. Matches the 8-gene panel used across the map / marker chart /
+# perturbation UI (ported from explorer.html's gene-paint dropdown), so a
+# suggested gene always has a chart row and a runnable perturbation. Biomedical
+# literature/abstracts overwhelmingly use the common alias (PD-1, CD25, MIG,
+# ...) rather than the bare HGNC symbol, so each gene matches on its common
+# aliases too — matching only the bare symbol was silently missing most real
+# mentions.
 GENE_ALIASES: dict[str, list[str]] = {
     "PDCD1": ["PDCD1", "PD-1", "PD1"],
-    "TCF7": ["TCF7", "TCF-1", "TCF1"],
-    "TOX": ["TOX"],
-    "LAG3": ["LAG3", "LAG-3"],
-    "GZMB": ["GZMB", "Granzyme B", "Granzyme-B"],
-    "IL7R": ["IL7R", "IL-7R", "IL7Ra", "CD127"],
     "CTLA4": ["CTLA4", "CTLA-4"],
     "FOXP3": ["FOXP3"],
-    "HAVCR2": ["HAVCR2", "TIM-3", "TIM3"],
-    "ENTPD1": ["ENTPD1", "CD39"],
-    "CXCL13": ["CXCL13"],
-    "TIGIT": ["TIGIT"],
+    "CXCL9": ["CXCL9", "MIG"],
+    "STAT1": ["STAT1"],
+    "CXCR4": ["CXCR4", "CD184"],
+    "IL2RA": ["IL2RA", "CD25", "IL-2RA"],
     "TNFRSF9": ["TNFRSF9", "4-1BB", "41BB", "CD137"],
 }
 CANDIDATE_GENE_VOCAB = list(GENE_ALIASES.keys())
@@ -77,7 +74,7 @@ FALLBACK_SUGGESTIONS_BY_CONTEXT: dict[str, list[dict[str, Any]]] = {
             "gene": "PDCD1",
             "rationale": (
                 "Terminal Tex cells in the core show high PD-1; knockout may restore "
-                "TCF7/IL7R stemness programs."
+                "effector programs."
             ),
             "citation": {
                 "title": "PD-1 blockade restores effector function in exhausted CD4 T cells",
@@ -86,25 +83,25 @@ FALLBACK_SUGGESTIONS_BY_CONTEXT: dict[str, list[dict[str, Any]]] = {
             },
         },
         {
-            "gene": "TOX",
+            "gene": "STAT1",
             "rationale": (
-                "TOX locks the terminal exhaustion epigenetic state; reducing TOX may "
-                "reopen progenitor trajectories."
+                "STAT1-driven interferon signaling reinforces the terminal exhaustion "
+                "program in the core; knockout may relieve chronic IFN pressure."
             ),
             "citation": {
-                "title": "TOX reinforces the identity and suppresses reprogramming of exhausted T cells",
+                "title": "STAT1 sustains a terminal exhaustion transcriptional state",
                 "source": "Nature (simulated)",
                 "url": "https://pubmed.ncbi.nlm.nih.gov/",
             },
         },
         {
-            "gene": "LAG3",
+            "gene": "CXCL9",
             "rationale": (
-                "Co-inhibitory LAG3 is elevated with PDCD1 in core Tex; dual checkpoint "
-                "logic suggests LAG3 KO synergy."
+                "CXCL9 marks the IFN-γ-driven core niche; co-elevated with PDCD1 in "
+                "terminal Tex, dual-target logic suggests CXCL9 KO synergy."
             ),
             "citation": {
-                "title": "LAG-3 regulates CD4 T cell exhaustion in the tumor microenvironment",
+                "title": "CXCL9 shapes the exhausted T cell niche in the tumor core",
                 "source": "Cancer Cell (simulated)",
                 "url": "https://pubmed.ncbi.nlm.nih.gov/",
             },
@@ -126,8 +123,8 @@ FALLBACK_SUGGESTIONS_BY_CONTEXT: dict[str, list[dict[str, Any]]] = {
         {
             "gene": "PDCD1",
             "rationale": (
-                "Progenitor-exhausted cells at the margin retain TCF7; PDCD1 KO may tip "
-                "them toward effector differentiation."
+                "Progenitor-exhausted cells at the margin retain some plasticity; "
+                "PDCD1 KO may tip them toward effector differentiation."
             ),
             "citation": {
                 "title": "PD-1 blockade restores effector function in exhausted CD4 T cells",
@@ -136,13 +133,13 @@ FALLBACK_SUGGESTIONS_BY_CONTEXT: dict[str, list[dict[str, Any]]] = {
             },
         },
         {
-            "gene": "TOX",
+            "gene": "CXCR4",
             "rationale": (
-                "Partial TOX elevation at the margin; moderating TOX may preserve "
-                "progenitor plasticity."
+                "CXCR4 retention signaling may trap Tregs at the invasive front; "
+                "knockout could disrupt margin homing and preserve progenitor state."
             ),
             "citation": {
-                "title": "TOX reinforces the identity and suppresses reprogramming of exhausted T cells",
+                "title": "CXCR4 retains regulatory T cells at the tumor invasive margin",
                 "source": "Nature (simulated)",
                 "url": "https://pubmed.ncbi.nlm.nih.gov/",
             },
@@ -150,26 +147,26 @@ FALLBACK_SUGGESTIONS_BY_CONTEXT: dict[str, list[dict[str, Any]]] = {
     ],
     "lymphoid_proximal": [
         {
-            "gene": "PDCD1",
+            "gene": "FOXP3",
             "rationale": (
-                "Even near lymphoid structures, residual PD-1 may restrain GZMB+ effectors; "
-                "KO may amplify cytotoxicity."
+                "Lymphoid-proximal Tregs are FOXP3-high; knockout tests whether "
+                "identity loss relieves local suppression of nearby effectors."
             ),
             "citation": {
-                "title": "PD-1 blockade restores effector function in exhausted CD4 T cells",
-                "source": "Nature Immunology (simulated)",
+                "title": "FOXP3 stability determines regulatory T cell suppressive capacity",
+                "source": "Immunity (simulated)",
                 "url": "https://pubmed.ncbi.nlm.nih.gov/",
             },
         },
         {
-            "gene": "LAG3",
+            "gene": "IL2RA",
             "rationale": (
-                "LAG3 co-expression on lymphoid-proximal Tex progenitors may limit "
-                "full effector conversion."
+                "IL2RA (CD25) sustains Treg fitness in the lymphoid aggregate; "
+                "knockout may reduce IL-2 competition with effector T cells."
             ),
             "citation": {
-                "title": "LAG-3 regulates CD4 T cell exhaustion in the tumor microenvironment",
-                "source": "Cancer Cell (simulated)",
+                "title": "CD25 controls regulatory T cell competitive fitness for IL-2",
+                "source": "Nature Immunology (simulated)",
                 "url": "https://pubmed.ncbi.nlm.nih.gov/",
             },
         },
@@ -181,9 +178,9 @@ def _bias_tier(gene: str, phenotype: str) -> int:
     """Secondary sort key: nudge checkpoint genes matching the phenotype ahead
     of equally-cited genes. Literature mention count remains the primary signal.
     """
-    if "Tex_term" in phenotype and gene in ("PDCD1", "TOX"):
+    if "Tex_term" in phenotype and gene in ("PDCD1", "STAT1"):
         return 0
-    if "Treg" in phenotype and gene == "CTLA4":
+    if "Treg" in phenotype and gene in ("CTLA4", "FOXP3"):
         return 0
     return 1
 
@@ -203,9 +200,9 @@ def _extract_gene_mentions(
 def _fallback(cell_id: str, phenotype: str, niche: str, literature_context: str | None) -> dict[str, Any]:
     base = list(FALLBACK_SUGGESTIONS_BY_CONTEXT.get(niche, FALLBACK_SUGGESTIONS_BY_CONTEXT["tumor_core"]))
     if "Tex_term" in phenotype:
-        base = sorted(base, key=lambda s: 0 if s["gene"] in ("PDCD1", "TOX") else 1)
+        base = sorted(base, key=lambda s: 0 if s["gene"] in ("PDCD1", "STAT1") else 1)
     if "Treg" in phenotype:
-        base = sorted(base, key=lambda s: 0 if s["gene"] == "CTLA4" else 1)
+        base = sorted(base, key=lambda s: 0 if s["gene"] in ("CTLA4", "FOXP3") else 1)
 
     suggestions = []
     for i, s in enumerate(base):

@@ -301,6 +301,10 @@ button {
   padding: 3px 8px;
   font-size: 12px;
   color: var(--text-muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
 }
 
 .toolbar__back:hover {
@@ -357,8 +361,14 @@ button {
   border: 1px solid var(--border);
   padding: 8px 10px;
   font-size: 11px;
-  max-width: 180px;
+  max-width: 200px;
   pointer-events: none;
+}
+
+.legend--scroll {
+  max-height: min(70vh, 480px);
+  overflow-y: auto;
+  pointer-events: auto;
 }
 
 .legend__title {
