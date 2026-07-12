@@ -41,6 +41,9 @@ export interface Cell {
   expression: Record<MarkerGene, number>;
   /** Atlas-only: infiltration score (atlas_score mode), unused for spatial cells. */
   score?: number;
+  /** Atlas-only: top-5% selected barcode (atlas_selected mode). cell_type
+   * always stays the real subtype — this drives coloring, not identity. */
+  selected?: boolean;
 }
 
 export interface Citation {

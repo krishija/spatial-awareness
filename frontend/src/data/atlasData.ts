@@ -1,6 +1,5 @@
 import type { Cell, MarkerGene } from '../types';
 import { MARKER_GENES } from '../types';
-import { ATLAS_BG_TYPE, ATLAS_SELECTED_TYPE } from './palettes';
 
 interface RawAtlasPoint {
   x: number;
@@ -48,63 +47,55 @@ function normalizer(points: RawAtlasPoint[]): (p: RawAtlasPoint) => { x: number;
   });
 }
 
+const coordKey = (p: RawAtlasPoint) => `${p.x}|${p.y}`;
+
 export function adaptAtlasData(raw: AtlasCellsResponse): AtlasData {
   // Shared coordinate frame (derived from the full atlas) so every mode's
   // point cloud lands in the same place on screen when toggled between.
   const norm = normalizer(raw.subtypes);
 
-  const subtypeCells: Cell[] = raw.subtypes.map((p, i) => {
+  // Stable id keyed by (x,y): the same underlying atlas cell has identical
+  // UMAP coordinates in every trace, even though there's no shared barcode
+  // field across them (verified: 100% coordinate match for score_cells and
+  // selected_cells against subtypes). This is what keeps a clicked cell's
+  // selection circle on the same cell across all three modes, matching the
+  // spatial window's behavior.
+  const idByCoord = new Map<string, string>();
+  raw.subtypes.forEach((p, i) => idByCoord.set(coordKey(p), `atlas-${i}`));
+
+  const toCell = (p: RawAtlasPoint, id: string, extra: Partial<Cell> = {}): Cell => {
     const { x, y } = norm(p);
     return {
-      id: `atlas-sub-${i}`,
+      id,
       x,
       y,
       cell_type: p.subtype,
       niche: null,
       exhaustion_state: 'other',
       expression: ZERO_EXPRESSION,
+      ...extra,
     };
-  });
+  };
 
-  const scoreCells: Cell[] = raw.score_cells.map((p, i) => {
-    const { x, y } = norm(p);
-    return {
-      id: `atlas-score-${i}`,
-      x,
-      y,
-      cell_type: p.subtype,
-      niche: null,
-      exhaustion_state: 'other',
-      expression: ZERO_EXPRESSION,
-      score: p.score,
-    };
-  });
+  const subtypeCells: Cell[] = raw.subtypes.map((p, i) => toCell(p, `atlas-${i}`));
 
-  const background: Cell[] = raw.subtypes.map((p, i) => {
-    const { x, y } = norm(p);
-    return {
-      id: `atlas-bg-${i}`,
-      x,
-      y,
-      cell_type: ATLAS_BG_TYPE,
-      niche: null,
-      exhaustion_state: 'other',
-      expression: ZERO_EXPRESSION,
-    };
-  });
-  const selectedOverlay: Cell[] = raw.selected_cells.map((p, i) => {
-    const { x, y } = norm(p);
-    return {
-      id: `atlas-selected-${i}`,
-      x,
-      y,
-      cell_type: ATLAS_SELECTED_TYPE,
-      niche: null,
-      exhaustion_state: 'other',
-      expression: ZERO_EXPRESSION,
+  const scoreCells: Cell[] = raw.score_cells.map((p, i) =>
+    toCell(p, idByCoord.get(coordKey(p)) ?? `atlas-score-${i}`, { score: p.score }),
+  );
+
+  // Selected overlay first (so we know which ids to exclude from the
+  // background layer) — every atlas cell appears exactly once in
+  // selectedCells, either as background or as the red overlay, never both.
+  const selectedOverlay: Cell[] = raw.selected_cells.map((p, i) =>
+    toCell(p, idByCoord.get(coordKey(p)) ?? `atlas-selected-${i}`, {
       score: p.score,
-    };
-  });
+      selected: true,
+    }),
+  );
+  const selectedIds = new Set(selectedOverlay.map((c) => c.id));
+  const background: Cell[] = subtypeCells
+    .filter((c) => !selectedIds.has(c.id))
+    .map((c) => ({ ...c, selected: false }));
 
   return {
     subtypeCells,

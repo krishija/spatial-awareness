@@ -127,9 +127,6 @@ export function atlasScoreColor(score: number, max = 1): string {
   return lerpColor(MAGMA_STOPS[i], MAGMA_STOPS[i + 1], seg - i);
 }
 
-export const ATLAS_BG_TYPE = '__atlas_bg__';
-export const ATLAS_SELECTED_TYPE = '__atlas_selected__';
-
 /** Shared per-cell color rule for all map modes — used by both the main
  * TissueMap and the MiniMap so they always read as the same data. */
 export function cellColor(cell: Cell, colorMode: ColorMode, selectedGene: MarkerGene): string {
@@ -140,7 +137,7 @@ export function cellColor(cell: Cell, colorMode: ColorMode, selectedGene: Marker
   }
   if (colorMode === 'atlas_score') return atlasScoreColor(cell.score ?? 0);
   if (colorMode === 'atlas_selected') {
-    return cell.cell_type === ATLAS_SELECTED_TYPE ? '#c0392b' : '#dcdcdc';
+    return cell.selected ? '#c0392b' : '#dcdcdc';
   }
   return cellTypeColor(cell.cell_type);
 }

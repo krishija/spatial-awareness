@@ -69,7 +69,7 @@ export function Legend({ colorMode, selectedGene, cells }: Props) {
   }
 
   if (colorMode === 'atlas_selected') {
-    const nSelected = cells.filter((c) => c.cell_type === '__atlas_selected__').length;
+    const nSelected = cells.filter((c) => c.selected).length;
     return (
       <div className="legend">
         <div className="legend__title">Selected barcodes</div>
