@@ -1,60 +1,67 @@
 # Frontend — Spatial Exhaustion Explorer
 
-Vite + React UI for exploring spatial single-cell data, marker expression, AI knockout suggestions, and virtual-cell perturbation deltas.
+Vite + React UI with two windows:
 
-Tissue maps and perturbation deltas use **fixture data**. Literature search and ranked knockout suggestions call the live You.com-backed `search_literature` / `suggest_perturbations` tools through the MCP server’s REST proxy.
+1. **Spatial map** (default) — tissue sample, niches, markers, knockout suggestions, literature chat
+2. **UMAP / atlas** (`?view=umap`) — single-cell atlas exploration; open from the toolbar “UMAP ↗” link
+
+Tissue maps and local perturbation deltas still use **fixture samples** in the
+browser. Literature search and ranked knockout suggestions call the live
+You.com-backed tools through `spatial-api`. The research agent’s Atera /
+scLDM path is separate — they do not have to be wired together for a demo.
 
 ## Run
 
 ```bash
-# terminal 1 — REST proxy (keeps YOU_API_KEY server-side)
+# terminal 1 — REST proxy (YOU_API_KEY stays server-side)
 cd ../mcp_server
 source .venv/bin/activate   # or: python3 -m venv .venv && pip install -e .
 spatial-api                 # http://localhost:8001
 
-# terminal 2 — UI
+# terminal 2
 cd ../frontend
 npm install
 npm run dev                 # http://localhost:5173
 ```
 
-Optional: set `VITE_API_BASE_URL` (defaults to `http://localhost:8001`). Put `YOU_API_KEY` in the repo-root `.env`.
+Optional: `VITE_API_BASE_URL` (default `http://localhost:8001`). Put `YOU_API_KEY`
+in the repo-root `.env`.
 
-Without the proxy running, the demo still works — suggestions fall back to fixture citations and the chat panel shows a connection error.
+Without the proxy, fixture suggestions still work; the literature panel shows a
+connection error.
 
-### "Full tissue view" link
+### Full tissue view
 
-The toolbar's **Full tissue view ↗** button opens `/explorer.html` — Kriti's standalone 715k-cell Plotly explorer (all cell types / Treg niches / gene expression). It's gitignored (27MB, too large for git) so it does **not** come with a fresh clone. To make the button work locally, copy the file into `frontend/public/`:
-
-```bash
-cp "path/to/explorer.html" frontend/public/explorer.html
-```
-
-Without it, the button just 404s — everything else in the app works fine regardless.
+The toolbar **Full tissue view ↗** opens `/explorer.html` — a large standalone
+Plotly explorer. That file is gitignored (too big for git). Copy it into
+`frontend/public/` locally if you have it; otherwise the link 404s and the rest
+of the app is fine.
 
 ## Layout
 
 ```
 src/
-  types.ts           # Cell, suggestion, literature, chat contracts
-  api/client.ts      # Fixture sample/perturbation + live literature HTTP calls
+  main.tsx           # mounts App or AtlasApp from ?view=umap
+  App.tsx            # spatial window
+  AtlasApp.tsx       # UMAP / atlas window
+  types.ts
+  api/client.ts      # fixture sample/perturbation + live literature HTTP
   data/
-    generate.ts      # Seeded dummy tissue (~2k cells / sample)
-    palettes.ts      # Colorblind-safe cell-type + expression colors
+    generate.ts      # seeded dummy tissue
+    atlasData.ts     # atlas-side fixtures
+    palettes.ts
   components/
-    SampleSelect.tsx
-    TissueMap.tsx
-    CellPanel.tsx          # Live suggest_perturbations on cell select
-    LiteratureChat.tsx     # Free-text Ask literature → /api/chat → search_literature
-    MarkerChart.tsx / DeltaChart.tsx / MiniMap.tsx / HypothesisCard.tsx / Legend.tsx
-  App.tsx
+    TissueMap.tsx / CellPanel.tsx / LiteratureChat.tsx
+    MarkerChart.tsx / MiniMap.tsx / HypothesisCard.tsx / Legend.tsx
+    …
   styles.css
 ```
 
 ## Demo flow
 
-1. Pick a preloaded sample  
-2. Toggle cell-type / expression / niches on the map  
-3. Click a cell → markers + You.com-ranked knockout suggestions  
-4. Run a perturbation → hypothesis summary card  
-5. **Ask literature** → free-text questions grounded in `search_literature` citations (and ranked KO genes when a cell is selected)  
+1. Pick a preloaded sample
+2. Toggle cell-type / expression / niches on the map
+3. Click a cell → markers + ranked knockout suggestions
+4. Optionally run a fixture perturbation → hypothesis card
+5. **Ask literature** → `/api/chat` → `search_literature` (and suggestions when a cell is selected)
+6. Open **UMAP ↗** for the atlas window
