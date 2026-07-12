@@ -45,3 +45,4 @@ mcp_server/data/*.db-*
 work/
 artifacts/
 demo_data/
+mcp_server/data/*.csv
