@@ -32,8 +32,32 @@ setup_logging()
 HOST = os.environ.get("SPATIAL_MCP_HOST", "0.0.0.0")
 PORT = int(os.environ.get("SPATIAL_MCP_PORT", "8000"))
 
+# Protocol-level server instructions (InitializeResult.instructions) — not a tool description.
+SERVER_INSTRUCTIONS = """\
+Spatial-awareness MCP: a research epistemics engine pointed at CD4 T-cell exhaustion.
+Confidence is P(H|evidence) in log-odds (bits), not a weighted score. Evidence combines
+by independence, not by count. Simulation is optional weak corroboration (~0.16 bits)
+and can never be load-bearing for REPORT.
+
+Fail loud: missing data/keys/models → ok:false. Empty literature → under_studied.
+Never call TCGA output "validation" (cohort association only).
+
+Typical flow:
+1. Resolve cells with list_candidate_cells (needs data/cells.parquet).
+2. query_prior_findings before suggest_perturbations; record_finding after results.
+3. Gather grounded evidence: search_literature (prefer equal-budget contradiction
+   search), find_measured_perturbation_evidence, differential_survival_analysis.
+   simulate_perturbations is optional corroboration only.
+4. evaluate_evidence (Bayesian budget + optional gate) / decide_next_action.
+5. If gating stalls, recommend_next_experiment (prefers reanalyze_existing_data).
+
+REPORT requires: posterior ≥ threshold, ≥2 independent sources, ≥1 grounded source
+(measured/cohort/literature — not simulation), priors checked, no unresolved conflict.
+map_spatial_to_single is not implemented. Tools write additive graph edges as side effects.\
+"""
+
 REGISTRY = build_default_registry()
-app = Server("spatial-awareness")
+app = Server("spatial-awareness", instructions=SERVER_INSTRUCTIONS)
 
 
 @app.list_tools()
